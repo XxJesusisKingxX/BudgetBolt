@@ -8,7 +8,8 @@ import (
 
 // Connect to a PostgreSQL database
 func connectPQDB(user string, pass string, db string) (*sql.DB, error) {
-	connStr := fmt.Sprintf("user=%v password=%v dbname=%v sslmode=disable", user, pass, db)
+	loginStr := "user=%v password=%v dbname=%v sslmode=disable"
+	connStr := fmt.Sprintf(loginStr, user, pass, db)
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -40,13 +41,12 @@ func LogonDB(debug bool) (*sql.DB, error) {
 	var err error
 	if dbErr != nil {
 		logError(dbErr, debug)
-		return nil, dbErr
-	} else if userErr != nil {
+	}
+	if userErr != nil {
 		logError(userErr, debug)
-		return nil, userErr
-	} else if passErr != nil {
+	}
+	if passErr != nil {
 		logError(passErr, debug)
-		return nil, passErr
 	}
 	return nil, err
 }
