@@ -2,10 +2,11 @@ package driverpq
 
 import (
 	"budgetbolt/tests"
-	"strings"
-	"testing"
+	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
+	"testing"
 )
 
 func TestIsValidateUserInput(t *testing.T) {
@@ -38,18 +39,18 @@ func TestIsLogError(t *testing.T) {
 }
 
 func TestIsGetStdIn(t *testing.T) {
+	err := errors.New("Input error")
 	readerValid := strings.NewReader("myusername\n")
 	readerInvalid := strings.NewReader("myusername")
-	err := errors.New("Has an error")
-	mockTerminal := tests.MockTerminal{Password: "secret123", Err: nil}
+	mockTerminal := tests.MockTerminal{Password: "secret123"}
 	mockTerminalErr := tests.MockTerminal{Password: "", Err: err}
 	realTerminal := tests.RealTerminal{}
 
 	resValid, _ := getStdin(readerValid, "enter username: ", false, realTerminal)
 	resInvalid, _  := getStdin(readerInvalid, "enter username: ", false, realTerminal)
 	resEncryptValid, _ := getStdin(readerValid, "enter password: ", true, mockTerminal)
-	resEncryptInvalid, _ := getStdin(readerInvalid, "enter password: ", true, mockTerminalErr)
-	
+	_, resEncryptInvalid := getStdin(readerInvalid, "enter password: ", true, mockTerminalErr)
+
 	// Check if getting user input
 	tests.Equals(t, "myusername", resValid, fmt.Sprintf("Expected %v but got %v", "myusername\n", resValid))
 	// Check if user input gives error
@@ -57,5 +58,25 @@ func TestIsGetStdIn(t *testing.T) {
 	// Check if user input is encrypt
 	tests.Equals(t, "secret123", resEncryptValid, fmt.Sprintf("Expected %v but got %v", "secret123", resEncryptValid))
 	// Check if user input is encrypt but gives error
-	tests.Equals(t, "", resEncryptInvalid, fmt.Sprintf("Expected %v but got %v", "", resEncryptInvalid))
+	tests.Equals(t, err, resEncryptInvalid, fmt.Sprintf("Expected %v but got %v", err, resEncryptInvalid))
+}
+
+func TestIsConnectPQDB(t *testing.T) {
+	db := &sql.DB{}
+	err := errors.New("Connection failed")
+	errPing := errors.New("Ping failed")
+	mockSql := tests.MockSql{DB: db}
+	mockSqlPingErr := tests.MockSql{DB: db, ErrPing: errPing}
+	mockSqlErr := tests.MockSql{DB: db, Err: err}
+
+	_, connValid := connectPQDB("user", "secret", "test", mockSql)
+	_, connInvalid := connectPQDB("user", "secret", "test", mockSqlErr)
+	_, connPingInvalid := connectPQDB("user", "secret", "test", mockSqlPingErr)
+
+	// Check if getting connection succeds
+	tests.Equals(t, nil, connValid, fmt.Sprintf("Expected %v but got %v", nil, connValid))
+	// Check if getting connection fails
+	tests.Equals(t, err, connInvalid, fmt.Sprintf("Expected %v but got %v", err, connInvalid))
+	// Check if getting connection succeds but ping fails
+	tests.Equals(t, errPing, connPingInvalid, fmt.Sprintf("Expected %v but got %v", errPing, connPingInvalid))
 }

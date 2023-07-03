@@ -10,14 +10,14 @@ import (
 )
 
 // Connect to a PostgreSQL database
-func connectPQDB(user string, pass string, db string) (*sql.DB, error) {
+func connectPQDB(user string, pass string, db string, sql tests.Sql) (*sql.DB, error) {
 	loginStr := "user=%v password=%v dbname=%v sslmode=disable"
 	connStr := fmt.Sprintf(loginStr, user, pass, db)
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
-	err = conn.Ping()
+	err = sql.Ping(conn)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func LogonDB(debug bool) (*sql.DB, error) {
 	if dbErr == nil && userErr == nil && passErr == nil {
 		valid := validateUserInput(user, pass, db)
 		if valid {
-			conn, err := connectPQDB(user, pass, db)
+			conn, err := connectPQDB(user, pass, db, tests.RealSql{})
 			if err != nil {
 				if debug {
 					fmt.Println(err.Error())
