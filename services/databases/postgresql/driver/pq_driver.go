@@ -1,9 +1,12 @@
 package driverpq
 
 import (
-	_ "github.com/lib/pq"
+	"budgetbolt/tests"
 	"database/sql"
 	"fmt"
+	"os"
+
+	_ "github.com/lib/pq"
 )
 
 // Connect to a PostgreSQL database
@@ -22,9 +25,9 @@ func connectPQDB(user string, pass string, db string) (*sql.DB, error) {
 }
 
 func LogonDB(debug bool) (*sql.DB, error) {
-	db, dbErr := getStdin("Enter database name: ", false)
-	user, userErr := getStdin("Enter username: ", false)
-	pass, passErr := getStdin("Enter password: ", true)
+	db, dbErr := getStdin(os.Stdin, "Enter database name: ", false, tests.RealTerminal{})
+	user, userErr := getStdin(os.Stdin, "Enter username: ", false, tests.RealTerminal{})
+	pass, passErr := getStdin(os.Stdin, "Enter password: ", true, tests.RealTerminal{})
 	if dbErr == nil && userErr == nil && passErr == nil {
 		valid := validateUserInput(user, pass, db)
 		if valid {
@@ -40,13 +43,13 @@ func LogonDB(debug bool) (*sql.DB, error) {
 	}
 	var err error
 	if dbErr != nil {
-		logError(dbErr, debug)
+		LogError(dbErr, debug)
 	}
 	if userErr != nil {
-		logError(userErr, debug)
+		LogError(userErr, debug)
 	}
 	if passErr != nil {
-		logError(passErr, debug)
+		LogError(passErr, debug)
 	}
 	return nil, err
 }

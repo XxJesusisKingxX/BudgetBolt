@@ -1,34 +1,38 @@
 package driverpq
 
 import (
-	"golang.org/x/term"
-	"syscall"
-	"strings"
-	"regexp"
+	"budgetbolt/tests"
 	"bufio"
 	"fmt"
-	"os"
+	"io"
+	"regexp"
+	"strings"
 )
 
-func logError(err error, debug bool) {
+func LogError(err error, debug bool) {
 	if debug {
 		fmt.Println(err.Error())
 	}
 }
 
-func getStdin(msg string, encrypt bool) (string, error) {
-	fmt.Print(msg)
+func getStdin(r io.Reader, msg string, encrypt bool, terminal tests.Terminal) (string, error) {
+	fmt.Println(msg)
 	if encrypt {
-		encryptInput, _ := term.ReadPassword(int(syscall.Stdin))
-		fmt.Println("")
+		encryptInput, err := terminal.ReadPassword()
 		fmt.Println("") // force a new line after password enter
-		return string(encryptInput), nil
+		if err == nil {
+			return string(encryptInput), nil
+		}
+		return "", err
 	}
-	reader := bufio.NewReader(os.Stdin)
-	input, err := reader.ReadString('\n')
-	input = strings.TrimRight(input, "\n")
-	input = strings.TrimSpace(input)
-	return input, err
+	readers := bufio.NewReader(r)
+	input, err := readers.ReadString('\n')
+	if err == nil {
+		input = strings.TrimRight(input, "\n")
+		input = strings.TrimSpace(input)
+		return input, nil
+	}
+	return "", err
 }
 
 func validateUserInput(user string, pass string, db string) bool {
