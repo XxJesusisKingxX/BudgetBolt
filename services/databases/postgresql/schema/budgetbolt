@@ -1,0 +1,123 @@
+CREATE TABLE public.budget (
+    budget_id integer NOT NULL,
+    budget_name character(25) NOT NULL,
+    short_description character(50),
+    budget_frequency character(20) NOT NULL
+);
+
+ALTER TABLE public.budget OWNER TO postgres;
+
+ALTER TABLE public.budget ALTER COLUMN budget_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.budget_budget_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE public.expense (
+    expense_id integer NOT NULL,
+    due_date date,
+    expense_name character(25) NOT NULL,
+    expense_limit double precision,
+    budget_id integer NOT NULL,
+    transaction_id integer,
+    expense_category character(100)
+);
+
+ALTER TABLE public.expense OWNER TO postgres;
+
+ALTER TABLE public.expense ALTER COLUMN expense_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.expense_expense_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE public.income (
+    income_id integer NOT NULL,
+    income_name character(25) NOT NULL,
+    income_amount_expected double precision NOT NULL,
+    budget_id integer NOT NULL,
+    transaction_id integer,
+    income_category character(100)
+);
+
+ALTER TABLE public.income OWNER TO postgres;
+
+ALTER TABLE public.income ALTER COLUMN income_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.income_income_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE public.transaction (
+    transaction_id integer NOT NULL,
+    transaction_date date NOT NULL,
+    net_amount double precision NOT NULL,
+    payment_method character(20) NOT NULL,
+    payment_account_from_to character(50) NOT NULL,
+    vendor character(50),
+    is_recurring boolean DEFAULT false NOT NULL,
+    short_description character(50)
+);
+
+ALTER TABLE public.transaction OWNER TO postgres;
+
+ALTER TABLE public.transaction ALTER COLUMN transaction_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.transaction_transaction_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+SELECT pg_catalog.setval('public.budget_budget_id_seq', 1, false);
+
+SELECT pg_catalog.setval('public.expense_expense_id_seq', 1, false);
+
+SELECT pg_catalog.setval('public.income_income_id_seq', 1, false);
+
+SELECT pg_catalog.setval('public.transaction_transaction_id_seq', 1, false);
+
+
+ALTER TABLE ONLY public.budget
+    ADD CONSTRAINT budget_pkey PRIMARY KEY (budget_id);
+
+ALTER TABLE ONLY public.expense
+    ADD CONSTRAINT expense_pkey PRIMARY KEY (expense_id);
+
+ALTER TABLE ONLY public.income
+    ADD CONSTRAINT income_pkey PRIMARY KEY (income_id);
+
+ALTER TABLE ONLY public.transaction
+    ADD CONSTRAINT transaction_pkey PRIMARY KEY (transaction_id);
+
+
+CREATE INDEX fki_fk_expense_budget_id ON public.expense USING btree (budget_id);
+
+CREATE INDEX fki_fk_expense_transaction_id ON public.expense USING btree (transaction_id);
+
+CREATE INDEX fki_fk_income_budget_id ON public.income USING btree (budget_id);
+
+CREATE INDEX fki_fk_income_transaction_id ON public.income USING btree (transaction_id);
+
+
+ALTER TABLE ONLY public.expense
+    ADD CONSTRAINT fk_expense_budget_id FOREIGN KEY (budget_id) REFERENCES public.budget(budget_id);
+
+ALTER TABLE ONLY public.expense
+    ADD CONSTRAINT fk_expense_transaction_id FOREIGN KEY (transaction_id) REFERENCES public.transaction(transaction_id);
+
+ALTER TABLE ONLY public.income
+    ADD CONSTRAINT fk_income_budget_id FOREIGN KEY (budget_id) REFERENCES public.budget(budget_id);
+
+ALTER TABLE ONLY public.income
+    ADD CONSTRAINT fk_income_transaction_id FOREIGN KEY (transaction_id) REFERENCES public.transaction(transaction_id);
