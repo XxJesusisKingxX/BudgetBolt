@@ -26,3 +26,4 @@ func GetStdout(f interface{}, args ...interface{}) string {
 	return string(out)
 }
 
+
