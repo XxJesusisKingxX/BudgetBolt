@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -94,23 +95,50 @@ func createWhereCondition(t interface{}) string {
 	return conditions
 }
 
-func buildTransactionInsertQuery(model table.Transaction) string {
-	query := "INSERT INTO transaction (%v) VALUES (%v)"
+func buildAddQuery(tableName string, model table.Transaction) (string, error) {
+	var err error
+	query := "INSERT INTO %v (%v) VALUES (%v)"
 	columns, values := formatColumnsAndValues(model)
-	preparedQuery := fmt.Sprintf(query, columns, values)
-	return preparedQuery
+	if columns == "" {
+		err = errors.New("Empty model")
+		return "", err
+	}
+	query = fmt.Sprintf(query, tableName, columns, values)
+	return query, err
 }
 
-func buildTransactionUpdateQuery(model table.Transaction) string {
+func buildUpdateQuery(tableName string, model table.Transaction) (string, error) {
+	var err error
 	query := "UPDATE transaction SET %v WHERE transaction_id=%v" // TODO have the ability to update multiple transactions
 	set := setColumnsAndValues(model)
-	preparedQuery := fmt.Sprintf(query, set, model.ID)
-	return preparedQuery
+	if set == "" {
+		err = errors.New("Empty model")
+		return "", err
+	}
+	query = fmt.Sprintf(query, set, model.ID)
+	return query, err
 }
 
-func buildTransactionGetQuery(model table.Transaction) string {
+func buildGetQuery(tableName string, model table.Transaction) (string, error) {
+	var err error
 	query := "SELECT * FROM transaction WHERE %v" // TODO have the ability to make more complex where conditons sunch as nesting and other operators: >,<,IS NULL,etc
 	conditions := createWhereCondition(model)
-	preparedQuery := fmt.Sprintf(query, conditions)
-	return preparedQuery
+	if conditions == "" {
+		err = errors.New("Empty model")
+		return "", err
+	}
+	query = fmt.Sprintf(query, conditions)
+	return query, err
+}
+
+func buildDeleteQuery(tableName string, model table.Transaction) (string, error) {
+	var err error
+	query := "DELETE FROM transaction WHERE %v"
+	conditions := createWhereCondition(model)
+	if conditions == "" {
+		err = errors.New("Empty model")
+		return "", err
+	}
+	query = fmt.Sprintf(query, conditions)
+	return query, err
 }
