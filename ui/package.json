@@ -1,0 +1,19 @@
+{
+  "name": "budgetbolt",
+  "version": "1.0.0",
+  "description": "An automated budget tracker application that helps users manage their finances by automatically categorizing and tracking expenses, providing visualizations, and generating personalized reports.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XxJesusisKingxX/BudgetBolt.git"
+  },
+  "author": "xXJesusIsKingxX",
+  "license": "CC-BY-NC-ND-4.0",
+  "bugs": {
+    "url": "https://github.com/XxJesusisKingxX/BudgetBolt/issues"
+  },
+  "homepage": "https://github.com/XxJesusisKingxX/BudgetBolt#readme"
+}
