@@ -2,7 +2,7 @@ package querybuilder
 
 import (
 	table "budgetbolt/services/databases/postgresql/model"
-	tests "budgetbolt/tests"
+	tests "budgetbolt/services/tests"
 	"errors"
 	"fmt"
 	"testing"

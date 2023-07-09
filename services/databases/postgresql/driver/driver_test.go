@@ -1,7 +1,7 @@
 package driverpq
 
 import (
-	"budgetbolt/tests"
+	"budgetbolt/services/tests"
 	"database/sql"
 	"testing"
 	"errors"
