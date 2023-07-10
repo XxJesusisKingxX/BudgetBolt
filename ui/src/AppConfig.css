@@ -1,0 +1,19 @@
+:root {
+    --BACKGROUND_DARKMODE: black;
+    --FONT_DARKMODE: white;
+    
+    --BACKGROUND_LIGHTMODE: white;
+    --FONT_LIGHTMODE: black;
+}
+
+body {
+    background-color: var(--BACKGROUND_LIGHTMODE);
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+  
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
