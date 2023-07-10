@@ -1,9 +1,13 @@
 import './AppConfig.css';
 import Header from './components/header/Header'
+import MenuBar from './components/menubar/MenuBar';
 
 function App() {
   return (
-    <Header></Header>
+    <>
+      <Header></Header>
+      <MenuBar></MenuBar>
+    </>
   );
 }
 

@@ -1,0 +1,122 @@
+@keyframes bolt_top {
+    from {
+        margin-right: 1.5rem;
+    }
+    to {
+        margin-right: -2rem;
+    }
+}
+@keyframes bolt_middle {
+    from {
+        margin-right: 1rem;
+    }
+    to {
+        margin-right: -2rem;
+    }
+}
+@keyframes bolt_bottom {
+    from {
+        margin-right: 1.5rem;
+    }
+    to {
+        margin-right: -2rem;
+    }
+}
+@keyframes reveal {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+.menubar {
+    width: 3rem;
+    height: 3rem;
+    right: 0;
+    position: fixed;
+}
+.menubar:hover {
+    width: 12rem;
+    height: 18rem;
+}
+.menubar:hover .hidden_text {
+    animation: reveal 0.5s forwards;
+}
+.menubar:hover .top_line {
+    animation: bolt_top 0.3s forwards;
+}
+.menubar:hover .middle_line {
+    animation: bolt_middle 0.2s forwards;
+}
+.menubar:hover .bottom_line {
+    animation: bolt_bottom 0.3s forwards;
+}
+.menubar:hover .hidden_menu {
+    display: block;
+    animation: reveal 0.3s forwards;
+}
+
+.top_line {
+    background-color: var(--FONT_MODE);
+    height: 0.3rem;
+    width: 2rem;
+    position: fixed;
+    margin-right: 1rem;
+    right: 0;
+    top: 1.5rem;
+}
+.middle_line {
+    background-color: var(--FONT_MODE);
+    height: 0.3rem;
+    width: 2rem;
+    position: fixed;
+    margin-right: 1rem;
+    right: 0;
+    top: 2rem;
+}
+.bottom_line {
+    background-color: var(--FONT_MODE);
+    height: 0.3rem;
+    width: 2rem;
+    position: fixed;
+    margin-right: 1rem;
+    right: 0;
+    top: 2.5rem;
+}
+.hidden_text {
+    color: var(--FONT_MODE);
+    font-weight: 900;
+    position: fixed;
+    margin-right: 1rem;
+    right: 0;
+    top: 1.5rem;
+    opacity: 0%;
+}
+.hidden_menu {
+    background-color: var(--BACKGROUND_MODE);
+    font-size: 1.5rem;
+    position: fixed;
+    width: 17rem;
+    right: 0;
+    top: 3.6rem;
+    border: 1px solid var(--FONT_MODE);
+    border-radius: 1px;
+    display: none;
+}
+.hidden_menu ul {
+    padding: 0;
+    position: relative;
+    left: 0.5rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--FONT_MODE);
+    text-align: left;
+    white-space: nowrap;
+}
+.hidden_menu a {
+    text-decoration: none;
+    color: var(--FONT_MODE);
+}
+.hidden_menu img {
+    width: 20px;
+}
