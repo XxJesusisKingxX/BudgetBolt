@@ -2,9 +2,10 @@ import './Header.css'
 
 function Header() {
     return (
-        <div className="title_container">
+        <>
             <div className="title">BUDGETBOLT</div>
-        </div>
+            <div className="border_line"></div>
+        </>
     );
 }
   
