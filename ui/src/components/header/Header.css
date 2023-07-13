@@ -1,4 +1,5 @@
 .title {
+    width: 100%;
     color: var(--FONT_MODE);
     position: fixed;
     left: 40%;

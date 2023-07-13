@@ -1,6 +1,7 @@
 :root {
     --BACKGROUND_MODE: white;
     --FONT_MODE: black;
+    --WINDOW_MODE: grey;
 }
 
 body {
