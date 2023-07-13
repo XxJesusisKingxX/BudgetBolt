@@ -1,10 +1,11 @@
 import './Header.css'
 
-function Header() {
+function Header(props) {
     return (
         <>
             <div className="title">BUDGETBOLT</div>
             <div className="border_line"></div>
+            {props.children}
         </>
     );
 }
