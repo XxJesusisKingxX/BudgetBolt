@@ -79,6 +79,11 @@ ALTER TABLE public.transaction ALTER COLUMN transaction_id ADD GENERATED ALWAYS 
     CACHE 1
 );
 
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.account
+    OWNER to postgres;
+
 SELECT pg_catalog.setval('public.budget_budget_id_seq', 1, false);
 
 SELECT pg_catalog.setval('public.expense_expense_id_seq', 1, false);

@@ -1,29 +1,30 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 
-	table "budgetbolt/services/databases/postgresql/model"
 	q "budgetbolt/services/databases/postgresql/controller/querybuilder"
+	table "budgetbolt/services/databases/postgresql/model"
 )
 
-func CreateTransaction(table table.Transaction) error {
+func CreateTransaction(db *sql.DB, table table.Transaction) error {
 	query, err := q.BuildCreateQuery("transaction", table)
 	if err == nil {
-		fmt.Println(query)
+		db.Exec(query)
 	}
 	return err
 }
 
-func UpdateTransaction(table table.Transaction) error {
+func UpdateTransaction(db *sql.DB, table table.Transaction) error {
 	query, err := q.BuildUpdateQuery("transaction", table)
 	if err == nil {
-		fmt.Println(query)
+		db.Exec(query)
 	}
 	return err
 }
 
-func RetrieveTransaction(table table.Transaction) error {
+func RetrieveTransaction(db *sql.DB, table table.Transaction) error {
 	query, err := q.BuildRetrieveQuery("transaction", table)
 	if err == nil {
 		fmt.Println(query)
@@ -31,10 +32,10 @@ func RetrieveTransaction(table table.Transaction) error {
 	return err
 }
 
-func DeleteTransaction(table table.Transaction) error {
+func DeleteTransaction(db *sql.DB, table table.Transaction) error {
 	query, err := q.BuildDeleteQuery("transaction", table)
 	if err == nil {
-		fmt.Println(query)
+		db.Exec(query)
 	}
 	return err
 }

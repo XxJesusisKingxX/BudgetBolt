@@ -29,6 +29,11 @@ const Link = () => {
           return;
         }
         const data = await response.json();
+        const testResponse = await fetch("/api/holdings", {
+          method: "GET"
+        });
+        const test = await testResponse.json();
+        console.log(test)
         dispatch({
           type: "SET_STATE",
           state: {
