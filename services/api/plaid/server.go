@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,10 +11,14 @@ import (
 	"strings"
 	"time"
 
+	resp "budgetbolt/services/api/plaid/response"
+	driver "budgetbolt/services/databases/postgresql/driver"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	plaid "github.com/plaid/plaid-go/v12/plaid"
 )
+
 
 var (
 	PLAID_CLIENT_ID                      = ""
@@ -24,6 +29,7 @@ var (
 	PLAID_REDIRECT_URI                   = ""
 	APP_PORT                             = ""
 	client              *plaid.APIClient = nil
+	db					*sql.DB	         = nil
 )
 
 var environments = map[string]plaid.Environment{
@@ -79,6 +85,9 @@ func init() {
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
 	configuration.UseEnvironment(environments[PLAID_ENV])
 	client = plaid.NewAPIClient(configuration)
+
+	// create database connection
+	db, _ = driver.LogonDB(driver.CREDENTIALS{User:"postgres", Pass: `P-S$\\/M1n3!`}, "budgetbolt", driver.DB{}, false)
 }
 
 func main() {
@@ -90,10 +99,9 @@ func main() {
 	r.POST("/api/create_link_token", createLinkToken)
 	// Re-initialize with the link token (from step 1) and the full received redirect URI
 	// from step 2.
-	r.POST("/api/info", info)
 	r.POST("/api/set_access_token", getAccessToken)
+	r.POST("/api/info", info)
 	r.GET("/api/accounts", accounts)
-	r.GET("/api/balance", balance)
 	r.GET("/api/transactions", transactions)
 	r.GET("/api/investments_transactions", investmentTransactions)
 	r.GET("/api/holdings", holdings)
@@ -157,29 +165,12 @@ func accounts(c *gin.Context) {
 		return
 	}
 
+	accounts := accountsGetResp.Accounts
 	c.JSON(http.StatusOK, gin.H{
-		"accounts": accountsGetResp.GetAccounts(),
+		"accounts": accounts,
 	})
 
-	accountsGetResp.GetAccounts()
-	
-}
-
-func balance(c *gin.Context) {
-	ctx := context.Background()
-
-	balancesGetResp, _, err := client.PlaidApi.AccountsBalanceGet(ctx).AccountsBalanceGetRequest(
-		*plaid.NewAccountsBalanceGetRequest(accessToken),
-	).Execute()
-
-	if err != nil {
-		renderError(c, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"accounts": balancesGetResp.GetAccounts(),
-	})
+	resp.ParseAccountsToDB(db, accessToken, accounts)
 }
 
 func transactions(c *gin.Context) {
@@ -220,30 +211,40 @@ func transactions(c *gin.Context) {
 	sort.Slice(added, func(i, j int) bool {
 		return added[i].GetDate() < added[j].GetDate()
 	})
-	latestTransactions := added[len(added)-9:]
+
+	var latestTransactions []plaid.Transaction = nil
+	if len(added) >= 9 {
+		latestTransactions = added[len(added)-9:]
+
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"latest_transactions": latestTransactions,
 	})
+
+	resp.ParseTransactionsToDB(db, latestTransactions)
 }
 
 func investmentTransactions(c *gin.Context) {
 	ctx := context.Background()
-
+	
 	endDate := time.Now().Local().Format("2006-01-02")
 	startDate := time.Now().Local().Add(-30 * 24 * time.Hour).Format("2006-01-02")
-
 	request := plaid.NewInvestmentsTransactionsGetRequest(accessToken, startDate, endDate)
 	invTxResp, _, err := client.PlaidApi.InvestmentsTransactionsGet(ctx).InvestmentsTransactionsGetRequest(*request).Execute()
-
+	
 	if err != nil {
 		renderError(c, err)
 		return
 	}
-
+	
+	invest := invTxResp.InvestmentTransactions
+	accounts := invTxResp.Accounts
 	c.JSON(http.StatusOK, gin.H{
 		"investments_transactions": invTxResp,
 	})
+	resp.ParseAccountsToDB(db, accessToken, accounts)
+	resp.ParseInvestmentsToDB(db, invest)
 }
 
 func holdings(c *gin.Context) {
@@ -257,9 +258,14 @@ func holdings(c *gin.Context) {
 		return
 	}
 
+	accounts := holdingsGetResp.Accounts
+	holdings := holdingsGetResp.Holdings
 	c.JSON(http.StatusOK, gin.H{
-		"holdings": holdingsGetResp,
+		"holdings": holdings,
 	})
+
+	resp.ParseAccountsToDB(db, accessToken, accounts)
+	resp.ParseHoldingsToDB(db, holdings)
 }
 
 func info(context *gin.Context) {
