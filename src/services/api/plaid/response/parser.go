@@ -3,8 +3,8 @@ package response
 import (
 	"database/sql"
 
-	controller "budgetbolt/services/databases/postgresql/controller"
-	model "budgetbolt/services/databases/postgresql/model"
+	controller "budgetbolt/src/services/databases/postgresql/controller"
+	model "budgetbolt/src/services/databases/postgresql/model"
 
 	plaid "github.com/plaid/plaid-go/v12/plaid"
 )

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	q "budgetbolt/services/databases/postgresql/controller/querybuilder"
-	table "budgetbolt/services/databases/postgresql/model"
+	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
+	table "budgetbolt/src/services/databases/postgresql/model"
 )
 
 func CreateInvestment(db *sql.DB, table table.Investment) error {

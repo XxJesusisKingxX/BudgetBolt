@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 
-	table "budgetbolt/services/databases/postgresql/model"
-	q "budgetbolt/services/databases/postgresql/controller/querybuilder"
+	table "budgetbolt/src/services/databases/postgresql/model"
+	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
 )
 
 func CreateBudget(table table.Budget) error {

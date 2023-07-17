@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	resp "budgetbolt/services/api/plaid/response"
-	driver "budgetbolt/services/databases/postgresql/driver"
+	resp "budgetbolt/src/services/api/plaid/response"
+	driver "budgetbolt/src/services/databases/postgresql/driver"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -90,7 +90,7 @@ func init() {
 	db, _ = driver.LogonDB(driver.CREDENTIALS{User:"postgres", Pass: `P-S$\\/M1n3!`}, "budgetbolt", driver.DB{}, false)
 }
 
-func main() {
+func maint() {
 	r := gin.Default()
 
 	// Create a link token with the redirectURI (as white listed at https://dashboard.plaid.com/team/api).
@@ -99,7 +99,7 @@ func main() {
 	r.POST("/api/create_link_token", createLinkToken)
 	// Re-initialize with the link token (from step 1) and the full received redirect URI
 	// from step 2.
-	r.POST("/api/set_access_token", getAccessToken)
+	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}) })
 	r.POST("/api/info", info)
 	r.GET("/api/accounts", accounts)
 	r.GET("/api/transactions", transactions)
@@ -117,8 +117,9 @@ func main() {
 var accessToken string
 var itemID string
 
-func renderError(c *gin.Context, originalErr error) {
-	if plaidError, err := plaid.ToPlaidError(originalErr); err == nil {
+func renderError(c *gin.Context, originalErr error, plaid Plaid) {
+	plaidError, err := plaid.ToPlaidError(originalErr)
+	if err == nil {
 		// Return 200 and allow the front end to render the error.
 		c.JSON(http.StatusOK, gin.H{"error": plaidError})
 		return
@@ -127,16 +128,14 @@ func renderError(c *gin.Context, originalErr error) {
 	c.JSON(http.StatusInternalServerError, gin.H{"error": originalErr.Error()})
 }
 
-func getAccessToken(c *gin.Context) {
+func getAccessToken(c *gin.Context, plaid Plaid) {
 	publicToken := c.PostForm("public_token")
 	ctx := context.Background()
 
 	// exchange the public_token for an access_token
-	exchangePublicTokenResp, _, err := client.PlaidApi.ItemPublicTokenExchange(ctx).ItemPublicTokenExchangeRequest(
-		*plaid.NewItemPublicTokenExchangeRequest(publicToken),
-	).Execute()
+	exchangePublicTokenResp, err := plaid.ItemPublicTokenExchange(ctx, publicToken)
 	if err != nil {
-		renderError(c, err)
+		renderError(c, err, PlaidClient{})
 		return
 	}
 
@@ -161,10 +160,10 @@ func accounts(c *gin.Context) {
 	).Execute()
 
 	if err != nil {
-		renderError(c, err)
+		renderError(c, err, PlaidClient{})
 		return
 	}
-
+	
 	accounts := accountsGetResp.Accounts
 	c.JSON(http.StatusOK, gin.H{
 		"accounts": accounts,
@@ -194,7 +193,7 @@ func transactions(c *gin.Context) {
 			ctx,
 		).TransactionsSyncRequest(*request).Execute()
 		if err != nil {
-			renderError(c, err)
+			renderError(c, err, PlaidClient{})
 			return
 		}
 
@@ -234,7 +233,7 @@ func investmentTransactions(c *gin.Context) {
 	invTxResp, _, err := client.PlaidApi.InvestmentsTransactionsGet(ctx).InvestmentsTransactionsGetRequest(*request).Execute()
 	
 	if err != nil {
-		renderError(c, err)
+		renderError(c, err, PlaidClient{})
 		return
 	}
 	
@@ -254,7 +253,7 @@ func holdings(c *gin.Context) {
 		*plaid.NewInvestmentsHoldingsGetRequest(accessToken),
 	).Execute()
 	if err != nil {
-		renderError(c, err)
+		renderError(c, err, PlaidClient{})
 		return
 	}
 
@@ -279,7 +278,7 @@ func info(context *gin.Context) {
 func createLinkToken(c *gin.Context) {
 	linkToken, err := linkTokenCreate(nil)
 	if err != nil {
-		renderError(c, err)
+		renderError(c, err, PlaidClient{})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"link_token": linkToken})
