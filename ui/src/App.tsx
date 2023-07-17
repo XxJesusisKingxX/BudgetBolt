@@ -1,10 +1,10 @@
 import React, { useEffect, useContext, useCallback } from "react";
 
-import Link from "./Components/plaid/PlaidAccountConnect";
+import Link from "./components/plaid/PlaidAccountConnect";
 import Context from "./Context";
-import Header from "./Components/header/Header";
+import Header from "./components/header/Header";
 import Home from "./pages/home/Home";
-import MenuBar from "./Components/menubar/MenuBar";
+import MenuBar from "./components/menubar/MenuBar";
 
 const App = () => {
   const { linkSuccess, isItemAccess, isPaymentInitiation, dispatch } = useContext(Context);

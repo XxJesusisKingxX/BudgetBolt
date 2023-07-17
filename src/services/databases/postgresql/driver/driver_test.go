@@ -1,11 +1,10 @@
 package driverpq
 
 import (
-	"budgetbolt/services/tests"
+	"budgetbolt/src/services/tests"
 	"database/sql"
 	"testing"
 	"errors"
-	"fmt"
 )
 
 func TestValidateUserInput(t *testing.T) {
@@ -20,9 +19,9 @@ func TestValidateUserInput(t *testing.T) {
 	resInvalid := validateUserInput(userInValid, passInValid, dbInValid)
 
 	// Check if input is valid
-	tests.Equals(t, true, resValid, fmt.Sprintf("Expected %v but got %v", true, resValid))
+	tests.Equals(t, true, resValid)
 	// Check if input is invalid
-	tests.Equals(t, false, resInvalid, fmt.Sprintf("Expected %v but got %v", false, resInvalid))
+	tests.Equals(t, false, resInvalid)
 }
 
 func TestLogError(t *testing.T) {
@@ -32,8 +31,8 @@ func TestLogError(t *testing.T) {
 	notOut := tests.GetStdout(LogError, err, false)
 
 	// Check if output is correct
-	tests.Equals(t, "This test is valid\n", string(isOut), fmt.Sprintf("Expected %v but got %v", "This test is valid\n", string(isOut)))
-	tests.Equals(t, "", string(notOut), fmt.Sprintf("Expected %v but got %v", "", string(notOut)))
+	tests.Equals(t, "This test is valid\n", string(isOut))
+	tests.Equals(t, "", string(notOut))
 
 }
 
@@ -51,11 +50,11 @@ func TestConnectPQDB(t *testing.T) {
 	_, caseThree := connectPQDB("user", "secret", "test", mockDBPingFail)
 
 	// Check if getting connection succeds
-	tests.Equals(t, nil, caseOne, fmt.Sprintf("Expected %v but got %v", nil, caseOne))
+	tests.Equals(t, nil, caseOne)
 	// Check if getting connection fails
-	tests.Equals(t, err, caseTwo, fmt.Sprintf("Expected %v but got %v", err, caseTwo))
+	tests.Equals(t, err, caseTwo)
 	// Check if getting connection succeds but ping fails
-	tests.Equals(t, errPing, caseThree, fmt.Sprintf("Expected %v but got %v", errPing, caseThree))
+	tests.Equals(t, errPing, caseThree)
 }
 
 func TestLogonDB(t *testing.T) {
@@ -73,9 +72,9 @@ func TestLogonDB(t *testing.T) {
 	_, caseThree := LogonDB(credsSuccess, "testdb", mockDBFail, false)
 
 	// Check if user doesnt pass validation fails
-	tests.EqualsErr(t, err, caseOne, fmt.Sprintf("Expected %v but got %v", err, caseOne))
+	tests.EqualsErr(t, err, caseOne)
 	// Check if user logon successfully
-	tests.Equals(t, nil, caseTwo, fmt.Sprintf("Expected %v but got %v", nil, caseTwo))
+	tests.Equals(t, nil, caseTwo)
 	// Check if user logon fails
-	tests.Equals(t, errDBFail, caseThree, fmt.Sprintf("Expected %v but got %v", errDBFail, caseThree))
+	tests.Equals(t, errDBFail, caseThree)
 }
