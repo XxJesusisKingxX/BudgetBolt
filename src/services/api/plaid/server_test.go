@@ -171,7 +171,7 @@ func TestInvestments(t *testing.T) {
 
 	responseBody, _ := ioutil.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
-	invest := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\":") //TODO get test accounts to models investments holdings
+	invest := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\"") //TODO get test accounts to models investments holdings
 
 	tests.Equals(t, http.StatusOK, w.Code)
 	tests.Equals(t, true, invest)
@@ -214,7 +214,7 @@ func TestHoldings(t *testing.T) {
 
 	responseBody, _ := ioutil.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
-	holdings := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\":") //TODO get test accounts to models investments holdings
+	holdings := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\"") //TODO get test accounts to models investments holdings
 
 	tests.Equals(t, http.StatusOK, w.Code)
 	tests.Equals(t, true, holdings)
