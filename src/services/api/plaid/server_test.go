@@ -302,6 +302,50 @@ func TestLinkTokenCreateFails(t *testing.T) {
 
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
 }
-// func TestTransactions(t *testing.T) {
-// TO DO
-// }
+func TestTransactions(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/get-transactions", func(c *gin.Context) {
+		transactions(c, PlaidClient{}, true)
+	})
+	// Create request
+	form := url.Values{}
+	wd, _ := os.Getwd()
+	path := strings.Replace(wd, "\\api\\plaid", "\\tests\\server\\access_token.txt", 1)
+	content, _ := os.ReadFile(path)
+	form.Set("access_token", string(content))
+	req, _ := http.NewRequest("POST", "/get-transactions", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	trans := strings.Contains(string(responseBody), "\"transactions\":")
+
+	tests.Equals(t, http.StatusOK, w.Code)
+	tests.Equals(t, true, trans)
+}
+func TestTransactionsFails(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/get-transactions", func(c *gin.Context) {
+		transactions(c, MockPlaidClient{ Err: errors.New("Failed") }, true)
+	})
+	// Create request
+	form := url.Values{}
+	wd, _ := os.Getwd()
+	path := strings.Replace(wd, "\\api\\plaid", "\\tests\\server\\access_token.txt", 1)
+	content, _ := os.ReadFile(path)
+	form.Set("access_token", string(content))
+	req, _ := http.NewRequest("POST", "/get-transactions", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+}
