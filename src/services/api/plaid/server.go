@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	
 	resp "budgetbolt/src/services/api/plaid/response"
@@ -95,7 +94,7 @@ func maint() {
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}) })
 	r.POST("/api/info", info)
 	r.GET("/api/accounts", func(c *gin.Context){ accounts(c, PlaidClient{}, false) })
-	r.GET("/api/transactions", transactions)
+	r.GET("/api/transactions", func(c *gin.Context){ transactions(c, PlaidClient{}, false) })
 	r.GET("/api/investments_transactions", func(c *gin.Context){ investmentTransactions(c, PlaidClient{}, false) })
 	r.GET("/api/holdings", func(c *gin.Context){ holdings(c, PlaidClient{}, false) })
 	err := r.Run(":" + APP_PORT)
@@ -109,8 +108,8 @@ func maint() {
 var accessToken string
 var itemID string
 
-func renderError(c *gin.Context, originalErr error, plaid Plaid) {
-	plaidError, err := plaid.ToPlaidError(originalErr)
+func renderError(c *gin.Context, originalErr error, p Plaid) {
+	plaidError, err := p.ToPlaidError(originalErr)
 	if err == nil {
 		// Return 200 and allow the front end to render the error.
 		c.JSON(http.StatusOK, gin.H{"error": plaidError})
@@ -119,11 +118,11 @@ func renderError(c *gin.Context, originalErr error, plaid Plaid) {
 	c.JSON(http.StatusInternalServerError, gin.H{"error": originalErr.Error()})
 }
 
-func getAccessToken(c *gin.Context, plaid Plaid) {
+func getAccessToken(c *gin.Context, p Plaid) {
 	publicToken := c.PostForm("public_token")
 	ctx := context.Background()
 	// exchange the public_token for an access_token
-	exchangePublicTokenResp, err := plaid.ItemPublicTokenExchange(ctx, publicToken)
+	exchangePublicTokenResp, err := p.ItemPublicTokenExchange(client, ctx, publicToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
@@ -139,12 +138,12 @@ func getAccessToken(c *gin.Context, plaid Plaid) {
 	})
 }
 
-func accounts(c *gin.Context, plaid Plaid, testMode bool) {
+func accounts(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
 	if testMode == true {
 		accessToken = c.PostForm("access_token")
 	}
-	accountsGetResp, err := plaid.AccountsGet(ctx, accessToken)
+	accountsGetResp, err := p.AccountsGet(client, ctx, accessToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
@@ -158,8 +157,11 @@ func accounts(c *gin.Context, plaid Plaid, testMode bool) {
 	}
 }
 
-func transactions(c *gin.Context) {
+func transactions(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
+	if testMode == true {
+		accessToken = c.PostForm("access_token")
+	}
 	// Set cursor to empty to receive all historical updates
 	var cursor *string
 	// New transaction updates since "cursor"
@@ -169,13 +171,7 @@ func transactions(c *gin.Context) {
 	hasMore := true
 	// Iterate through each page of new transaction updates for item
 	for hasMore {
-		request := plaid.NewTransactionsSyncRequest(accessToken)
-		if cursor != nil {
-			request.SetCursor(*cursor)
-		}
-		resp, _, err := client.PlaidApi.TransactionsSync(
-			ctx,
-		).TransactionsSyncRequest(*request).Execute()
+		resp, err := p.NewTransactionsSyncRequest(client, ctx, accessToken, cursor)
 		if err != nil {
 			renderError(c, err, PlaidClient{})
 			return
@@ -189,27 +185,20 @@ func transactions(c *gin.Context) {
 		nextCursor := resp.GetNextCursor()
 		cursor = &nextCursor
 	}
-
-	sort.Slice(added, func(i, j int) bool {
-		return added[i].GetDate() < added[j].GetDate()
-	})
-	var latestTransactions []plaid.Transaction = nil
-	if len(added) >= 9 {
-		latestTransactions = added[len(added)-9:]
-
-	}
 	c.JSON(http.StatusOK, gin.H{
-		"latest_transactions": latestTransactions,
+		"transactions": added,
 	})
-	resp.ParseTransactionsToDB(db, latestTransactions)
+	if testMode != true {
+		resp.ParseTransactionsToDB(db, added)
+	}
 }
 
-func investmentTransactions(c *gin.Context, plaid Plaid, testMode bool) {
+func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
 	if testMode == true {
 		accessToken = c.PostForm("access_token")
 	}
-	invTxResp, err := plaid.InvestmentsTransactionsGet(ctx, accessToken)
+	invTxResp, err := p.InvestmentsTransactionsGet(client, ctx, accessToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
@@ -225,12 +214,12 @@ func investmentTransactions(c *gin.Context, plaid Plaid, testMode bool) {
 	}
 }
 
-func holdings(c *gin.Context, plaid Plaid, testMode bool) {
+func holdings(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
 	if testMode == true {
 		accessToken = c.PostForm("access_token")
 	}
-	holdingsGetResp, err := plaid.InvestmentsHoldingsGet(ctx, accessToken)
+	holdingsGetResp, err := p.InvestmentsHoldingsGet(client, ctx, accessToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
@@ -254,12 +243,12 @@ func info(c *gin.Context) {
 	})
 }
 
-func createLinkToken(c *gin.Context, plaid Plaid) {
+func createLinkToken(c *gin.Context, p Plaid) {
 	ctx := context.Background()
 	countryCodes := convertCountryCodes(strings.Split(PLAID_COUNTRY_CODES, ","))
 	products := convertProducts(strings.Split(PLAID_PRODUCTS, ","))
-	request := plaid.NewLinkTokenCreateRequest("Test User", "TestUser", countryCodes,  products, PLAID_REDIRECT_URI)
-	linkTokenCreateResp, err := plaid.CreateLinkToken(ctx, request)
+	request := p.NewLinkTokenCreateRequest("Test User", "TestUser", countryCodes,  products, PLAID_REDIRECT_URI)
+	linkTokenCreateResp, err := p.CreateLinkToken(client, ctx, request)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
