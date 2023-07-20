@@ -236,3 +236,72 @@ func TestHoldingsFails(t *testing.T) {
 
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
 }
+
+func TestInfo(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.GET("/get-info", func(c *gin.Context) {
+		info(c)
+	})
+	// Create request
+	form := url.Values{}
+	req, _ := http.NewRequest("GET", "/get-info", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	itemId := strings.Contains(string(responseBody), "\"item_id\"")
+	accessToken := strings.Contains(string(responseBody), "\"access_token\"")
+	products := strings.Contains(string(responseBody), "\"products\"")
+
+	tests.Equals(t, http.StatusOK, w.Code)
+	tests.Equals(t, true, itemId)
+	tests.Equals(t, true, accessToken)
+	tests.Equals(t, true, products)
+}
+func TestLinkTokenCreate(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/create-link-token", func(c *gin.Context) {
+		createLinkToken(c, PlaidClient{})
+	})
+	// Create request
+	form := url.Values{}
+	req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	linkToken := strings.Contains(string(responseBody), "\"link_token\":")
+
+	tests.Equals(t, http.StatusOK, w.Code)
+	tests.Equals(t, true, linkToken)
+}
+func TestLinkTokenCreateFails(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/create-link-token", func(c *gin.Context) {
+		createLinkToken(c, MockPlaidClient{ Err: errors.New("Failed") })
+	})
+	// Create request
+	form := url.Values{}
+	req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+}
+// func TestTransactions(t *testing.T) {
+// TO DO
+// }

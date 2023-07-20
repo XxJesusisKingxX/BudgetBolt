@@ -9,8 +9,7 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"time"
-
+	
 	resp "budgetbolt/src/services/api/plaid/response"
 	driver "budgetbolt/src/services/databases/postgresql/driver"
 
@@ -92,7 +91,7 @@ func init() {
 
 func maint() {
 	r := gin.Default()
-	r.POST("/api/create_link_token", createLinkToken)
+	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}) })
 	r.POST("/api/info", info)
 	r.GET("/api/accounts", func(c *gin.Context){ accounts(c, PlaidClient{}, false) })
@@ -247,21 +246,25 @@ func holdings(c *gin.Context, plaid Plaid, testMode bool) {
 	}
 }
 
-func info(context *gin.Context) {
-	context.JSON(http.StatusOK, map[string]interface{}{
+func info(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"item_id":      itemID,
 		"access_token": accessToken,
 		"products":     strings.Split(PLAID_PRODUCTS, ","),
 	})
 }
 
-func createLinkToken(c *gin.Context) {
-	linkToken, err := linkTokenCreate()
+func createLinkToken(c *gin.Context, plaid Plaid) {
+	ctx := context.Background()
+	countryCodes := convertCountryCodes(strings.Split(PLAID_COUNTRY_CODES, ","))
+	products := convertProducts(strings.Split(PLAID_PRODUCTS, ","))
+	request := plaid.NewLinkTokenCreateRequest("Test User", "TestUser", countryCodes,  products, PLAID_REDIRECT_URI)
+	linkTokenCreateResp, err := plaid.CreateLinkToken(ctx, request)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"link_token": linkToken})
+	c.JSON(http.StatusOK, gin.H{"link_token": linkTokenCreateResp.GetLinkToken()})
 }
 
 func convertCountryCodes(countryCodeStrs []string) []plaid.CountryCode {
@@ -278,30 +281,4 @@ func convertProducts(productStrs []string) []plaid.Products {
 		products = append(products, plaid.Products(productStr))
 	}
 	return products
-}
-
-// linkTokenCreate creates a link token using the specified parameters
-func linkTokenCreate() (string, error) {
-	ctx := context.Background()
-	countryCodes := convertCountryCodes(strings.Split(PLAID_COUNTRY_CODES, ","))
-	redirectURI := PLAID_REDIRECT_URI
-	user := plaid.LinkTokenCreateRequestUser{
-		ClientUserId: time.Now().String(),
-	}
-	request := plaid.NewLinkTokenCreateRequest(
-		"Plaid Quickstart",
-		"en",
-		countryCodes,
-		user,
-	)
-	products := convertProducts(strings.Split(PLAID_PRODUCTS, ","))
-	request.SetProducts(products)
-	if redirectURI != "" {
-		request.SetRedirectUri(redirectURI)
-	}
-	linkTokenCreateResp, _, err := client.PlaidApi.LinkTokenCreate(ctx).LinkTokenCreateRequest(*request).Execute()
-	if err != nil {
-		return "", err
-	}
-	return linkTokenCreateResp.GetLinkToken(), nil
 }
