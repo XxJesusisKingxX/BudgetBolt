@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os/exec"
 	"time"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -80,7 +80,7 @@ func TestGetAccessToken(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	accessToken := strings.Contains(string(responseBody), "\"access_token\":")
 	itemId := strings.Contains(string(responseBody), "\"item_id\":")
@@ -126,7 +126,7 @@ func TestAccounts(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	accounts := strings.Contains(string(responseBody), "\"accounts\":")
 
@@ -169,7 +169,7 @@ func TestInvestments(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	invest := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\"") //TODO get test accounts to models investments holdings
 
@@ -212,7 +212,7 @@ func TestHoldings(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	holdings := strings.Contains(string(responseBody), "\"NO_INVESTMENT_ACCOUNTS\"") //TODO get test accounts to models investments holdings
 
@@ -252,7 +252,7 @@ func TestInfo(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	itemId := strings.Contains(string(responseBody), "\"item_id\"")
 	accessToken := strings.Contains(string(responseBody), "\"access_token\"")
@@ -278,7 +278,7 @@ func TestLinkTokenCreate(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	linkToken := strings.Contains(string(responseBody), "\"link_token\":")
 
@@ -321,7 +321,7 @@ func TestTransactions(t *testing.T) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	responseBody, _ := ioutil.ReadAll(w.Result().Body)
+	responseBody, _ := io.ReadAll(w.Result().Body)
 	defer w.Result().Body.Close()
 	trans := strings.Contains(string(responseBody), "\"transactions\":")
 

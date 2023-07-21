@@ -35,15 +35,6 @@ type MockPlaidClient struct {
 	SyncResp plaid.TransactionsSyncResponse
 }
 
-func createClient() *plaid.APIClient {
-	configuration := plaid.NewConfiguration()
-	configuration.AddDefaultHeader("PLAID-CLIENT-ID", "63962697de7ba8001361d7fe")
-	configuration.AddDefaultHeader("PLAID-SECRET", "e72fdfe4452e82f53b5d0f57aebf1d")
-	configuration.UseEnvironment(plaid.Sandbox)
-	client := plaid.NewAPIClient(configuration)
-	return client
-}
-
 func (t MockPlaidClient) GetAccessToken(o *plaid.ItemPublicTokenExchangeResponse) string {
 	return t.ExchangeResp.AccessToken
 }
