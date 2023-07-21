@@ -88,7 +88,7 @@ func init() {
 	db, _ = driver.LogonDB(driver.CREDENTIALS{User:"postgres", Pass: `P-S$\\/M1n3!`}, "budgetbolt", driver.DB{}, false)
 }
 
-func maint() {
+func main() {
 	r := gin.Default()
 	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}) })
@@ -140,7 +140,7 @@ func getAccessToken(c *gin.Context, p Plaid) {
 
 func accounts(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
-	if testMode == true {
+	if testMode {
 		accessToken = c.PostForm("access_token")
 	}
 	accountsGetResp, err := p.AccountsGet(client, ctx, accessToken)
@@ -152,14 +152,14 @@ func accounts(c *gin.Context, p Plaid, testMode bool) {
 	c.JSON(http.StatusOK, gin.H{
 		"accounts": accounts,
 	})
-	if testMode != true {
+	if !testMode {
 		resp.ParseAccountsToDB(db, accessToken, accounts)
 	}
 }
 
 func transactions(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
-	if testMode == true {
+	if testMode {
 		accessToken = c.PostForm("access_token")
 	}
 	// Set cursor to empty to receive all historical updates
@@ -188,14 +188,14 @@ func transactions(c *gin.Context, p Plaid, testMode bool) {
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": added,
 	})
-	if testMode != true {
+	if !testMode {
 		resp.ParseTransactionsToDB(db, added)
 	}
 }
 
 func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
-	if testMode == true {
+	if testMode {
 		accessToken = c.PostForm("access_token")
 	}
 	invTxResp, err := p.InvestmentsTransactionsGet(client, ctx, accessToken)
@@ -208,7 +208,7 @@ func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
 	c.JSON(http.StatusOK, gin.H{
 		"investments_transactions": invTxResp,
 	})
-	if testMode != true {
+	if !testMode {
 		resp.ParseAccountsToDB(db, accessToken, accounts)
 		resp.ParseInvestmentsToDB(db, invest)
 	}
@@ -216,7 +216,7 @@ func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
 
 func holdings(c *gin.Context, p Plaid, testMode bool) {
 	ctx := context.Background()
-	if testMode == true {
+	if testMode {
 		accessToken = c.PostForm("access_token")
 	}
 	holdingsGetResp, err := p.InvestmentsHoldingsGet(client, ctx, accessToken)
@@ -229,7 +229,7 @@ func holdings(c *gin.Context, p Plaid, testMode bool) {
 	c.JSON(http.StatusOK, gin.H{
 		"holdings": holdings,
 	})
-	if testMode != true {
+	if !testMode {
 		resp.ParseAccountsToDB(db, accessToken, accounts)
 		resp.ParseHoldingsToDB(db, holdings)
 	}
