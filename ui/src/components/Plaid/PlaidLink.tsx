@@ -1,9 +1,9 @@
 import React, { useEffect, useContext, useCallback } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import "./PlaidAccountConnect.css"
-import Context from "../../Context";
+import "./PlaidLink.css"
+import Context from "../../context/Context";
 
-const Link = () => {
+const PlaidLink = () => {
   const { linkToken, dispatch } = useContext(Context);
 
   const onSuccess = useCallback(
@@ -29,11 +29,6 @@ const Link = () => {
           return;
         }
         const data = await response.json();
-        const testResponse = await fetch("/api/holdings", {
-          method: "GET"
-        });
-        const test = await testResponse.json();
-        console.log(test)
         dispatch({
           type: "SET_STATE",
           state: {
@@ -78,4 +73,4 @@ const Link = () => {
   );
 };
 
-export default Link;
+export default PlaidLink;

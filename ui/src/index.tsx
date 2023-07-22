@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import './AppConfig.css';
-import { QuickstartProvider } from "./Context";
+import { QuickstartProvider } from "./context/Context";
 
 ReactDOM.render(
   <React.StrictMode>

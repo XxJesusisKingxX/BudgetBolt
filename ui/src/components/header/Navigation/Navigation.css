@@ -30,29 +30,29 @@
         opacity: 100%;
     }
 }
-.menubar {
+.navigation {
     width: 3rem;
     height: 3rem;
     right: 0;
     position: fixed;
 }
-.menubar:hover {
+.navigation:hover {
     width: 12rem;
     height: 18rem;
 }
-.menubar:hover .hidden_text {
+.navigation:hover .hidden_text {
     animation: reveal 0.5s forwards;
 }
-.menubar:hover .top_line {
+.navigation:hover .top_line {
     animation: bolt_top 0.3s forwards;
 }
-.menubar:hover .middle_line {
+.navigation:hover .middle_line {
     animation: bolt_middle 0.2s forwards;
 }
-.menubar:hover .bottom_line {
+.navigation:hover .bottom_line {
     animation: bolt_bottom 0.3s forwards;
 }
-.menubar:hover .hidden_menu {
+.navigation:hover .hidden_menu {
     display: block;
     animation: reveal 0.3s forwards;
 }

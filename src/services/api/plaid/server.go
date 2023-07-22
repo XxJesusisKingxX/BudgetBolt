@@ -188,9 +188,9 @@ func transactions(c *gin.Context, p Plaid, testMode bool) {
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": added,
 	})
-	if !testMode {
-		resp.ParseTransactionsToDB(db, added)
-	}
+	// if !testMode {
+	// 	resp.ParseTransactionsToDB(db, added)
+	// }
 }
 
 func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
