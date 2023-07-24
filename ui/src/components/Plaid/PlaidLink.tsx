@@ -10,12 +10,16 @@ const PlaidLink = () => {
     (public_token: string) => {
       // If the access_token is needed, send public_token to server
       const exchangePublicTokenForAccessToken = async () => {
+        const body = new URLSearchParams
+        body.append("public_token", public_token)
+        body.append("username", "test_user")
+        body.append("password", "password")
         const response = await fetch("/api/set_access_token", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
-          body: `public_token=${public_token}`,
+          body: body.toString(),
         });
         if (!response.ok) {
           dispatch({
@@ -23,7 +27,6 @@ const PlaidLink = () => {
             state: {
               itemId: `no item_id retrieved`,
               accessToken: `no access_token retrieved`,
-              isItemAccess: false,
             },
           });
           return;
@@ -34,7 +37,6 @@ const PlaidLink = () => {
           state: {
             itemId: data.item_id,
             accessToken: data.access_token,
-            isItemAccess: true,
           },
         });
       };

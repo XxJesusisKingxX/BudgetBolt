@@ -1,40 +1,44 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 
-	table "budgetbolt/src/services/databases/postgresql/model"
 	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
+	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func CreateIncome(table table.Income) error {
-	query, err := q.BuildCreateQuery("income", table)
+func CreateIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildCreateQuery("income", m)
+	if err == nil {
+		_, err := db.Exec(query)
+		return err
+	}
+	return err
+}
+
+func UpdateIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildUpdateQuery("income", m)
+	if err == nil {
+		_, err := db.Exec(query)
+		return err
+	}
+	return err
+}
+
+func RetrieveIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildRetrieveQuery("income", m)
 	if err == nil {
 		fmt.Println(query)
 	}
 	return err
 }
 
-func UpdateIncome(table table.Income) error {
-	query, err := q.BuildUpdateQuery("income", table)
+func DeleteIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildDeleteQuery("income", m)
 	if err == nil {
-		fmt.Println(query)
-	}
-	return err
-}
-
-func RetrieveIncome(table table.Income) error {
-	query, err := q.BuildRetrieveQuery("income", table)
-	if err == nil {
-		fmt.Println(query)
-	}
-	return err
-}
-
-func DeleteIncome(table table.Income) error {
-	query, err := q.BuildDeleteQuery("income", table)
-	if err == nil {
-		fmt.Println(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }

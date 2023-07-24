@@ -13,7 +13,7 @@ const Transaction: React.FC<Props> = ({account, transaction, amount, bottom}) =>
             <img src={reel} className="transaction-icon"/>
             <span className="account-name">{account}</span>
             <br/>
-            <span className="transaction-name">{transaction}........................${amount}</span>
+            <span className="transaction-name">{transaction}...${amount}</span>
         </div>
     );
 };

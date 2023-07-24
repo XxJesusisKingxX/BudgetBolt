@@ -3,31 +3,33 @@ package response
 import (
 	"database/sql"
 
-	controller "budgetbolt/src/services/databases/postgresql/controller"
-	model "budgetbolt/src/services/databases/postgresql/model"
+	"github.com/plaid/plaid-go/v12/plaid"
 
-	plaid "github.com/plaid/plaid-go/v12/plaid"
+	"budgetbolt/src/services/databases/postgresql/controller"
+	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func ParseAccountsToDB(db *sql.DB, accessToken string, accounts []plaid.AccountBase){
+func ParseAccountsToDB(db *sql.DB, profileId int, accounts []plaid.AccountBase){
 	for _, v := range accounts {
 		acc := model.Account {
-			PlaidID: v.AccountId,
 			Name: v.Name,
 			Balance: v.Balances.GetAvailable(),
-			Token: accessToken,
+			PlaidAccountID: v.AccountId,
+			ProfileID: profileId,
 		}
 		controller.CreateAccount(db, acc)
 	}
 }
-func ParseTransactionsToDB(db *sql.DB, transactions []plaid.Transaction){
+func ParseTransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Transaction){
 	for _, v := range transactions {
+    	acc, _ := controller.RetrieveAccount(db, model.Account{ PlaidAccountID: v.AccountId })
 		trans := model.Transaction {
-			From: v.AccountId,
+			From: acc[0].Name, //should never be dups for account id matches
 			Vendor: v.GetMerchantName(),
 			Amount: v.Amount,
 			Date: v.Date,
 			Description: v.Name,
+			ProfileID: profileId,
 		}
 		controller.CreateTransaction(db, trans)
 	}
@@ -57,4 +59,18 @@ func ParseHoldingsToDB(db *sql.DB, holdings []plaid.Holding){
 		}
 		controller.CreateHolding(db, holdings)
 	}
+}
+func ParseProfileToDB(db *sql.DB, username string, password string){
+	profile := model.Profile {
+		Name: username,
+		Password: password,
+	}
+	controller.CreateProfile(db, profile)
+}
+func ParseTokenToDB(db *sql.DB, itemId string, accessToken string){
+	token := model.Token {
+		Item: itemId,
+		Token: accessToken,
+	}
+	controller.CreateToken(db, token)
 }

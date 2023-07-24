@@ -5,37 +5,40 @@ import (
 	"fmt"
 
 	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
-	table "budgetbolt/src/services/databases/postgresql/model"
+	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func CreateHolding(db *sql.DB, table table.Holding) error {
-	query, err := q.BuildCreateQuery("holding", table)
+func CreateHolding(db *sql.DB, m model.Holding) error {
+	query, err := q.BuildCreateQuery("holding", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func UpdateHolding(db *sql.DB, table table.Holding) error {
-	query, err := q.BuildUpdateQuery("holding", table)
+func UpdateHolding(db *sql.DB, m model.Holding) error {
+	query, err := q.BuildUpdateQuery("holding", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func RetrieveHolding(db *sql.DB, table table.Holding) error {
-	query, err := q.BuildRetrieveQuery("holding", table)
+func RetrieveHolding(db *sql.DB, m model.Holding) error {
+	query, err := q.BuildRetrieveQuery("holding", m)
 	if err == nil {
 		fmt.Println(query)
 	}
 	return err
 }
 
-func DeleteHolding(db *sql.DB, table table.Holding) error {
-	query, err := q.BuildDeleteQuery("holding", table)
+func DeleteHolding(db *sql.DB, m model.Holding) error {
+	query, err := q.BuildDeleteQuery("holding", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }

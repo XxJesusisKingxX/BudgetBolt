@@ -1,13 +1,33 @@
+import { useEffect, useState } from 'react';
 import Transaction from './Transaction';
 
-// TODO remove after persistnet state
-const demoArr = [["Saving Account","Apple",5.99],["Saving Account","Apple",5.99]];
+interface Transaction {
+    From: string
+    Amount: number
+    Vendor: string
+}
 const TransactionContainer = () => {
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("/api/transactions/get?username=test_user", {
+                    method: "GET",
+                });
+                const data = await response.json();
+                setTransactions(data["transactions"]);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData();
+    }, []);
+    const maxPeek = 6
+    const maxChar = 18
     return (
         <>
-            {/* TODO add persistent data storage */}
-            {demoArr.map((element, index) => (
-                <Transaction key={index} bottom={{marginBottom:'-35px'}} account={String(element[0])} transaction={String(element[1])} amount={Number(element[2])}/>
+            {transactions.slice(0, maxPeek).map((transaction) => (
+                <Transaction bottom={{marginBottom:'-35px'}} account={transaction.From} transaction={transaction.Vendor.length < maxChar ? transaction.Vendor : "Click to see more"} amount={transaction.Amount}/>
             ))}
         </>
     );

@@ -67,7 +67,7 @@ func TestGetAccessToken(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		getAccessToken(c, PlaidClient{})
+		getAccessToken(c, PlaidClient{}, true)
 	})
 	// Create request
 	form := url.Values{}
@@ -95,7 +95,7 @@ func TestGetAccessTokenFails(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		getAccessToken(c, MockPlaidClient{Err: errors.New("Failed")})
+		getAccessToken(c, MockPlaidClient{Err: errors.New("Failed")}, true)
 	})
 	// Create request
 	form := url.Values{}

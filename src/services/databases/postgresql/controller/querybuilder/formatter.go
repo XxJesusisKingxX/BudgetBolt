@@ -8,7 +8,7 @@ import (
 
 func formatColumnsAndValues(t interface{}) (string, string) {
 	id := reflect.ValueOf(t).FieldByName("ID")
-	if id.IsValid() == true {
+	if id.IsValid() {
 		var column []string
 		var value []string
 		tValue := reflect.ValueOf(t)
@@ -19,7 +19,7 @@ func formatColumnsAndValues(t interface{}) (string, string) {
 			// Check if the field is empty
 			isEmpty := reflect.DeepEqual(fieldValue.Interface(), reflect.Zero(fieldValue.Type()).Interface())
 			// Add values that are not empty to array
-			if isEmpty != true {
+			if !isEmpty {
 				columnName := fieldType.Tag.Get("db")
 				if columnName == "" {
 					panic("Missing `db` tag")
@@ -45,7 +45,7 @@ func formatColumnsAndValues(t interface{}) (string, string) {
 
 func setColumnsAndValues(t interface{}) string {
 	id := reflect.ValueOf(t).FieldByName("ID")
-	if id.IsValid() == true {
+	if id.IsValid() {
 		var sets []string
 		tValue := reflect.ValueOf(t)
 		tType := reflect.TypeOf(t)
@@ -57,7 +57,7 @@ func setColumnsAndValues(t interface{}) string {
 				// Check if the field is empty
 				isEmpty := reflect.DeepEqual(fieldValue.Interface(), reflect.Zero(fieldValue.Type()).Interface())
 				// Add values that are not empty to array
-				if isEmpty != true {
+				if isEmpty {
 					columnName := fieldType.Tag.Get("db")
 					if columnName == "" {
 						panic("Missing `db` tag")
@@ -82,7 +82,7 @@ func setColumnsAndValues(t interface{}) string {
 
 func createWhereCondition(t interface{}) string {
 	id := reflect.ValueOf(t).FieldByName("ID")
-	if id.IsValid() == true {
+	if id.IsValid() {
 		var condition []string
 		tValue := reflect.ValueOf(t)
 		tType := reflect.TypeOf(t)
@@ -92,7 +92,7 @@ func createWhereCondition(t interface{}) string {
 			// Check if the field is empty
 			isEmpty := reflect.DeepEqual(fieldValue.Interface(), reflect.Zero(fieldValue.Type()).Interface())
 			// Add values that are not empty to array
-			if isEmpty != true {
+			if !isEmpty {
 				columnName := fieldType.Tag.Get("db")
 				if columnName == "" {
 					panic("Missing `db` tag")

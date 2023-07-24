@@ -1,40 +1,44 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 
-	table "budgetbolt/src/services/databases/postgresql/model"
 	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
+	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func CreateExpense(table table.Expense) error {
-	query, err := q.BuildCreateQuery("expense", table)
+func CreateExpense(db *sql.DB, m model.Expense) error {
+	query, err := q.BuildCreateQuery("expense", m)
+	if err == nil {
+		_, err := db.Exec(query)
+		return err
+	}
+	return err
+}
+
+func UpdateExpense(db *sql.DB, m model.Expense) error {
+	query, err := q.BuildUpdateQuery("expense", m)
+	if err == nil {
+		_, err := db.Exec(query)
+		return err
+	}
+	return err
+}
+
+func RetrieveExpense(db *sql.DB, m model.Expense) error {
+	query, err := q.BuildRetrieveQuery("expense", m)
 	if err == nil {
 		fmt.Println(query)
 	}
 	return err
 }
 
-func UpdateExpense(table table.Expense) error {
-	query, err := q.BuildUpdateQuery("expense", table)
+func DeleteExpense(db *sql.DB, m model.Expense) error {
+	query, err := q.BuildDeleteQuery("expense", m)
 	if err == nil {
-		fmt.Println(query)
-	}
-	return err
-}
-
-func RetrieveExpense(table table.Expense) error {
-	query, err := q.BuildRetrieveQuery("expense", table)
-	if err == nil {
-		fmt.Println(query)
-	}
-	return err
-}
-
-func DeleteExpense(table table.Expense) error {
-	query, err := q.BuildDeleteQuery("expense", table)
-	if err == nil {
-		fmt.Println(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
