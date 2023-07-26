@@ -193,7 +193,13 @@ func retrieveAccounts(c *gin.Context, p Plaid, testMode bool) {
 func retrieveTransactions(c *gin.Context, p Plaid, testMode bool) {
 	user := c.Query("username")
 	profile, _ := controller.RetrieveProfile(db, model.Profile{ Name: user })
-	transactions, _ := controller.RetrieveTransaction(db, model.Transaction{ ProfileID: profile.ID})
+	transactions, _ := controller.RetrieveTransaction(db, model.Transaction{ 
+		ProfileID: profile.ID, 
+		Query: model.Querys{ 
+			Select: model.QueryParameters{
+				Desc: true,
+				OrderBy: "transaction_date",
+		}}})
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": transactions,
 	})
