@@ -22,6 +22,7 @@ const TransactionContainer = () => {
         };
         fetchData();
     }, []);
+    console.log(transactions)
     const maxPeek = 6
     const maxChar = 18
     return (

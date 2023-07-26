@@ -34,6 +34,8 @@ type Transaction struct {
 	IsRecurring bool      `db:"is_recurring"`
 	Description string    `db:"short_description"`
 	ProfileID   int       `db:"profile_id"`
+	Query       Querys
+
 }
 type Account struct {
 	ID             int	   `db:"account_id"`

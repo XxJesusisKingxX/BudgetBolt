@@ -95,7 +95,7 @@ func createWhereCondition(t interface{}) string {
 			if !isEmpty {
 				columnName := fieldType.Tag.Get("db")
 				if columnName == "" {
-					panic("Missing `db` tag")
+					continue
 				}
 				if fieldValue.Kind() == reflect.Int {
 					condition = append(condition, fmt.Sprintf("%v = %v", columnName, fieldValue))

@@ -9,7 +9,7 @@ import (
 )
 
 func CreateTransaction(db *sql.DB, m model.Transaction) error {
-	query, err := q.BuildCreateQuery("transaction", m)
+	query, err := q.BuildTransactionCreateQuery(m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -18,7 +18,7 @@ func CreateTransaction(db *sql.DB, m model.Transaction) error {
 }
 
 func UpdateTransaction(db *sql.DB, m model.Transaction) error {
-	query, err := q.BuildUpdateQuery("transaction", m)
+	query, err := q.BuildTransactionUpdateQuery(m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -27,7 +27,7 @@ func UpdateTransaction(db *sql.DB, m model.Transaction) error {
 }
 
 func RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, error) {
-	query, err := q.BuildRetrieveQuery("transaction", m)
+	query, err := q.BuildTransactionRetrieveQuery(m)
 	if err == nil {
 		rows, err := db.Query(query)
 		if err != nil {
@@ -39,7 +39,7 @@ func RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, 
 }
 
 func DeleteTransaction(db *sql.DB, m model.Transaction) error {
-	query, err := q.BuildDeleteQuery("transaction", m)
+	query, err := q.BuildTransactionDeleteQuery(m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
