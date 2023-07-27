@@ -95,10 +95,10 @@ func main() {
 	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}, false) })
 	r.POST("/api/info", info)
-	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, false) })
-	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, PlaidClient{}, false) })
-	r.POST("/api/transactions/create", func(c *gin.Context){ createTransactions(c, PlaidClient{}, false) })
-	r.GET("/api/transactions/get", func(c *gin.Context){ retrieveTransactions(c, PlaidClient{}, false) })
+	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, true) })
+	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, controller.DB{}) })
+	r.POST("/api/transactions/create", func(c *gin.Context){ createTransactions(c, PlaidClient{}, controller.DB{}, false) })
+	r.GET("/api/transactions/get", func(c *gin.Context){ retrieveTransactions(c, controller.DB{}) })
 	r.GET("/api/investments_transactions", func(c *gin.Context){ investmentTransactions(c, PlaidClient{}, false) })
 	r.GET("/api/holdings", func(c *gin.Context){ holdings(c, PlaidClient{}, false) })
 	err := r.Run(":" + APP_PORT)
@@ -157,80 +157,99 @@ func getAccessToken(c *gin.Context, p Plaid, testMode bool) {
 	})
 }
 
-func createAccounts(c *gin.Context, p Plaid, testMode bool) {
+func createAccounts(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
 	ctx := context.Background()
 	user := c.PostForm("username")
-	profile, _ := controller.RetrieveProfile(db, model.Profile{ Name: user })
-	id := profile.ID
-	token, _ := controller.RetrieveToken(db, model.Token{ ProfileID: id })
-	accessToken := token.Token
-	if testMode {
-		accessToken = c.PostForm("access_token")
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	if err == nil {
+		id := profile.ID
+		token, err := dbhandler.RetrieveToken(db, id)
+		if err == nil {
+			accessToken := token.Token
+			accounts, err := p.AccountsGet(client, ctx, accessToken)
+			if err != nil {
+				renderError(c, err, PlaidClient{})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{
+				"accounts": accounts,
+			})
+			if !testMode {
+				resp.ParseAccountsToDB(db, id, accounts)
+			}
+		}
+		renderError(c, err, PlaidClient{})
 	}
-	accountsGetResp, err := p.AccountsGet(client, ctx, accessToken)
+	renderError(c, err, PlaidClient{})
+}
+func retrieveAccounts(c *gin.Context, dbhandler controller.DBHandler) {
+	user := c.Query("username")
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	if err == nil {
+		accounts, err := dbhandler.RetrieveAccount(db, profile.ID)
+		if err != nil {
+			renderError(c, err, PlaidClient{})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"accounts": accounts,
+		})
+	}
+	renderError(c, err, PlaidClient{})
+}
+
+func retrieveTransactions(c *gin.Context, dbhandler controller.DBHandler) {
+	user := c.Query("username")
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	var transactions []model.Transaction
+	if err == nil {
+		transactions, err = dbhandler.RetrieveTransaction(db, model.Transaction{ 
+			ProfileID: profile.ID, 
+			Query: model.Querys{ 
+				Select: model.QueryParameters{
+					Desc: true,
+					OrderBy: "transaction_date",
+			}}})
+	}
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
 	}
-	accounts := accountsGetResp.Accounts
-	c.JSON(http.StatusOK, gin.H{
-		"accounts": accounts,
-	})
-	if !testMode {
-		resp.ParseAccountsToDB(db, id, accounts)
-	}
-}
-func retrieveAccounts(c *gin.Context, p Plaid, testMode bool) {
-	user := c.Query("username")
-	profile, _ := controller.RetrieveProfile(db, model.Profile{ Name: user })
-	id := profile.ID
-	accounts, _ := controller.RetrieveAccount(db, model.Account{ ProfileID: id })
-	c.JSON(http.StatusOK, gin.H{
-		"accounts": accounts,
-	})
-}
-
-func retrieveTransactions(c *gin.Context, p Plaid, testMode bool) {
-	user := c.Query("username")
-	profile, _ := controller.RetrieveProfile(db, model.Profile{ Name: user })
-	transactions, _ := controller.RetrieveTransaction(db, model.Transaction{ 
-		ProfileID: profile.ID, 
-		Query: model.Querys{ 
-			Select: model.QueryParameters{
-				Desc: true,
-				OrderBy: "transaction_date",
-		}}})
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": transactions,
 	})
 }
 
-func createTransactions(c *gin.Context, p Plaid, testMode bool) {
+func createTransactions(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
 	ctx := context.Background()
 	user := c.PostForm("username")
-	profile, _ := controller.RetrieveProfile(db, model.Profile{ Name: user })
-	token, _ := controller.RetrieveToken(db, model.Token{ ProfileID: profile.ID })
-	accessToken := token.Token
-	if testMode {
-		accessToken = c.PostForm("access_token")
-	}
-	var cursor *string
-	var transactions []plaid.Transaction
-	hasMore := true
-	for hasMore {
-		resp, err := p.NewTransactionsSyncRequest(client, ctx, accessToken, cursor)
-		if err != nil {
-			renderError(c, err, PlaidClient{})
-			return
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	if err == nil {
+		token, err := dbhandler.RetrieveToken(db, profile.ID)
+		if err == nil {
+			accessToken := token.Token
+			var cursor *string
+			var transactions []plaid.Transaction
+			hasMore := true
+			for hasMore {
+				resp, err := p.NewTransactionsSyncRequest(client, ctx, accessToken, cursor)
+				fmt.Println(resp)
+				if err != nil {
+					renderError(c, err, PlaidClient{})
+					return
+				}
+				transactions = append(transactions, resp.GetAdded()...)
+				hasMore = resp.GetHasMore()
+				nextCursor := resp.GetNextCursor()
+				cursor = &nextCursor
+			}
+			if !testMode {
+				resp.ParseTransactionsToDB(db, profile.ID, transactions)
+			}
 		}
-		transactions = append(transactions, resp.GetAdded()...)
-		hasMore = resp.GetHasMore()
-		nextCursor := resp.GetNextCursor()
-		cursor = &nextCursor
+		renderError(c, err, PlaidClient{})
 	}
-	if !testMode {
-		resp.ParseTransactionsToDB(db, profile.ID, transactions)
-	}
+	renderError(c, err, PlaidClient{})
 }
 
 func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {
