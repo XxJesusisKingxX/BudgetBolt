@@ -22,7 +22,7 @@ func formatColumnsAndValues(t interface{}) (string, string) {
 			if !isEmpty {
 				columnName := fieldType.Tag.Get("db")
 				if columnName == "" {
-					panic("Missing `db` tag")
+					continue
 				}
 				column = append(column, columnName)
 				if fieldValue.Kind() == reflect.Int {
@@ -57,14 +57,12 @@ func setColumnsAndValues(t interface{}) string {
 				// Check if the field is empty
 				isEmpty := reflect.DeepEqual(fieldValue.Interface(), reflect.Zero(fieldValue.Type()).Interface())
 				// Add values that are not empty to array
-				if isEmpty {
+				if !isEmpty {
 					columnName := fieldType.Tag.Get("db")
 					if columnName == "" {
-						panic("Missing `db` tag")
+						continue
 					}
-					if fieldValue.Kind() == reflect.Int {
-						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue))
-					} else if fieldValue.Kind() == reflect.Float64 {
+					if fieldValue.Kind() == reflect.Float64 {
 						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue))
 					} else if fieldValue.Kind() == reflect.Bool {
 						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue))

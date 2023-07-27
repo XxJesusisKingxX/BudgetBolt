@@ -30,11 +30,11 @@ func BuildTransactionUpdateQuery(m model.Transaction) (string, error) {
 }
 
 func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
-	query := "SELECT * FROM transaction WHERE %v " // TODO have the ability to make more complex where conditons sunch as nesting and other operators: >,<,IS NULL,etc
+	query := "SELECT * FROM transaction WHERE %v" // TODO have the ability to make more complex where conditons sunch as nesting and other operators: >,<,IS NULL,etc
 	if m.Query.Select.Asc {
-		query = query + fmt.Sprintf("ORDER BY %v ASC", m.Query.Select.OrderBy)
+		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy)
 	} else if m.Query.Select.Desc {
-		query = query + fmt.Sprintf("ORDER BY %v DESC", m.Query.Select.OrderBy)
+		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy)
 	}
 	conditions := createWhereCondition(m)
 	if conditions == "" {
