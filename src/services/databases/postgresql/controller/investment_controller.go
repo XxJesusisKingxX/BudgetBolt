@@ -5,37 +5,40 @@ import (
 	"fmt"
 
 	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
-	table "budgetbolt/src/services/databases/postgresql/model"
+	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func CreateInvestment(db *sql.DB, table table.Investment) error {
-	query, err := q.BuildCreateQuery("investment", table)
+func CreateInvestment(db *sql.DB, m model.Investment) error {
+	query, err := q.BuildCreateQuery("investment", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func UpdateInvestment(db *sql.DB, table table.Investment) error {
-	query, err := q.BuildUpdateQuery("investment", table)
+func UpdateInvestment(db *sql.DB, m model.Investment) error {
+	query, err := q.BuildUpdateQuery("investment", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func RetrieveInvestment(db *sql.DB, table table.Investment) error {
-	query, err := q.BuildRetrieveQuery("investment", table)
+func RetrieveInvestment(db *sql.DB, m model.Investment) error {
+	query, err := q.BuildRetrieveQuery("investment", m)
 	if err == nil {
 		fmt.Println(query)
 	}
 	return err
 }
 
-func DeleteInvestment(db *sql.DB, table table.Investment) error {
-	query, err := q.BuildDeleteQuery("investment", table)
+func DeleteInvestment(db *sql.DB, m model.Investment) error {
+	query, err := q.BuildDeleteQuery("investment", m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }

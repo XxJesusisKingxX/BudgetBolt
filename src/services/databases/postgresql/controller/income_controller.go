@@ -8,8 +8,8 @@ import (
 	"budgetbolt/src/services/databases/postgresql/model"
 )
 
-func CreateHolding(db *sql.DB, m model.Holding) error {
-	query, err := q.BuildCreateQuery("holding", m)
+func CreateIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildCreateQuery("income", m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -17,8 +17,8 @@ func CreateHolding(db *sql.DB, m model.Holding) error {
 	return err
 }
 
-func UpdateHolding(db *sql.DB, m model.Holding) error {
-	query, err := q.BuildUpdateQuery("holding", m)
+func UpdateIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildUpdateQuery("income", m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -26,16 +26,16 @@ func UpdateHolding(db *sql.DB, m model.Holding) error {
 	return err
 }
 
-func RetrieveHolding(db *sql.DB, m model.Holding) error {
-	query, err := q.BuildRetrieveQuery("holding", m)
+func RetrieveIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildRetrieveQuery("income", m)
 	if err == nil {
 		fmt.Println(query)
 	}
 	return err
 }
 
-func DeleteHolding(db *sql.DB, m model.Holding) error {
-	query, err := q.BuildDeleteQuery("holding", m)
+func DeleteIncome(db *sql.DB, m model.Income) error {
+	query, err := q.BuildDeleteQuery("income", m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

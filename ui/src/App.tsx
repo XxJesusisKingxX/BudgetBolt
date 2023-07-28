@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useCallback } from "react";
 
-import Link from "./components/plaid/PlaidAccountConnect";
-import Context from "./Context";
-import Header from "./components/header/Header";
-import Home from "./pages/home/Home";
-import MenuBar from "./components/menubar/MenuBar";
+import Link from "./components/Plaid/PlaidLink";
+import Context from "./context/Context";
+import Header from "./components/Header/Header";
+import Home from "./pages/Home/Home";
 
 const App = () => {
   const { linkSuccess, isItemAccess, isPaymentInitiation, dispatch } = useContext(Context);
@@ -84,7 +83,6 @@ const App = () => {
   return (
     <>
       <Header>
-        <MenuBar/>
         <Home/>
         <Link/>
       </Header>

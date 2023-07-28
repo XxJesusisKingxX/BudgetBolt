@@ -2,40 +2,47 @@ package controller
 
 import (
 	"database/sql"
-	"fmt"
 
 	q "budgetbolt/src/services/databases/postgresql/controller/querybuilder"
-	table "budgetbolt/src/services/databases/postgresql/model"
+	"budgetbolt/src/services/databases/postgresql/model"
+	"budgetbolt/src/services/databases/postgresql/view"
 )
 
-func CreateTransaction(db *sql.DB, table table.Transaction) error {
-	query, err := q.BuildCreateQuery("transaction", table)
+func CreateTransaction(db *sql.DB, m model.Transaction) error {
+	query, err := q.BuildTransactionCreateQuery(m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func UpdateTransaction(db *sql.DB, table table.Transaction) error {
-	query, err := q.BuildUpdateQuery("transaction", table)
+func UpdateTransaction(db *sql.DB, m model.Transaction) error {
+	query, err := q.BuildTransactionUpdateQuery(m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }
 
-func RetrieveTransaction(db *sql.DB, table table.Transaction) error {
-	query, err := q.BuildRetrieveQuery("transaction", table)
+func RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, error) {
+	query, err := q.BuildTransactionRetrieveQuery(m)
 	if err == nil {
-		fmt.Println(query)
+		rows, err := db.Query(query)
+		if err != nil {
+			return nil, err
+		}
+		return view.ViewTransaction(rows), nil
 	}
-	return err
+	return nil, err
 }
 
-func DeleteTransaction(db *sql.DB, table table.Transaction) error {
-	query, err := q.BuildDeleteQuery("transaction", table)
+func DeleteTransaction(db *sql.DB, m model.Transaction) error {
+	query, err := q.BuildTransactionDeleteQuery(m)
 	if err == nil {
-		db.Exec(query)
+		_, err := db.Exec(query)
+		return err
 	}
 	return err
 }

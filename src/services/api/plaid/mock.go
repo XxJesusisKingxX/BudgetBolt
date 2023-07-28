@@ -10,7 +10,7 @@ import (
 type Plaid interface {
 	ToPlaidError(err error) (plaid.PlaidError, error)
 	ItemPublicTokenExchange(client *plaid.APIClient, ctx context.Context, publicToken string ) (plaid.ItemPublicTokenExchangeResponse, error)
-	AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.AccountsGetResponse, error)
+	AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) ([]plaid.AccountBase, error)
 	InvestmentsTransactionsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.InvestmentsTransactionsGetResponse, error)
 	InvestmentsHoldingsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.InvestmentsHoldingsGetResponse, error)
 	CreateLinkToken(client *plaid.APIClient, ctx context.Context, request *plaid.LinkTokenCreateRequest) (plaid.LinkTokenCreateResponse, error)
@@ -27,6 +27,7 @@ type MockPlaidClient struct {
 	RedirectURI string
 	PlaidError plaid.PlaidError
 	Err error
+	Accounts []plaid.AccountBase
 	ExchangeResp plaid.ItemPublicTokenExchangeResponse
 	AccountsResp plaid.AccountsGetResponse
 	InvestTransResp plaid.InvestmentsTransactionsGetResponse
@@ -47,8 +48,8 @@ func (t MockPlaidClient) ToPlaidError(err error) (plaid.PlaidError, error) {
 func (t MockPlaidClient) ItemPublicTokenExchange(client *plaid.APIClient, ctx context.Context, publicToken string ) (plaid.ItemPublicTokenExchangeResponse, error) {
 	return t.ExchangeResp, t.Err
 }
-func (t MockPlaidClient) AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.AccountsGetResponse, error) {
-	return t.AccountsResp, t.Err
+func (t MockPlaidClient) AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) ([]plaid.AccountBase, error) {
+	return t.Accounts, t.Err
 }
 func (t MockPlaidClient) InvestmentsTransactionsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.InvestmentsTransactionsGetResponse, error) {
 	return t.InvestTransResp, t.Err
@@ -91,11 +92,11 @@ func (t PlaidClient) ItemPublicTokenExchange(client *plaid.APIClient, ctx contex
 	).Execute()
 	return exchangePublicTokenResp, err
 }
-func (t PlaidClient) AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.AccountsGetResponse, error) {
+func (t PlaidClient) AccountsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) ([]plaid.AccountBase, error) {
 	accountsGetResp, _, err := client.PlaidApi.AccountsGet(ctx).AccountsGetRequest(
 		*plaid.NewAccountsGetRequest(accessToken),
 	).Execute()
-	return accountsGetResp, err
+	return accountsGetResp.Accounts, err
 }
 func (t PlaidClient) InvestmentsTransactionsGet(client *plaid.APIClient, ctx context.Context, accessToken string ) (plaid.InvestmentsTransactionsGetResponse, error) {
 	endDate := time.Now().Local().Format("2006-01-02")

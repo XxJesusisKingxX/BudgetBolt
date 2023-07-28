@@ -59,7 +59,7 @@ export function formatOverviewDate(currentDate) {
         default:
             month = "N/A"
             break;
-    }
+    };
     const date = `${month} ${day}, ${year}`;
-    return date
-}
+    return date;
+};

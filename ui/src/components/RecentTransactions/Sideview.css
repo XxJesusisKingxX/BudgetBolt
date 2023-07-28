@@ -1,0 +1,27 @@
+.sideview_container {
+    background-color: var(--WINDOW_MODE);
+    text-align: center;
+    width: 20rem;
+    height: 35rem;
+    margin-left: 1rem;
+    position: fixed;
+    top: 5rem;
+    border-radius: 1rem;
+    outline: auto;
+    outline: var(--FONT_MODE) solid 0.2rem;
+    z-index: -1
+}
+.sideview_title {
+    color: var(--FONT_MODE);
+    font-size: 1.3rem;
+    font-weight: 900;
+    position: relative;
+    top: 0.7rem;
+}
+.sideview_border {
+    background-color: var(--FONT_MODE);;
+    width: 100%;
+    height: 0.1rem;
+    position: relative;
+    top: 1rem;
+}

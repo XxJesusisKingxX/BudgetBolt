@@ -4,6 +4,7 @@ type Budget struct {
 	Name        string `db:"budget_name"`
 	Description string `db:"short_description"`
 	Frequency   string `db:"budget_frequency"`
+	ProfileID   int    `db:"profile_id"`
 }
 type Expense struct {
 	ID            int       `db:"expense_id"`
@@ -32,15 +33,17 @@ type Transaction struct {
 	Vendor      string    `db:"vendor"`
 	IsRecurring bool      `db:"is_recurring"`
 	Description string    `db:"short_description"`
+	ProfileID   int       `db:"profile_id"`
+	Query       Querys
+
 }
 type Account struct {
-	ID          int	    `db:"account_id"`
-	Name        string  `db:"account_name"`
-	Balance     float64 `db:"account_balance"`
-	PlaidID     string  `db:"plaid_id"`
-	Token       string  `db:"access_token"`
+	ID             int	   `db:"account_id"`
+	Name           string  `db:"account_name"`
+	Balance        float64 `db:"account_balance"`
+	PlaidAccountID string  `db:"plaid_account_id"`
+	ProfileID      int     `db:"profile_id"`
 }
-
 type Investment struct {
 	ID          int     `db:"investment_id"`
 	PlaidId     string  `db:"plaid_id"`
@@ -59,4 +62,15 @@ type Holding struct {
 	TotalValue  float64 `db:"total_value"`
 	LastPrice   float64 `db:"last_price"`
 	Quantity    float64 `db:"purchase_quantity"`
+}
+type Profile struct {
+	ID          int  `db:"profile_id"`
+	Name      string `db:"profile_name"`
+	Password  string `db:"profile_password"`
+}
+type Token struct {
+	ID          int  `db:"token_id"`
+	Item      string `db:"item_id"`
+	Token     string `db:"access_token"`
+	ProfileID    int    `db:"profile_id"`
 }

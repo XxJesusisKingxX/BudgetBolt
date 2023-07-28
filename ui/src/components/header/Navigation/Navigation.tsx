@@ -1,17 +1,17 @@
-import './MenuBar.css'
-import settingsIcon from '../menubar/icons/settings.png';
-import helpIcon from '../menubar/icons/help.png';
-import reminderIcon from '../menubar/icons/reminder.png';
-import goalIcon from '../menubar/icons/goal.png';
-import incomeIcon from '../menubar/icons/income.png';
-import expenseIcon from '../menubar/icons/expense.png';
-import transactionIcon from '../menubar/icons/transaction.png';
-import budgetIcon from '../menubar/icons/budget.png';
+import './Navigation.css';
+import settingsIcon from './icons/settings.png';
+import helpIcon from './icons/help.png';
+import reminderIcon from './icons/reminder.png';
+import goalIcon from './icons/goal.png';
+import incomeIcon from './icons/income.png';
+import expenseIcon from './icons/expense.png';
+import transactionIcon from './icons/transaction.png';
+import budgetIcon from './icons/budget.png';
 
 
-function MenuBar() {
+function Navigation() {
     return (
-        <div className="menubar">
+        <div className="navigation">
             <div className="top_line"></div>
             <div className="middle_line"></div>
             <div className="bottom_line"></div>
@@ -29,6 +29,6 @@ function MenuBar() {
             </div>
         </div>
     );
-}
+};
   
-export default MenuBar;
+export default Navigation;
