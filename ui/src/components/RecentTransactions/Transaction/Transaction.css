@@ -1,19 +1,19 @@
 .transaction-container {
     background:linear-gradient(var(--BACKGROUND_MODE), rgba(255, 255, 255, 0));
-    top: 1rem;
+    top: 0.5rem;
     margin: 1rem;
     width: 90%;
     height: 6rem;
     position: relative;
     text-align: left;
-    animation: fade 2s forwards;
+    animation: fade 2s backwards;
 }
 .transaction-icon {
     margin: 0.3rem;
     top: 0.5rem;
     width: 2rem;
     position: absolute;
-    animation: fade 2s forwards;
+    animation: fade 2s backwards;
 }
 .account-name {
     position: relative;
@@ -22,7 +22,7 @@
     font-weight: 900;
     font-size: larger;
     white-space: nowrap;
-    animation: fade 2s forwards;
+    animation: fade 2s backwards;
 }
 .transaction-name {
     position: relative;
@@ -30,7 +30,21 @@
     margin-left: 3.5rem;
     font-weight: 500;
     white-space: nowrap;
-    animation: fade 2s forwards;
+    animation: fade 2s backwards;
+}
+.transaction-loading {
+    position: relative;
+    top: 12rem;
+    width: 5rem;
+    animation: loading 1.2s infinite;
+}
+@keyframes loading {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: 360deg;
+    }
 }
 @keyframes fade {
     from {

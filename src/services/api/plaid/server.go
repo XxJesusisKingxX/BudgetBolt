@@ -199,7 +199,6 @@ func createTransactions(c *gin.Context, p Plaid, dbhandler controller.DBHandler,
 	hasMore := true
 	for hasMore {
 		resp, err := p.NewTransactionsSyncRequest(client, ctx, accessToken, cursor)
-		fmt.Println(resp)
 		if err != nil {
 			renderError(c, err, PlaidClient{})
 			return

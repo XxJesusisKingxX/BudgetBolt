@@ -1,0 +1,30 @@
+@keyframes loadAlt {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: -180deg;
+    }
+}
+@keyframes load {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: -180deg;
+    }
+}
+.sideview_refresh {
+    width: 1.4rem;
+    position: absolute;
+    margin-left: 1rem;
+    cursor: pointer;
+    animation: loadAlt 1s forwards;
+}
+.sideview_refresh_load {
+    width: 1.4rem;
+    position: absolute;
+    margin-left: 1rem;
+    cursor: pointer;
+    animation: load 1s forwards;
+}

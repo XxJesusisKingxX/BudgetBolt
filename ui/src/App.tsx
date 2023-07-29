@@ -1,40 +1,16 @@
 import React, { useEffect, useContext, useCallback } from "react";
 
-import Link from "./components/Plaid/PlaidLink";
+import PlaidLink from "./components/Plaid/PlaidLinkContainer";
 import Context from "./context/Context";
 import Header from "./components/Header/Header";
 import Home from "./pages/Home/Home";
 
 const App = () => {
-  const { linkSuccess, isItemAccess, isPaymentInitiation, dispatch } = useContext(Context);
-
-  const getInfo = useCallback(async () => {
-    const response = await fetch("/api/info", { method: "POST" });
-    if (!response.ok) {
-      dispatch({ type: "SET_STATE", state: { backend: false } });
-      return { paymentInitiation: false };
-    }
-    const data = await response.json();
-    const paymentInitiation: boolean = data.products.includes(
-      "payment_initiation"
-    );
-    dispatch({
-      type: "SET_STATE",
-      state: {
-        products: data.products,
-        isPaymentInitiation: paymentInitiation,
-      },
-    });
-    return { paymentInitiation };
-  }, [dispatch]);
+  const { dispatch } = useContext(Context);
 
   const generateToken = useCallback(
-    async (isPaymentInitiation) => {
-      // Link tokens for 'payment_initiation' use a different creation flow in your backend.
-      const path = isPaymentInitiation
-        ? "/api/create_link_token_for_payment"
-        : "/api/create_link_token";
-      const response = await fetch(path, {
+    async () => {
+      const response = await fetch("/api/create_link_token", {
         method: "POST",
       });
       if (!response.ok) {
@@ -47,8 +23,7 @@ const App = () => {
           dispatch({
             type: "SET_STATE",
             state: {
-              linkToken: null,
-              linkTokenError: data.error,
+              linkToken: null
             },
           });
           return;
@@ -63,9 +38,6 @@ const App = () => {
 
   useEffect(() => {
     const init = async () => {
-      const { paymentInitiation } = await getInfo(); // used to determine which path to take when generating token
-      // do not generate a new token for OAuth redirect; instead
-      // setLinkToken from localStorage
       if (window.location.href.includes("?oauth_state_id=")) {
         dispatch({
           type: "SET_STATE",
@@ -75,16 +47,16 @@ const App = () => {
         });
         return;
       }
-      generateToken(paymentInitiation);
+      generateToken();
     };
     init();
-  }, [dispatch, generateToken, getInfo]);
+  }, [dispatch, generateToken]);
 
   return (
     <>
       <Header>
         <Home/>
-        <Link/>
+        <PlaidLink/>
       </Header>
     </>
   );

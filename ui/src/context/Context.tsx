@@ -1,6 +1,9 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
 
 interface QuickstartState {
+  isTransactionsUpdated: boolean
+  lastTransactionsUpdate: Date,
+  isTransactionsRefresh: boolean
   linkSuccess: boolean;
   isItemAccess: boolean;
   isPaymentInitiation: boolean;
@@ -18,6 +21,9 @@ interface QuickstartState {
 }
 
 const initialState: QuickstartState = {
+  isTransactionsUpdated: false,
+  lastTransactionsUpdate: new Date(),
+  isTransactionsRefresh: false,
   linkSuccess: false,
   isItemAccess: true,
   isPaymentInitiation: false,

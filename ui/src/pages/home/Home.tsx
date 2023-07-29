@@ -1,6 +1,6 @@
 import './Home.css';
-import Sideview from '../../components/RecentTransactions/Sideview';
 import Overview from '../../components/Overview/OverviewContainer';
+import Sideview from '../../components/RecentTransactions/SideviewContainer';
 
 const Home = () => {
     return (
