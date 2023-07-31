@@ -1,4 +1,4 @@
-.plaid_addbutton {
+.plaid-addbutton {
     background-color: var(--FONT_MODE);
     color: var(--BACKGROUND_MODE);
     border-width: 0;
@@ -8,7 +8,7 @@
     height: 2rem;
     width: 6rem;
 }
-.plaid_addbutton:hover {
+.plaid-addbutton:hover {
     background-color: rgb(63, 61, 61);
     transition: 0.2s;
     cursor: pointer;

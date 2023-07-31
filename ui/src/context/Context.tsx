@@ -1,6 +1,8 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
 
 interface QuickstartState {
+  showCreateWindow: boolean,
+  showLoginWindow: boolean,
   isTransactionsUpdated: boolean
   lastTransactionsUpdate: Date,
   isTransactionsRefresh: boolean
@@ -21,6 +23,8 @@ interface QuickstartState {
 }
 
 const initialState: QuickstartState = {
+  showCreateWindow: false,
+  showLoginWindow: false,
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),
   isTransactionsRefresh: false,

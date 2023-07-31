@@ -1,0 +1,68 @@
+@keyframes press {
+    from {
+        box-shadow:  5px 5px 5px grey;
+    }
+    to {
+        box-shadow:  1px 1px 1px grey;
+    }
+}
+.create-window-container {
+    background-color: var(--BACKGROUND_MODE);
+    position: absolute;
+    text-align: center;
+    height: 12rem;
+    width: 17rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+}
+.create-window-title {
+    color: var(--FONT_MODE);
+    top: 1rem;
+    font-size: x-large;
+}
+#create-username {
+    color: var(--FONT_MODE);
+    border-color: var(--FONT_MODE);
+    border-radius: 0.5rem;
+}
+#create-username:hover{
+    background-color: rgb(207, 207, 207);
+    transition: 0.2s;
+}
+#create-password {
+    color: var(--FONT_MODE);
+    border-color: var(--FONT_MODE);
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+}
+#create-password:hover{
+    background-color: rgb(207, 207, 207);
+    transition: 0.2s;
+}
+.create-window-cancel {
+    width: 1rem;
+    position: absolute;
+    left: 90%;
+    cursor: pointer;
+}
+.create-submit-button {
+    background-color: var(--FONT_MODE);
+    color: var(--BACKGROUND_MODE);
+    border-radius: 2rem;
+    box-shadow: 5px 5px 5px grey;
+    margin-top: 0.5rem;
+    height: 2rem;
+    width: 4rem;
+    white-space: nowrap;
+}
+.create-submit-button:hover {
+    background-color: rgb(63, 61, 61);
+    transition: 0.2s;
+    cursor: pointer;
+}
+.create-submit-button:active {
+    animation: press 0.1s forwards;
+}

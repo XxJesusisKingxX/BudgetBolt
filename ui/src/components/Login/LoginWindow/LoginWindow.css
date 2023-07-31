@@ -1,0 +1,57 @@
+.login-window-container {
+    background-color: var(--BACKGROUND_MODE);
+    position: absolute;
+    text-align: center;
+    height: 10rem;
+    width: 15rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+}
+.login-window-title {
+    color: var(--FONT_MODE);
+    top: 1rem;
+    font-size: x-large;
+}
+#username {
+    color: var(--FONT_MODE);
+    border-color: var(--FONT_MODE);
+    border-radius: 0.5rem;
+}
+#username:hover{
+    background-color: rgb(207, 207, 207);
+    transition: 0.2s;
+}
+#password {
+    color: var(--FONT_MODE);
+    border-color: var(--FONT_MODE);
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+}
+#password:hover{
+    background-color: rgb(207, 207, 207);
+    transition: 0.2s;
+}
+.login-window-cancel {
+    width: 1rem;
+    position: absolute;
+    left: 90%;
+    cursor: pointer;
+}
+.login-window-create {
+    color: var(--FONT_MODE);
+    margin-top: 1rem;
+    font-weight: 500;
+}
+.login-window-signup {
+    color: var(--FONT_MODE);
+    font-size: small;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.login-window-signup:hover {
+    color: grey;
+    transition: 0.2s;
+}
