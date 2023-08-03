@@ -5,6 +5,7 @@ import { ChangeEventHandler, FormEventHandler } from 'react';
 
 interface Props {
     close: Function
+    error: boolean
     isLoading: boolean
     username: string
     password: string
@@ -13,7 +14,7 @@ interface Props {
     signup: FormEventHandler<HTMLFormElement>
 };
 
-const SignupWindow: React.FC<Props> = ({ close, isLoading, username, password, userChange, passChange, signup, }) => {
+const SignupWindow: React.FC<Props> = ({ close, error, isLoading, username, password, userChange, passChange, signup, }) => {
     return (
         <>
             <div className="create-window-container">
@@ -23,6 +24,7 @@ const SignupWindow: React.FC<Props> = ({ close, isLoading, username, password, u
                     <input id="create-password" type="password" value={password} onChange={passChange} placeholder="Password" required/>
                     <br/>
                     {!isLoading ? <button type="submit" className="create-submit-button">Submit</button> : <img src={loading} className="signup-loading"/>}
+                    {error ? <div>{error}</div> : null}
                 </form>
             </div>
         </>

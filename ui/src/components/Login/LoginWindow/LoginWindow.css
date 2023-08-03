@@ -10,7 +10,7 @@
     background-color: var(--BACKGROUND_MODE);
     position: absolute;
     text-align: center;
-    height: 12rem;
+    height: 14rem;
     width: 15rem;
     left: 50%;
     top: 50%;
@@ -20,13 +20,16 @@
 }
 .login-window-title {
     color: var(--FONT_MODE);
-    top: 1rem;
     font-size: x-large;
+    margin: 0;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 #username {
     color: var(--FONT_MODE);
     border-color: var(--FONT_MODE);
     border-radius: 0.5rem;
+    padding: 0.3rem;
 }
 #username:hover{
     background-color: rgb(207, 207, 207);
@@ -36,7 +39,9 @@
     color: var(--FONT_MODE);
     border-color: var(--FONT_MODE);
     border-radius: 0.5rem;
-    margin-top: 0.5rem;
+    position: relative;
+    top: 0.5rem;
+    padding: 0.3rem;
 }
 #password:hover{
     background-color: rgb(207, 207, 207);
@@ -50,8 +55,9 @@
 }
 .login-window-create {
     color: var(--FONT_MODE);
-    margin-top: 0.5rem;
     font-weight: 500;
+    padding-top: 1rem;
+    padding-bottom: 0.3rem;
 }
 .login-window-signup {
     color: var(--FONT_MODE);
@@ -63,27 +69,34 @@
     color: grey;
     transition: 0.2s;
 }
-.login-submit-button {
+.login-acc-button {
     background-color: var(--FONT_MODE);
     color: var(--BACKGROUND_MODE);
     border-radius: 2rem;
     box-shadow: 5px 5px 5px grey;
-    margin-top: 0.5rem;
-    height: 2rem;
-    width: 4rem;
-    white-space: nowrap;
+    position: relative;
+    height: 1.5rem;
+    width: 8rem;
+    left: 50%;
+    top: 7%;
+    transform: translate(-50%, -50%);
 }
-.login-submit-button:hover {
+.login-acc-button:hover {
     background-color: rgb(63, 61, 61);
     transition: 0.2s;
     cursor: pointer;
 }
-.login-submit-button:active {
+.login-acc-button:active {
     animation: press 0.1s forwards;
 }
 .login-loading {
     position: relative;
-    top: 0.5rem;
+    top: 0.4rem;
     width: 2rem;
     animation: loading 1.2s infinite;
+}
+.login-error {
+    color: red;
+    position: relative;
+    /* top: -0.5rem; */
 }

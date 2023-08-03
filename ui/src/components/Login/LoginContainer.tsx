@@ -11,6 +11,8 @@ const LoginContainer = () => {
     const [showCreateWindow, setShowCreateWindow] = useState(false);
     const [showLoginWindow, setShowLoginWindow] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showLoginError, setShowLoginError] = useState(false);
+    const [showSignUpError, setShowSignUpError] = useState(false);
 
     const showLogin = (show: boolean) => {
         if (show) {
@@ -31,18 +33,17 @@ const LoginContainer = () => {
                 })
             });
             if (response.status == 200) {
-                
                 setIsLoading(false);
                 setShowCreateWindow(false);
-                console.log("success")
             }
         } catch (error) {
             setIsLoading(false);
             console.error("Error fetching data:", error);
         }
     }
-    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+
+    const handleLogin = async () => {
+        setShowLoginError(false);
         setIsLoading(true);
         try {
             const response = await fetch("/api/profile/get", {
@@ -60,17 +61,33 @@ const LoginContainer = () => {
                 console.log(data["id"])
             } else {
                 setIsLoading(false);
+                setShowLoginError(true);
             }
         } catch (error) {
             setIsLoading(false);
-            console.error("Error fetching data:", error);
+            setShowLoginError(true);
         }
     }
     const handleUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setUsername(event.target.value);
+        let maxChar = 25
+        const validStart = new RegExp("^[a-zA-Z_][a-zA-Z0-9_]$"); // make sure starts with _ or alpha minimum and the follwing can be numebr, alpha , or underscore
+        const isUnder = username.length <= maxChar ? true : false;
+        if (validStart.test(username) && isUnder) {
+            console.log("valid")
+        } else {
+            console.log("invalid")
+        }
     }
     const handlePassInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value);
+        //TODO FIX
+        // const complexityRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")
+        // if (complexityRegex.test(password)) {
+        //     console.log("valid")
+        // } else {
+        //     console.log("invalid")
+        // }
     }
     const clearFields = () => {
         setUsername("");
@@ -107,6 +124,7 @@ const LoginContainer = () => {
                     clearFields();
                     showLogin(true);
                 }}
+                error={showLoginError}
             />
             ) : (
                 null
@@ -124,6 +142,7 @@ const LoginContainer = () => {
                     clearFields();
                     showLogin(true);
                 }}
+                error={showSignUpError}
             />
             ) : (
                 null
