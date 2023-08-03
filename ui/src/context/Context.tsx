@@ -1,6 +1,8 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
 
 interface QuickstartState {
+  isLoading: boolean
+  isLogin: boolean
   showCreateWindow: boolean,
   showLoginWindow: boolean,
   isTransactionsUpdated: boolean
@@ -23,6 +25,8 @@ interface QuickstartState {
 }
 
 const initialState: QuickstartState = {
+  isLoading: false,
+  isLogin: false,
   showCreateWindow: false,
   showLoginWindow: false,
   isTransactionsUpdated: false,

@@ -1,19 +1,29 @@
 import './SignupWindow.css';
 import cancel from '../icons/cancel-dark.png'
+import loading from '../../../images/loading.png'
+import { ChangeEventHandler, FormEventHandler } from 'react';
 
 interface Props {
     close: Function
+    isLoading: boolean
+    username: string
+    password: string
+    userChange: ChangeEventHandler<HTMLInputElement>
+    passChange: ChangeEventHandler<HTMLInputElement>
+    signup: FormEventHandler<HTMLFormElement>
 };
 
-const SignupWindow: React.FC<Props> = ({ close }) => {
+const SignupWindow: React.FC<Props> = ({ close, isLoading, username, password, userChange, passChange, signup, }) => {
     return (
         <>
             <div className="create-window-container">
                 <h1 className="create-window-title">Create a Account<img className="create-window-cancel" src={cancel} onClick={() => close()}/></h1>
-                <input id="create-username" type="text" placeholder="User"/>
-                <input id="create-password" type="text" placeholder="Password"/>
-                <br/>
-                <button className="create-submit-button">Submit</button>
+                <form onSubmit={signup}>
+                    <input id="create-username" value={username} onChange={userChange} placeholder="User" required/>
+                    <input id="create-password" type="password" value={password} onChange={passChange} placeholder="Password" required/>
+                    <br/>
+                    {!isLoading ? <button type="submit" className="create-submit-button">Submit</button> : <img src={loading} className="signup-loading"/>}
+                </form>
             </div>
         </>
     );

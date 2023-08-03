@@ -1,8 +1,16 @@
+@keyframes loading {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: 360deg;
+    }
+}
 .login-window-container {
     background-color: var(--BACKGROUND_MODE);
     position: absolute;
     text-align: center;
-    height: 10rem;
+    height: 12rem;
     width: 15rem;
     left: 50%;
     top: 50%;
@@ -42,7 +50,7 @@
 }
 .login-window-create {
     color: var(--FONT_MODE);
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     font-weight: 500;
 }
 .login-window-signup {
@@ -54,4 +62,28 @@
 .login-window-signup:hover {
     color: grey;
     transition: 0.2s;
+}
+.login-submit-button {
+    background-color: var(--FONT_MODE);
+    color: var(--BACKGROUND_MODE);
+    border-radius: 2rem;
+    box-shadow: 5px 5px 5px grey;
+    margin-top: 0.5rem;
+    height: 2rem;
+    width: 4rem;
+    white-space: nowrap;
+}
+.login-submit-button:hover {
+    background-color: rgb(63, 61, 61);
+    transition: 0.2s;
+    cursor: pointer;
+}
+.login-submit-button:active {
+    animation: press 0.1s forwards;
+}
+.login-loading {
+    position: relative;
+    top: 0.5rem;
+    width: 2rem;
+    animation: loading 1.2s infinite;
 }

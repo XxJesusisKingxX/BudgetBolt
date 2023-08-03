@@ -11,7 +11,10 @@
     "@types/react-dom": "^16.9.8",
     "ajv": "^8.11.2",
     "ajv-keywords": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
+    "crypto": "^1.0.1",
+    "fs": "^0.0.1-security",
     "immer": "^9.0.6",
     "plaid": "^9.2.0",
     "plaid-threads": "^11.2.3",
@@ -54,6 +57,8 @@
     ]
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/classnames": "^2.2.11"
   },
   "engines": {

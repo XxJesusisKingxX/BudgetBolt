@@ -41,7 +41,7 @@ const TransactionContainer = () => {
                 setTransactions(data["transactions"]);
                 setIsLoading(false);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                
             }
         };
         // retrieveTransactions();
