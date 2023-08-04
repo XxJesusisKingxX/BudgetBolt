@@ -26,60 +26,41 @@
     border: 0.2rem solid var(--FONT_MODE);
     border-radius: 1rem;
 }
-.create-window-title {
-    color: var(--FONT_MODE);
-    top: 1rem;
-    font-size: x-large;
-}
-#create-username {
-    color: var(--FONT_MODE);
-    border-color: var(--FONT_MODE);
-    border-radius: 0.5rem;
-}
-#create-username:hover{
-    background-color: rgb(207, 207, 207);
-    transition: 0.2s;
-}
-#create-password {
-    color: var(--FONT_MODE);
-    border-color: var(--FONT_MODE);
-    border-radius: 0.5rem;
-    margin-top: 0.5rem;
-}
-#create-password:hover{
-    background-color: rgb(207, 207, 207);
-    transition: 0.2s;
-}
 .create-window-cancel {
     width: 1rem;
     position: absolute;
     left: 90%;
     cursor: pointer;
 }
-.create-submit-button {
+.signup-acc-button {
     background-color: var(--FONT_MODE);
     color: var(--BACKGROUND_MODE);
     border-radius: 2rem;
     box-shadow: 5px 5px 5px grey;
-    margin-top: 0.5rem;
-    height: 2rem;
-    width: 4rem;
-    white-space: nowrap;
+    position: relative;
+    height: 1.5rem;
+    width: 8rem;
+    left: 50%;
+    top: 15%;
+    transform: translate(-50%, -50%);
 }
-.create-submit-button:hover {
+.signup-acc-button:hover {
     background-color: rgb(63, 61, 61);
     transition: 0.2s;
     cursor: pointer;
 }
-.create-submit-button:active {
-    animation: press 0.1s forwards;
-}
-.signup-submit-button:active {
+.signup-acc-button:active {
     animation: press 0.1s forwards;
 }
 .signup-loading {
     position: relative;
-    top: 0.5rem;
+    top: 1rem;
     width: 2rem;
     animation: loading 1.2s infinite;
+}
+.signup-failed {
+    color: red;
+    position: relative;
+    padding-top: 0.5rem;
+    font-size: 0.5rem;
 }

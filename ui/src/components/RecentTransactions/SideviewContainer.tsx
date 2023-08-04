@@ -3,10 +3,16 @@ import Sideview from './Sideview';
 import { useContext } from 'react';
 
 const SideviewContainer = () => {
-    const {lastTransactionsUpdate} = useContext(Context)
+    const {lastTransactionsUpdate, isLogin} = useContext(Context)
     return (
         <>
-            <Sideview lastUpdate={lastTransactionsUpdate.toLocaleDateString() + " " + lastTransactionsUpdate.toLocaleTimeString()} />
+            {isLogin ? (
+            <Sideview
+                lastUpdate={lastTransactionsUpdate.toLocaleDateString() + " " + lastTransactionsUpdate.toLocaleTimeString()} 
+            />
+            ) : (
+                null
+            )}
         </>
     );
 };

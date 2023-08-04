@@ -23,7 +23,7 @@
     font-size: x-large;
     margin: 0;
     padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-bottom: 0.5rem;
 }
 #username {
     color: var(--FONT_MODE);
@@ -95,8 +95,12 @@
     width: 2rem;
     animation: loading 1.2s infinite;
 }
-.login-error {
+.login-failed {
     color: red;
     position: relative;
-    /* top: -0.5rem; */
+    font-size: 0.5rem;
+}
+.login-invalid {
+    color: red;
+    font-size: 0.5rem;
 }

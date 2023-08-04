@@ -5,144 +5,148 @@ import LoginWindow from "./LoginWindow/LoginWindow";
 import SignupWindow from "./SignupWindow/SignupWindow";
 
 const LoginContainer = () => {
-    const { isLogin, dispatch } = useContext(Context);
+    const { isLogin, profile, dispatch } = useContext(Context);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showLogin, setShowLogin] = useState(true);
     const [showCreateWindow, setShowCreateWindow] = useState(false);
     const [showLoginWindow, setShowLoginWindow] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [showLoginError, setShowLoginError] = useState(false);
-    const [showSignUpError, setShowSignUpError] = useState(false);
+    const [showLoading, setShowLoading] = useState(false);
+    const [showValidationError, setShowValidationError] = useState(false);
+    const [showServerError, setShowServerError] = useState(false);
 
-    const showLogin = (show: boolean) => {
-        if (show) {
-            dispatch({ type:"SET_STATE", state:{ isLogin: false }});
+    const AuthType = {
+        SignUp: 1,
+        Login: 2,
+    };
+    const handleAuthentication = (authType: number) => {
+        if (!validateUser(username) || !validatePass(password)) {
+            setShowServerError(false)
+            setShowValidationError(true);
         } else {
-            dispatch({ type:"SET_STATE", state:{ isLogin: true }});
-        }
-    }
-    const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsLoading(true);
-        try {
-            const response = await fetch("/api/profile/create", {
-                method: "POST",
-                body: new URLSearchParams ({
-                    username: username,
-                    password: password
-                })
-            });
-            if (response.status == 200) {
-                setIsLoading(false);
-                setShowCreateWindow(false);
+            setShowValidationError(false);
+            setShowServerError(false);
+            setShowLoading(true);
+            const startAuth = async () => {
+                try {
+                    const response = await fetch(authType == AuthType.Login
+                    ? "/api/profile/get"
+                    : "/api/profile/create", {
+                        method: "POST",
+                        body: new URLSearchParams ({
+                            username: username,
+                            password: password
+                        })
+                    });
+                    if (response.status == 200) {
+                        clearFields();
+                        dispatch({ type:"SET_STATE", state:{ isLogin: true }});
+                        dispatch({ type:"SET_STATE", state:{ profile: username.toLocaleUpperCase() }});
+                    } else {
+                        setShowLoading(false);
+                        setShowServerError(true);
+                    }
+                } catch (error) {
+                    setShowLoading(false);
+                    setShowServerError(true);
+                }
             }
-        } catch (error) {
-            setIsLoading(false);
-            console.error("Error fetching data:", error);
+            startAuth()
         }
     }
-
-    const handleLogin = async () => {
-        setShowLoginError(false);
-        setIsLoading(true);
-        try {
-            const response = await fetch("/api/profile/get", {
-                method: "POST",
-                body: new URLSearchParams ({
-                    username: username,
-                    password: password
-                })
-            });
-            if (response.status == 200) {
-                dispatch({ type:"SET_STATE", state:{ isLogin: true }});
-                setIsLoading(false);
-                setShowLoginWindow(false);
-                let data = await response.json()
-                console.log(data["id"])
-            } else {
-                setIsLoading(false);
-                setShowLoginError(true);
-            }
-        } catch (error) {
-            setIsLoading(false);
-            setShowLoginError(true);
-        }
-    }
-    const handleUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setUsername(event.target.value);
+    const validateUser = (username: string) => {
         let maxChar = 25
-        const validStart = new RegExp("^[a-zA-Z_][a-zA-Z0-9_]$"); // make sure starts with _ or alpha minimum and the follwing can be numebr, alpha , or underscore
+        const validStart = new RegExp(`^_?[a-zA-Z][a-zA-Z0-9_]{1,${maxChar}}$`); // make sure starts with _ (if _ must have letter follow) or letter minimum and the following can be a number, letter , or underscore
         const isUnder = username.length <= maxChar ? true : false;
         if (validStart.test(username) && isUnder) {
-            console.log("valid")
+            return true
         } else {
-            console.log("invalid")
+            return false
         }
     }
-    const handlePassInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const validatePass = (password: string) => {
+        let maxChar = 8
+        const complexityRegex = new RegExp(`^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{${maxChar},}$`)
+        if (complexityRegex.test(password)) {
+            return true
+        } else {
+            return false
+        }
+    }
+    const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setUsername(event.target.value);
+    }
+    const handleUserKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        setUsername(event.currentTarget.value);
+    }
+    const handlePassChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value);
-        //TODO FIX
-        // const complexityRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")
-        // if (complexityRegex.test(password)) {
-        //     console.log("valid")
-        // } else {
-        //     console.log("invalid")
-        // }
+    }
+    const handlePassKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        setPassword(event.currentTarget.value);
     }
     const clearFields = () => {
         setUsername("");
         setPassword("");
+        setShowLoading(false)
+        setShowServerError(false)
+        setShowValidationError(false)
+        setShowLoginWindow(false);
+        setShowCreateWindow(false);
     }
     return (
         <>
             {!isLogin ? (
-            <Login 
+            <Login
                 open={() => {
                     setShowLoginWindow(true);
-                    showLogin(false);
+                    setShowLogin(false);
                 }}
-                
             />
             ) : (
                 null
             )}
             {showLoginWindow ? (
             <LoginWindow
-                isLoading={isLoading}
-                login={handleLogin}
-                userChange={handleUserInput}
+                isInvalidInput={showValidationError}
+                isLoading={showLoading}
+                login={() => handleAuthentication(AuthType.Login)}
+                userKeyUp={handleUserKeyUp}
+                userChange={handleUserChange}
                 username={username}
-                passChange={handlePassInput}
+                passKeyUp={handlePassKeyUp}
+                passChange={handlePassChange}
                 password={password}
                 open={() => {
+                    clearFields();
                     setShowLoginWindow(false);
                     setShowCreateWindow(true);
                 }}
                 close={() => {
-                    setShowLoginWindow(false);
-                    setShowCreateWindow(false);
+                    setShowLogin(true);
                     clearFields();
-                    showLogin(true);
                 }}
-                error={showLoginError}
+                error={showServerError}
             />
             ) : (
                 null
             )}
             {showCreateWindow ? (
             <SignupWindow
-                isLoading={isLoading}
-                signup={handleSignUp}
-                userChange={handleUserInput}
+                isInvalidInput={showValidationError}
+                isLoading={showLoading}
+                signup={() => handleAuthentication(AuthType.SignUp)}
+                userKeyUp={handleUserKeyUp}
+                userChange={handleUserChange}
                 username={username}
-                passChange={handlePassInput}
+                passKeyUp={handlePassKeyUp}
+                passChange={handlePassChange}
                 password={password}
                 close={() => {
-                    setShowCreateWindow(false);
+                    setShowLogin(true);
                     clearFields();
-                    showLogin(true);
                 }}
-                error={showSignUpError}
+                error={showServerError}
             />
             ) : (
                 null
