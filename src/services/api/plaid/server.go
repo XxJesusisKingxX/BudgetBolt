@@ -66,11 +66,11 @@ func init() {
 func main() {
 	r := gin.Default()
 	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
-	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}, false) })
+	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}, controller.DB{}, false) })
 	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, controller.DB{}) })
 	r.POST("/api/profile/get", func(c *gin.Context){ retrieveProfile(c, controller.DB{}) })
-	r.POST("/api/profile/create", func(c *gin.Context){ createProfile(c, controller.DB{}) })
+	r.POST("/api/profile/create", func(c *gin.Context){ createProfile(c, controller.DB{}, true) })
 	r.POST("/api/transactions/create", func(c *gin.Context){ createTransactions(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/transactions/get", func(c *gin.Context){ retrieveTransactions(c, controller.DB{}) })
 	r.GET("/api/investments_transactions", func(c *gin.Context){ investmentTransactions(c, PlaidClient{}, false) })
@@ -90,23 +90,18 @@ func retrieveProfile(c *gin.Context, dbhandler controller.DBHandler) {
 		renderError(c, err, PlaidClient{})
 		return
 	}
+	if pass == userProfile.Password {
+		fmt.Print("HIT")
+	}
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
 	if auth == nil {
-		token, err := dbhandler.RetrieveToken(db, userProfile.ID)
-		if err == nil {
-			c.JSON(http.StatusOK, gin.H{
-				"id": userProfile.ID,
-				"token": token.Token,
-			})
-		} else {
-			c.JSON(http.StatusNotFound, gin.H{})
-		}
+		c.JSON(http.StatusOK, gin.H{})
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{})
 	}
 }
 
-func createProfile(c *gin.Context, dbhandler controller.DBHandler) {
+func createProfile(c *gin.Context, dbhandler controller.DBHandler, testMode bool) {
 	user := c.PostForm("username")
 	pass := c.PostForm("password")
 	// Test if username is already taken
@@ -115,7 +110,13 @@ func createProfile(c *gin.Context, dbhandler controller.DBHandler) {
 		c.JSON(http.StatusConflict, gin.H{})
 		return
 	}
-	hashedPass, err := bcrypt.GenerateFromPassword([]byte(pass), 17)
+	var err error
+	var hashedPass []byte
+	saltRounds := 17
+	if testMode {
+		saltRounds = 1
+	}
+	hashedPass, err = bcrypt.GenerateFromPassword([]byte(pass), saltRounds)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
@@ -141,7 +142,7 @@ func createLinkToken(c *gin.Context, p Plaid) {
 	c.JSON(http.StatusOK, gin.H{"link_token": linkTokenCreateResp.GetLinkToken()})
 }
 
-func getAccessToken(c *gin.Context, p Plaid, testMode bool) {
+func getAccessToken(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
 	ctx := context.Background()
 	publicToken := c.PostForm("public_token")
 	user := c.PostForm("profile")
@@ -153,16 +154,16 @@ func getAccessToken(c *gin.Context, p Plaid, testMode bool) {
 	var id int
 	accessToken := exchangePublicTokenResp.GetAccessToken()
 	itemID := exchangePublicTokenResp.GetItemId()
-	if !testMode {
-		profile, err := controller.RetrieveProfile(db, model.Profile{ Name: user })
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	if err == nil {
 		id = profile.ID
-		if err == nil {
+		if !testMode{
 			controller.CreateToken(db, model.Token{ ProfileID: id, Item: itemID, Token: accessToken })
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{})
 		}
+		c.JSON(http.StatusOK, gin.H{})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{})
 	}
-	c.JSON(http.StatusOK, gin.H{})
 }
 
 func createAccounts(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
