@@ -1,13 +1,15 @@
-import './Transaction.css'
-import reel from './icons/reel.png'
+import "./Transaction.css";
 
 interface Props {
+    mode: string
     account: string
     transaction: string
     amount: number
     bottom?: React.CSSProperties
-}
-const Transaction: React.FC<Props> = ({account, transaction, amount, bottom}) => {
+};
+
+const Transaction: React.FC<Props> = ({mode, account, transaction, amount, bottom}) => {
+    const reel = `/images/${mode}/reel.png`;
     return (
         <div className="transaction-container" style={bottom}>
             <img src={reel} className="transaction-icon"/>
@@ -18,4 +20,4 @@ const Transaction: React.FC<Props> = ({account, transaction, amount, bottom}) =>
     );
 };
 
-export default Transaction
+export default Transaction;

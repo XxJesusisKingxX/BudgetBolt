@@ -1,6 +1,5 @@
-import React, { useEffect, useContext, useCallback } from "react";
-
-import PlaidLink from "./components/Plaid/PlaidLinkContainer";
+import { useEffect, useContext, useCallback } from "react";
+import Login from "./components/Login/LoginContainer"
 import Context from "./context/Context";
 import Header from "./components/Header/Header";
 import Home from "./pages/Home/Home";
@@ -56,7 +55,8 @@ const App = () => {
     <>
       <Header>
         <Home/>
-        <PlaidLink/>
+        {/* <PlaidLink/> */}
+        <Login/>
       </Header>
     </>
   );

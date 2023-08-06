@@ -1,3 +1,19 @@
+@keyframes loading {
+    from {
+        rotate: 0deg;
+    }
+    to {
+        rotate: 360deg;
+    }
+}
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 100;
+    }
+}
 .transaction-container {
     background:linear-gradient(var(--BACKGROUND_MODE), rgba(255, 255, 255, 0));
     top: 0.5rem;
@@ -37,20 +53,4 @@
     top: 12rem;
     width: 5rem;
     animation: loading 1.2s infinite;
-}
-@keyframes loading {
-    from {
-        rotate: 0deg;
-    }
-    to {
-        rotate: 360deg;
-    }
-}
-@keyframes fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 100;
-    }
 }

@@ -1,0 +1,28 @@
+.account-window-container {
+    background-color: var(--BACKGROUND_MODE);
+    position: absolute;
+    text-align: center;
+    height: 12rem;
+    width: 17rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+}
+.account-window-title {
+    color: var(--FONT_MODE);
+    margin: 0;
+    padding-top: 1rem;
+}
+.account-window-cancel {
+    width: 1rem;
+    position: absolute;
+    top: 5%;
+    left: 90%;
+    cursor: pointer;
+}
+.account-link-button {
+    position: relative;
+    top: 10%
+}

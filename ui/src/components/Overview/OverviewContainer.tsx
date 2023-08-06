@@ -1,12 +1,21 @@
-import { formatOverviewDate } from '../../utils/FormatDate';
-import { getUser } from '../../utils/Profile';
-import Overview from './Overview';
-
+import { useContext } from "react";
+import { formatOverviewDate } from "../../utils/formatDate";
+import Overview from "./Overview";
+import Context from "../../context/Context";
 
 const OverviewContainer = () => {
-
+    const { isLogin, profile } = useContext(Context);
     return (
-        <Overview user={getUser()} date={formatOverviewDate(new Date)}/>
+        <>
+            {isLogin ? (
+            <Overview
+                user={profile.toLocaleUpperCase()}
+                date={formatOverviewDate(new Date)}
+            />
+            ) : (
+                null
+            )}
+        </>
     );
 };
 
