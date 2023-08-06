@@ -1,15 +1,15 @@
-import { useContext } from 'react';
-import { formatOverviewDate } from '../../utils/FormatDate';
-import Overview from './Overview';
-import Context from '../../context/Context';
+import { useContext } from "react";
+import { formatOverviewDate } from "../../utils/formatDate";
+import Overview from "./Overview";
+import Context from "../../context/Context";
 
 const OverviewContainer = () => {
-    const { isLogin, profile, dispatch } = useContext(Context);
+    const { isLogin, profile } = useContext(Context);
     return (
         <>
             {isLogin ? (
             <Overview
-                user={profile}
+                user={profile.toLocaleUpperCase()}
                 date={formatOverviewDate(new Date)}
             />
             ) : (

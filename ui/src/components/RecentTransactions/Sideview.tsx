@@ -1,12 +1,10 @@
-import './Sideview.css';
-import Transaction from './Transaction/TransactionContainer';
-import Refresh from './Refresh/Refresh';
-import Context from '../../context/Context';
-import { useContext } from 'react';
+import "./Sideview.css";
+import Transaction from "./Transaction/TransactionContainer";
+import Refresh from "./Refresh/RefreshContainer";
 
 interface Props {
     lastUpdate: string
-}
+};
 const Sideview: React.FC<Props> = ({ lastUpdate }) => {
     return (
         <>

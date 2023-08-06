@@ -1,15 +1,16 @@
 .plaid-addbutton {
     background-color: var(--FONT_MODE);
     color: var(--BACKGROUND_MODE);
-    border-width: 0;
-    position: relative;
-    margin-top: 0.8rem;
-    margin-left: 0.8rem;
-    height: 2rem;
-    width: 6rem;
+    border-radius: 2rem;
+    box-shadow: 5px 5px 5px grey;
+    height: 1.5rem;
+    width: 8rem;
 }
 .plaid-addbutton:hover {
     background-color: rgb(63, 61, 61);
     transition: 0.2s;
     cursor: pointer;
+}
+.plaid-addbutton:active {
+    animation: press 0.1s forwards;
 }

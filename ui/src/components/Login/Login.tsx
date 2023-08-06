@@ -1,13 +1,13 @@
-import './Login.css';
+import "./LoginLogout.css";
 
 interface Props {
-    open: Function
+    login: Function
 };
 
-const Login: React.FC<Props> = ({ open }) => {
+const Login: React.FC<Props> = ({ login }) => {
     return (
         <>
-            <button className="login-button" onClick={() => open()}>Login | Signup</button>
+            <button className="login-button" onClick={() => login()}>Login</button>
         </>
     );
 };

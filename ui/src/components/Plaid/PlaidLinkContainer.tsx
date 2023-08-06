@@ -5,42 +5,33 @@ import Context from "../../context/Context";
 import PlaidLink from "./PlaidLink";
 
 const PlaidLinkContainer = () => {
-  const { linkToken, dispatch } = useContext(Context);
+  const { linkToken, profile, dispatch } = useContext(Context);
 
   const onSuccess = useCallback(
     (public_token: string) => {
-      // If the access_token is needed, send public_token to server
-      const exchangePublicTokenForAccessToken = async () => {
-        const body = new URLSearchParams()
-        body.append("public_token", public_token)
-        const response = await fetch("/api/set_access_token", {
+      const linkAccounts = async () => {
+        await fetch("/api/set_access_token", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
-          body: body.toString(),
+          body: new URLSearchParams({
+            public_token: public_token,
+            profile: profile
+          }),
         });
-        if (!response.ok) {
-          dispatch({
-            type: "SET_STATE",
-            state: {
-              itemId: `no item_id retrieved`,
-              accessToken: `no access_token retrieved`,
-            },
-          });
-          return;
-        }
-        const data = await response.json();
-        dispatch({
-          type: "SET_STATE",
-          state: {
-            itemId: data.item_id,
-            accessToken: data.access_token,
+        await fetch("/api/accounts/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
+          body: new URLSearchParams({
+            profile: profile
+          }),
         });
+        dispatch({ type: "SET_STATE", state: { isLogin: true } });
       };
-      exchangePublicTokenForAccessToken();
-      dispatch({ type: "SET_STATE", state: { linkSuccess: true } });
+      linkAccounts();
       window.history.pushState("", "", "/");
     },
     [dispatch]

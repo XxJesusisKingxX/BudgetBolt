@@ -1,6 +1,6 @@
-import Context from '../../context/Context';
-import Sideview from './Sideview';
-import { useContext } from 'react';
+import Context from "../../context/Context";
+import Sideview from "./Sideview";
+import { useContext } from "react";
 
 const SideviewContainer = () => {
     const {lastTransactionsUpdate, isLogin} = useContext(Context)
@@ -8,7 +8,7 @@ const SideviewContainer = () => {
         <>
             {isLogin ? (
             <Sideview
-                lastUpdate={lastTransactionsUpdate.toLocaleDateString() + " " + lastTransactionsUpdate.toLocaleTimeString()} 
+                lastUpdate={lastTransactionsUpdate.toLocaleDateString() + " " + lastTransactionsUpdate.toLocaleTimeString()}
             />
             ) : (
                 null

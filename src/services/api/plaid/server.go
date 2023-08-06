@@ -67,7 +67,7 @@ func main() {
 	r := gin.Default()
 	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}, false) })
-	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, true) })
+	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, controller.DB{}) })
 	r.POST("/api/profile/get", func(c *gin.Context){ retrieveProfile(c, controller.DB{}) })
 	r.POST("/api/profile/create", func(c *gin.Context){ createProfile(c, controller.DB{}) })
@@ -92,18 +92,29 @@ func retrieveProfile(c *gin.Context, dbhandler controller.DBHandler) {
 	}
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
 	if auth == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"name": userProfile.Name,
-			"id": userProfile.ID,
-		})
+		token, err := dbhandler.RetrieveToken(db, userProfile.ID)
+		if err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"id": userProfile.ID,
+				"token": token.Token,
+			})
+		} else {
+			c.JSON(http.StatusNotFound, gin.H{})
+		}
 	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"Authentication failed"})
+		c.JSON(http.StatusUnauthorized, gin.H{})
 	}
 }
 
 func createProfile(c *gin.Context, dbhandler controller.DBHandler) {
 	user := c.PostForm("username")
 	pass := c.PostForm("password")
+	// Test if username is already taken
+	profile, _ := dbhandler.RetrieveProfile(db, user)
+	if profile.ID != 0 {
+		c.JSON(http.StatusConflict, gin.H{})
+		return
+	}
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(pass), 17)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
@@ -131,31 +142,32 @@ func createLinkToken(c *gin.Context, p Plaid) {
 }
 
 func getAccessToken(c *gin.Context, p Plaid, testMode bool) {
-	publicToken := c.PostForm("public_token")
-	user := c.PostForm("username")
 	ctx := context.Background()
+	publicToken := c.PostForm("public_token")
+	user := c.PostForm("profile")
 	exchangePublicTokenResp, err := p.ItemPublicTokenExchange(client, ctx, publicToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
 	}
+	var id int
 	accessToken := exchangePublicTokenResp.GetAccessToken()
 	itemID := exchangePublicTokenResp.GetItemId()
 	if !testMode {
 		profile, err := controller.RetrieveProfile(db, model.Profile{ Name: user })
+		id = profile.ID
 		if err == nil {
-			controller.CreateToken(db, model.Token{ ProfileID: profile.ID, Item: itemID, Token: accessToken })
+			controller.CreateToken(db, model.Token{ ProfileID: id, Item: itemID, Token: accessToken })
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{})
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"access_token": accessToken,
-		"item_id":      itemID,
-	})
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func createAccounts(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
 	ctx := context.Background()
-	user := c.PostForm("username")
+	user := c.PostForm("profile")
 	profile, err := dbhandler.RetrieveProfile(db, user)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
@@ -173,10 +185,10 @@ func createAccounts(c *gin.Context, p Plaid, dbhandler controller.DBHandler, tes
 		renderError(c, err, PlaidClient{})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{})
 	if !testMode {
 		resp.ParseAccountsToDB(db, id, accounts)
 	}
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func retrieveAccounts(c *gin.Context, dbhandler controller.DBHandler) {
@@ -246,10 +258,10 @@ func createTransactions(c *gin.Context, p Plaid, dbhandler controller.DBHandler,
 		nextCursor := resp.GetNextCursor()
 		cursor = &nextCursor
 	}
-	c.JSON(http.StatusOK, gin.H{})
 	if !testMode {
 		resp.ParseTransactionsToDB(db, profile.ID, transactions)
 	}
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func investmentTransactions(c *gin.Context, p Plaid, testMode bool) {

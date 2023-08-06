@@ -2,7 +2,7 @@ package response
 
 import (
 	"database/sql"
-
+	
 	"github.com/plaid/plaid-go/v12/plaid"
 
 	"budgetbolt/src/services/databases/postgresql/controller"
