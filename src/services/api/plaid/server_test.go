@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	// "os/exec"
-
 	// "time"
 	"io"
 	"net/http"
@@ -12,11 +11,11 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"golang.org/x/crypto/bcrypt"
 
 	"budgetbolt/src/services/databases/postgresql/controller"
 	"budgetbolt/src/services/databases/postgresql/model"
 	"budgetbolt/src/services/tests"
-
 	// browser "budgetbolt/src/services/tests/browser"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +47,7 @@ func TestRenderError500(t *testing.T) {
 	// 500 error
 	tests.Equals(t, http.StatusInternalServerError, c.Writer.Status())
 }
+
 // Intergration testing may need to be separate since causing problem with go.mod
 // func checkMockServer() bool {
 // 	c, _ := exec.Command("tasklist", "/FI", "IMAGENAME eq plaid_oauth*").Output()
@@ -90,17 +90,21 @@ func TestRenderError500(t *testing.T) {
 // 	accessToken := strings.Contains(string(responseBody), "\"access_token\":")
 // 	itemId := strings.Contains(string(responseBody), "\"item_id\":")
 
-// 	tests.Equals(t, http.StatusOK, w.Code)
-// 	tests.Equals(t, true, accessToken)
-// 	tests.Equals(t, true, itemId)
-// }
+//		tests.Equals(t, http.StatusOK, w.Code)
+//		tests.Equals(t, true, accessToken)
+//		tests.Equals(t, true, itemId)
+//	}
 func TestGetAccessTokenFails(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		getAccessToken(c, MockPlaidClient{Err: errors.New("Failed")}, true)
+		getAccessToken(c,
+			MockPlaidClient{Err: errors.New("Failed to get token")},
+			controller.MockDB{},
+			true,
+		)
 	})
 	// Create request
 	form := url.Values{}
@@ -109,8 +113,58 @@ func TestGetAccessTokenFails(t *testing.T) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
-
+	responseBody, _ := io.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	isToken := !strings.Contains(string(responseBody), "\"Failed to get token\"")
+	//Assert
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
+	tests.Equals(t, false , isToken)
+}
+func TestGetAccessTokenProfileFails(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/get-access-token", func(c *gin.Context) {
+		getAccessToken(c,
+			MockPlaidClient{},
+			controller.MockDB{
+				ProfileErr: errors.New("Failed to get profile"),
+			},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("public_token", "public-sandbox-12345678-1234-1234-1234-123456789012")
+	req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+}
+func TestGetAccessTokenReceived(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/get-access-token", func(c *gin.Context) {
+		getAccessToken(c,
+			MockPlaidClient{},
+			controller.MockDB{Profile: model.Profile{ ID: 1 }},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("public_token", "public-sandbox-12345678-1234-1234-1234-123456789012")
+	req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusOK, w.Code)
 }
 func TestGetAccounts_AccountsRecieved(t *testing.T) {
 	// Create mock engine
@@ -118,12 +172,12 @@ func TestGetAccounts_AccountsRecieved(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.GET("/get-accounts", func(c *gin.Context) {
-		retrieveAccounts(c, 
-			controller.MockDB{ 
-				Profile: model.Profile{ ID: 1 }, 
+		retrieveAccounts(c,
+			controller.MockDB{
+				Profile: model.Profile{ID: 1},
 				Account: []model.Account{
 					{
-						Name: "Test1",
+						Name:    "Test1",
 						Balance: 11.11,
 					},
 				}})
@@ -170,7 +224,7 @@ func TestGetAccounts_ProfileNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.GET("/get-accounts", func(c *gin.Context) {
-		retrieveAccounts(c, controller.MockDB{ ProfileErr: errors.New("Failed to get profile id") })
+		retrieveAccounts(c, controller.MockDB{ProfileErr: errors.New("Failed to get profile id")})
 	})
 	// Create request
 	form := url.Values{}
@@ -192,14 +246,14 @@ func TestCreateAccounts_AccountsCreated(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-accounts", func(c *gin.Context) {
-		createAccounts(c, 
-			MockPlaidClient{ 
+		createAccounts(c,
+			MockPlaidClient{
 				Accounts: []plaid.AccountBase{
 					{
 						Name: "Test Account",
 					},
-			}},
-			controller.MockDB{ Profile: model.Profile{ ID: 1 }, Token: model.Token{ Token: "access-sandbox-11-222-33" }},
+				}},
+			controller.MockDB{Profile: model.Profile{ID: 1}, Token: model.Token{Token: "access-sandbox-11-222-33"}},
 			true)
 	})
 	// Create request
@@ -223,11 +277,12 @@ func TestCreateAccounts_ProfileNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createAccounts(c, 
+		createAccounts(c,
 			MockPlaidClient{},
-			controller.MockDB{ ProfileErr: errors.New("Failed to get profile id")},
+			controller.MockDB{ProfileErr: errors.New("Failed to get profile id")},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -249,11 +304,12 @@ func TestCreateAccounts_TokenNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createAccounts(c, 
+		createAccounts(c,
 			MockPlaidClient{},
-			controller.MockDB{ TokenErr: errors.New("Failed to get access token")},
+			controller.MockDB{TokenErr: errors.New("Failed to get access token")},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -275,11 +331,12 @@ func TestCreateAccounts_AccountsNotCreated(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createAccounts(c, 
-			MockPlaidClient{ Err: errors.New("Failed to get accounts") },
+		createAccounts(c,
+			MockPlaidClient{Err: errors.New("Failed to get accounts")},
 			controller.MockDB{},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -409,7 +466,7 @@ func TestLinkTokenCreateFails(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-link-token", func(c *gin.Context) {
-		createLinkToken(c, MockPlaidClient{ Err: errors.New("Failed") })
+		createLinkToken(c, MockPlaidClient{Err: errors.New("Failed")})
 	})
 	// Create request
 	form := url.Values{}
@@ -427,18 +484,18 @@ func TestGetTransactions_TransactionsReceived(t *testing.T) {
 	// Create mock transactions
 	var transactions []model.Transaction
 	transactions = append(transactions, model.Transaction{
-		ID: 1001,
-		Date: "2023/01/01",
-		Amount: 12.34,
-		Method: "",
-		From: "Test Account",
-		Vendor: "Test",
+		ID:          1001,
+		Date:        "2023/01/01",
+		Amount:      12.34,
+		Method:      "",
+		From:        "Test Account",
+		Vendor:      "Test",
 		Description: "A test case was received",
-		ProfileID: 1,
+		ProfileID:   1,
 	})
 	// Handle mock route
 	r.GET("/get-transactions", func(c *gin.Context) {
-		retrieveTransactions(c, controller.MockDB{ Profile: model.Profile{ ID: 1 }, Transaction: transactions })
+		retrieveTransactions(c, controller.MockDB{Profile: model.Profile{ID: 1}, Transaction: transactions})
 	})
 	// Create request
 	form := url.Values{}
@@ -460,7 +517,7 @@ func TestGetTransactions_ProfileIdNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.GET("/get-transactions", func(c *gin.Context) {
-		retrieveTransactions(c, controller.MockDB{ ProfileErr: errors.New("Failed to get profile id")})
+		retrieveTransactions(c, controller.MockDB{ProfileErr: errors.New("Failed to get profile id")})
 	})
 	// Create request
 	form := url.Values{}
@@ -482,7 +539,7 @@ func TestGetTransactions_TransactionsNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.GET("/get-transactions", func(c *gin.Context) {
-		retrieveTransactions(c, controller.MockDB{ TransactionErr: errors.New("Failed to get transactions")})
+		retrieveTransactions(c, controller.MockDB{TransactionErr: errors.New("Failed to get transactions")})
 	})
 	// Create request
 	form := url.Values{}
@@ -508,11 +565,12 @@ func TestCreateTransactions_TransactionsCreated(t *testing.T) {
 	transactions = append(transactions, plaid.Transaction{AccountId: "2", Date: "2023/02/02", Amount: 22.22})
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createTransactions(c, 
-			MockPlaidClient{ SyncResp: plaid.TransactionsSyncResponse{ Added: transactions }},
-			controller.MockDB{ Profile: model.Profile{ ID: 1 }, Token: model.Token{ Token:"access-sandbox-111-222-3333-4444" }},
+		createTransactions(c,
+			MockPlaidClient{SyncResp: plaid.TransactionsSyncResponse{Added: transactions}},
+			controller.MockDB{Profile: model.Profile{ID: 1}, Token: model.Token{Token: "access-sandbox-111-222-3333-4444"}},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -534,11 +592,12 @@ func TestCreateTransactions_ProfileNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createTransactions(c, 
+		createTransactions(c,
 			MockPlaidClient{},
-			controller.MockDB{ ProfileErr: errors.New("Failed to get profile id")},
+			controller.MockDB{ProfileErr: errors.New("Failed to get profile id")},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -560,11 +619,12 @@ func TestCreateTransactions_TokenNotReceived(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createTransactions(c, 
+		createTransactions(c,
 			MockPlaidClient{},
-			controller.MockDB{ TokenErr: errors.New("Failed to get access token")},
+			controller.MockDB{TokenErr: errors.New("Failed to get access token")},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -586,11 +646,12 @@ func TestCreateTransactions_TransactionsNotCreated(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-transactions", func(c *gin.Context) {
-		createTransactions(c, 
-			MockPlaidClient{ Err: errors.New("Failed to get transactions") },
+		createTransactions(c,
+			MockPlaidClient{Err: errors.New("Failed to get transactions")},
 			controller.MockDB{},
 			true,
-		)})
+		)
+	})
 	// Create request
 	form := url.Values{}
 	form.Set("username", "test_user")
@@ -605,4 +666,188 @@ func TestCreateTransactions_TransactionsNotCreated(t *testing.T) {
 	// Assert
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
 	tests.Equals(t, false, isTransactions)
+}
+func TestCreateProfile_ProfileNameTaken(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/create", func(c *gin.Context) {
+		createProfile(c,
+			controller.MockDB{
+				Profile: model.Profile{ID: 1},
+			},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	req, _ := http.NewRequest("POST", "/api/profile/create", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusConflict, w.Code)
+}
+func TestCreateProfile_PasswordTooLong(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/create", func(c *gin.Context) {
+		createProfile(c,
+			controller.MockDB{
+				Profile: model.Profile{ID: 0},
+			},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/create", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Receive response
+	responseBody, _ := io.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	isLong := strings.Contains(string(responseBody), "password length exceeds 72 bytes")
+	// Assert
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+	tests.Equals(t, true, isLong)
+}
+func TestCreateProfile_ProfileNotCreated(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/create", func(c *gin.Context) {
+		createProfile(c,
+			controller.MockDB{
+				Profile:    model.Profile{ID: 0},
+				ProfileErr: errors.New("Failed to create profile"),
+			},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/create", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Receive response
+	responseBody, _ := io.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	isCreated := !strings.Contains(string(responseBody), "\"Failed to create profile\"")
+	// Assert
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+	tests.Equals(t, false, isCreated)
+}
+func TestCreateProfile_ProfileCreated(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/create", func(c *gin.Context) {
+		createProfile(c,
+			controller.MockDB{
+				Profile: model.Profile{ID: 0},
+			},
+			true,
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/create", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusOK, w.Code)
+}
+func TestRetrieveProfile_ProfileNotRetrieve(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/get", func(c *gin.Context) {
+		retrieveProfile(c,
+			controller.MockDB{
+				ProfileErr: errors.New("Failed to retrieve profile"),
+			},
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Receive response
+	responseBody, _ := io.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	isRetrieved := !strings.Contains(string(responseBody), "\"Failed to retrieve profile\"")
+	// Assert
+	tests.Equals(t, http.StatusInternalServerError, w.Code)
+	tests.Equals(t, false, isRetrieved)
+}
+func TestRetrieveProfile_AuthFailed(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	r.POST("/api/profile/get", func(c *gin.Context) {
+		retrieveProfile(c,
+			controller.MockDB{
+				Profile: model.Profile{
+					Password: "abcdefghijklmnopqrstuvwxy",
+				},
+			},
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusUnauthorized, w.Code)
+}
+func TestRetrieveProfile_AuthSucceed(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	// Handle mock route
+	hashPass, _ := bcrypt.GenerateFromPassword([]byte("abcdefghijklmnopqrstuvwxyz"), 1)
+	r.POST("/api/profile/get", func(c *gin.Context) {
+		retrieveProfile(c,
+			controller.MockDB{
+				Profile: model.Profile{
+					Password: string(hashPass),
+				},
+			},
+		)
+	})
+	// Create request
+	form := url.Values{}
+	form.Set("username", "test_user")
+	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
+	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	// Assert
+	tests.Equals(t, http.StatusOK, w.Code)
 }
