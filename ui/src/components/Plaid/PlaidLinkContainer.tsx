@@ -30,6 +30,7 @@ const PlaidLinkContainer = () => {
           }),
         });
         dispatch({ type: "SET_STATE", state: { isLogin: true } });
+        dispatch({ type: "SET_STATE", state: { isLoading: false } });
       };
       linkAccounts();
       window.history.pushState("", "", "/");
