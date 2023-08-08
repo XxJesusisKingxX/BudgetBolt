@@ -70,7 +70,7 @@ func main() {
 	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, controller.DB{}) })
 	r.POST("/api/profile/get", func(c *gin.Context){ retrieveProfile(c, controller.DB{}) })
-	r.POST("/api/profile/create", func(c *gin.Context){ createProfile(c, controller.DB{}, true) })
+	r.POST("/api/profile/create", func(c *gin.Context){ createProfile(c, controller.DB{}, false) })
 	r.POST("/api/transactions/create", func(c *gin.Context){ createTransactions(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/transactions/get", func(c *gin.Context){ retrieveTransactions(c, controller.DB{}) })
 	r.GET("/api/investments_transactions", func(c *gin.Context){ investmentTransactions(c, PlaidClient{}, false) })
@@ -89,9 +89,6 @@ func retrieveProfile(c *gin.Context, dbhandler controller.DBHandler) {
 	if err != nil {
 		renderError(c, err, PlaidClient{})
 		return
-	}
-	if pass == userProfile.Password {
-		fmt.Print("HIT")
 	}
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
 	if auth == nil {
