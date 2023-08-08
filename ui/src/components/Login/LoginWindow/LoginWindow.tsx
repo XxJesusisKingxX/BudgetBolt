@@ -7,7 +7,7 @@ interface Props {
     open: Function
     error: boolean
     isInvalidInput: boolean
-    isLoading: boolean
+    showLoading: boolean
     username: string
     password: string
     userChange: ChangeEventHandler<HTMLInputElement>
@@ -17,7 +17,7 @@ interface Props {
     login: MouseEventHandler<HTMLDivElement>
     loginOnEnter: KeyboardEventHandler<HTMLInputElement>
 }
-const LoginWindow: React.FC<Props> = ({ mode, close, open, error, isInvalidInput, isLoading, username, password,userKeyUp, userChange, passKeyUp, passChange, login, loginOnEnter}) => {
+const LoginWindow: React.FC<Props> = ({ mode, close, open, error, isInvalidInput, showLoading, username, password,userKeyUp, userChange, passKeyUp, passChange, login, loginOnEnter}) => {
     const cancel = `/images/${mode}/cancel.png`
     const loading = `/images/${mode}/loading.png`
     return (
@@ -37,7 +37,7 @@ const LoginWindow: React.FC<Props> = ({ mode, close, open, error, isInvalidInput
                 <input id="password" type="password" value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} name="pass" placeholder="Password" required/>
                 <div className="login-window-create">Create an Account: <span className="login-window-signup" onClick={() => open()}>Sign Up</span></div>
                 {error ? <div className="login-failed">Oops! The username or password you entered is incorrect. Please double check and try again.</div> : null}
-                {isLoading ? <img src={loading} className="login-loading"/> : <div onClick={login} className="login-acc-button"><span>Login</span></div>}
+                {showLoading ? <img src={loading} className="login-loading"/> : <div onClick={login} className="login-acc-button"><span>Login</span></div>}
             </div>
         </>
     );

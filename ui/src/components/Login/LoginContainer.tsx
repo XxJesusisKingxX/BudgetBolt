@@ -7,13 +7,12 @@ import SignupWindow from "./SignupWindow/SignupWindow";
 import AccountWindow from "./AccountWindow/AccountWindow";
 
 const LoginContainer = () => {
-    const { isLogin, mode, dispatch } = useContext(Context);
+    const { isLoading, isLogin, mode, dispatch } = useContext(Context);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showLogin, setShowLogin] = useState(true);
     const [showCreateWindow, setShowCreateWindow] = useState(false);
     const [showLoginWindow, setShowLoginWindow] = useState(false);
-    const [showLoading, setShowLoading] = useState(false);
     const [showValidationError, setShowValidationError] = useState(false);
     const [showNameError, setShowNameError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
@@ -31,7 +30,7 @@ const LoginContainer = () => {
         } else {
             setShowValidationError(false);
             setShowServerError(false);
-            setShowLoading(true);
+            dispatch({ type:"SET_STATE", state:{ isLoading: true }});
             const startAuth = async () => {
                 try {
                     const response = await fetch(authType == AuthType.Login
@@ -53,14 +52,14 @@ const LoginContainer = () => {
                             clearFields();
                         }
                     } else if (response.status == 409){
-                        setShowLoading(false);
+                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
                         setShowNameError(true);
                     } else {
-                        setShowLoading(false);
+                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
                         setShowServerError(true);
                     }
                 } catch (error) {
-                    setShowLoading(false);
+                    dispatch({ type:"SET_STATE", state:{ isLoading: false }});
                     setShowServerError(true);
                 }
             }
@@ -106,7 +105,7 @@ const LoginContainer = () => {
     const clearFields = () => {
         setUsername("");
         setPassword("");
-        setShowLoading(false)
+        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
         setShowServerError(false)
         setShowValidationError(false)
         setShowLoginWindow(false);
@@ -145,7 +144,7 @@ const LoginContainer = () => {
             {showLoginWindow ? (
             <LoginWindow
                 isInvalidInput={showValidationError}
-                isLoading={showLoading}
+                showLoading={isLoading}
                 loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
                 login={() => handleAuthentication(AuthType.Login)}
                 userKeyUp={handleUserKeyUp}
@@ -170,10 +169,10 @@ const LoginContainer = () => {
                 null
             )}
 
-            {showCreateWindow ? (
+            {!isLogin && showCreateWindow ? (
             <SignupWindow
                 isInvalidInput={showValidationError}
-                isLoading={showLoading}
+                showLoading={isLoading}
                 signupOnEnter={(event) => handleAuthOnEnter(event, AuthType.SignUp)}
                 signup={() => handleAuthentication(AuthType.SignUp)}
                 userKeyUp={handleUserKeyUp}

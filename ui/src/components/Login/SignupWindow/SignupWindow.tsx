@@ -7,7 +7,7 @@ interface Props {
     error: boolean
     isTakenName: boolean
     isInvalidInput: boolean
-    isLoading: boolean
+    showLoading: boolean
     username: string
     password: string
     userChange: ChangeEventHandler<HTMLInputElement>
@@ -18,7 +18,7 @@ interface Props {
     signupOnEnter: KeyboardEventHandler<HTMLInputElement>
 };
 
-const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInvalidInput, isLoading, username, password, userKeyUp, userChange, passKeyUp, passChange, signup, signupOnEnter }) => {
+const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInvalidInput, showLoading, username, password, userKeyUp, userChange, passKeyUp, passChange, signup, signupOnEnter }) => {
     const cancel = `/images/${mode}/cancel.png`
     const loading = `/images/${mode}/loading.png`
     return (
@@ -31,7 +31,7 @@ const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInva
                 <input id="password" type="password" value={password} onKeyDown={signupOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required/>
                 <br/>
                 {error ? <div className="signup-failed">We apologize, but there seems to be an issue on our end. Please try again later.</div> : null}
-                {isLoading ? <img src={loading} className="signup-loading"/> : <div onClick={signup} className="signup-acc-button">Submit</div>}
+                {showLoading ? <img src={loading} className="signup-loading"/> : <div onClick={signup} className="signup-acc-button">Submit</div>}
             </div>
         </>
     );
