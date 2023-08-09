@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Login from "./Login";
 import Logout from "./Logout";
 import Context from "../../context/Context";
@@ -10,26 +10,39 @@ const LoginContainer = () => {
     const { isLoading, isLogin, mode, dispatch } = useContext(Context);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [validation, setValidation] = useState(false);
     const [showLogin, setShowLogin] = useState(true);
     const [showCreateWindow, setShowCreateWindow] = useState(false);
     const [showLoginWindow, setShowLoginWindow] = useState(false);
-    const [showValidationError, setShowValidationError] = useState(false);
+    const [showUsernameError, setShowUsernameError] = useState(false);
+    const [showPasswordError, setShowPasswordError] = useState(false);
     const [showNameError, setShowNameError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
+    const [showAuthError, setShowAuthError] = useState(false);
     const [showAccountWindow, setShowAccountWindow] = useState(false);
 
     const AuthType = {
         SignUp: 1,
         Login: 2,
     };
+    const validate = () => {
+        if (!validateUser(username)) {
+            setShowUsernameError(true);
+        } else {
+            setShowUsernameError(false);
+        }
+        if (!validatePass(password)) {
+            setShowPasswordError(true);
+        } else {
+            setShowPasswordError(false);
+        }
+    };
+    useEffect(() => {
+        validate();
+    }, [username, password]);
     
     const handleAuthentication = (authType: number) => {
-        if (!validateUser(username) || !validatePass(password)) {
-            setShowServerError(false)
-            setShowValidationError(true);
-        } else {
-            setShowValidationError(false);
-            setShowServerError(false);
+        if (!showUsernameError && !showPasswordError && username != "" && password != "") {
             dispatch({ type:"SET_STATE", state:{ isLoading: true }});
             const startAuth = async () => {
                 try {
@@ -51,9 +64,12 @@ const LoginContainer = () => {
                             dispatch({ type:"SET_STATE", state:{ isLogin: true }});
                             clearFields();
                         }
-                    } else if (response.status == 409){
+                    } else if (response.status == 409) {
                         dispatch({ type:"SET_STATE", state:{ isLoading: false }});
                         setShowNameError(true);
+                    } else if (response.status == 401) {
+                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+                        setShowAuthError(true);
                     } else {
                         dispatch({ type:"SET_STATE", state:{ isLoading: false }});
                         setShowServerError(true);
@@ -65,7 +81,7 @@ const LoginContainer = () => {
             }
             startAuth()
         }
-    }
+    };
     const validateUser = (username: string) => {
         let maxChar = 25
         const validStart = new RegExp(`^_?[a-zA-Z][a-zA-Z0-9_]{1,${maxChar}}$`); // make sure starts with _ (if _ must have letter follow) or letter minimum and the following can be a number, letter , or underscore
@@ -106,8 +122,10 @@ const LoginContainer = () => {
         setUsername("");
         setPassword("");
         dispatch({ type:"SET_STATE", state:{ isLoading: false }});
-        setShowServerError(false)
-        setShowValidationError(false)
+        setShowServerError(false);
+        setShowUsernameError(false);
+        setShowPasswordError(false);
+        setShowAuthError(false);
         setShowLoginWindow(false);
         setShowCreateWindow(false);
         setShowAccountWindow(false);
@@ -121,7 +139,6 @@ const LoginContainer = () => {
     const login = () => {
         clearFields();
         setShowLoginWindow(true);
-        setShowLogin(true);
     }
     return (
         <>
@@ -143,7 +160,9 @@ const LoginContainer = () => {
 
             {showLoginWindow ? (
             <LoginWindow
-                isInvalidInput={showValidationError}
+                isInvalidName={showUsernameError}
+                isInvalidPass={showPasswordError}
+                isAuthError={showAuthError}
                 showLoading={isLoading}
                 loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
                 login={() => handleAuthentication(AuthType.Login)}
@@ -162,16 +181,17 @@ const LoginContainer = () => {
                     setShowLogin(true);
                     clearFields();
                 }}
-                error={showServerError}
                 mode={mode}
             />
             ) : (
                 null
             )}
 
-            {!isLogin && showCreateWindow ? (
+            {!showAccountWindow && showCreateWindow ? (
             <SignupWindow
-                isInvalidInput={showValidationError}
+                isTakenName={showNameError}
+                isInvalidName={showUsernameError}
+                isInvalidPass={showPasswordError}
                 showLoading={isLoading}
                 signupOnEnter={(event) => handleAuthOnEnter(event, AuthType.SignUp)}
                 signup={() => handleAuthentication(AuthType.SignUp)}
@@ -185,7 +205,6 @@ const LoginContainer = () => {
                     setShowLogin(true);
                     clearFields();
                 }}
-                isTakenName={showNameError}
                 error={showServerError}
                 mode={mode}
             />
@@ -208,10 +227,3 @@ const LoginContainer = () => {
 };
 
 export default LoginContainer;
-
-// Password:
-//     At least one digit (0-9).
-//     At least one lowercase letter (a-z).
-//     At least one uppercase letter (A-Z).
-//     At least one special character from the set: !@#$%^&*.
-//     At least 8 characters long.
