@@ -1,3 +1,4 @@
+import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
 import './Overview.css';
 
 interface Props {
@@ -13,6 +14,7 @@ const Overview: React.FC<Props> = ({ user, date }) => {
                 <span className="overview__header__date">~ Today is {date} ~</span>
                 <span className="overview__header__title">Budget Overview</span>
             </div>
+            <HealthIndicator/>
         </div>
     );
 };

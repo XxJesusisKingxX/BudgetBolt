@@ -7,7 +7,7 @@ const OverviewContainer = () => {
     const { isLogin, profile } = useContext(Context);
     return (
         <>
-            {isLogin ? (
+            {!isLogin ? (
             <Overview
                 user={profile.toLocaleUpperCase()}
                 date={formatOverviewDate(new Date)}
