@@ -22,18 +22,18 @@ import (
 )
 
 var (
-	PG_USER                              = ""
-	PG_SECRET                            = ""
-	PG_DB                                = ""
-	PLAID_CLIENT_ID                      = ""
-	PLAID_SECRET                         = ""
-	PLAID_ENV                            = ""
-	PLAID_PRODUCTS                       = ""
-	PLAID_COUNTRY_CODES                  = ""
-	PLAID_REDIRECT_URI                   = ""
-	APP_PORT                             = ""
-	client              *plaid.APIClient = nil
-	db					*sql.DB	         = nil
+	PG_USER             string
+	PG_SECRET           string
+	PG_DB               string
+	PLAID_CLIENT_ID     string
+	PLAID_SECRET        string
+	PLAID_ENV           string
+	PLAID_PRODUCTS      string
+	PLAID_COUNTRY_CODES string
+	PLAID_REDIRECT_URI  string
+	APP_PORT            string
+	client              *plaid.APIClient
+	db                  *sql.DB
 )
 
 var environments = map[string]plaid.Environment{
