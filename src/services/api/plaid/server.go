@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+
 	"golang.org/x/crypto/bcrypt"
 
 	resp "budgetbolt/src/services/api/plaid/response"
@@ -20,6 +22,9 @@ import (
 )
 
 var (
+	PG_USER                              = ""
+	PG_SECRET                            = ""
+	PG_DB                                = ""
 	PLAID_CLIENT_ID                      = ""
 	PLAID_SECRET                         = ""
 	PLAID_ENV                            = ""
@@ -45,6 +50,9 @@ func init() {
 	}
 
 	// set constants from env
+	PG_USER = os.Getenv("PG_USER")
+	PG_SECRET = os.Getenv("PG_SECRET")
+	PG_DB = os.Getenv("PG_DB")
 	PLAID_CLIENT_ID = os.Getenv("PLAID_CLIENT_ID")
 	PLAID_SECRET = os.Getenv("PLAID_SECRET")
 	PLAID_ENV = os.Getenv("PLAID_ENV")
@@ -56,16 +64,20 @@ func init() {
 	configuration := plaid.NewConfiguration()
 	configuration.AddDefaultHeader("PLAID-CLIENT-ID", PLAID_CLIENT_ID)
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
+	configuration.Scheme = "https"
+	configuration.Host = "sandbox.plaid.com"
 	configuration.UseEnvironment(environments[PLAID_ENV])
 	client = plaid.NewAPIClient(configuration)
 
 	// create database connection
-	db, _ = driver.LogonDB(driver.CREDENTIALS{User:"postgres", Pass: `P-S$\\/M1n3!`}, "budgetbolt", driver.DB{}, false)
+	db, _ = driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, PG_DB, driver.DB{}, false)
+	db.SetMaxOpenConns(10)
+    db.SetMaxIdleConns(5)
 }
 
 func main() {
 	r := gin.Default()
-	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}) })
+	r.POST("/api/create_link_token", func(c *gin.Context){ createLinkToken(c, PlaidClient{}, controller.DB{}) })
 	r.POST("/api/set_access_token", func(c *gin.Context){ getAccessToken(c, PlaidClient{}, controller.DB{}, false) })
 	r.POST("/api/accounts/create", func(c *gin.Context){ createAccounts(c, PlaidClient{}, controller.DB{}, false) })
 	r.GET("/api/accounts/get", func(c *gin.Context){ retrieveAccounts(c, controller.DB{}) })
@@ -85,9 +97,9 @@ func main() {
 func retrieveProfile(c *gin.Context, dbhandler controller.DBHandler) {
 	user := c.PostForm("username")
 	pass := c.PostForm("password")
-	userProfile, err := dbhandler.RetrieveProfile(db, strings.ToLower(user))
-	if err != nil {
-		renderError(c, err, PlaidClient{})
+	userProfile, _ := dbhandler.RetrieveProfile(db, strings.ToLower(user))
+	if userProfile.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{})
 		return
 	}
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
@@ -126,11 +138,17 @@ func createProfile(c *gin.Context, dbhandler controller.DBHandler, testMode bool
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func createLinkToken(c *gin.Context, p Plaid) {
+func createLinkToken(c *gin.Context, p Plaid, dbhandler controller.DBHandler) {
 	ctx := context.Background()
+	user := c.PostForm("username")
+	profile, err := dbhandler.RetrieveProfile(db, user)
+	if err != nil {
+		renderError(c, err, PlaidClient{})
+		return
+	}
 	countryCodes := convertCountryCodes(strings.Split(PLAID_COUNTRY_CODES, ","))
 	products := convertProducts(strings.Split(PLAID_PRODUCTS, ","))
-	request := p.NewLinkTokenCreateRequest("Test User", "TestUser", countryCodes,  products, PLAID_REDIRECT_URI)
+	request := p.NewLinkTokenCreateRequest(user, strconv.Itoa(profile.ID), countryCodes, products, PLAID_REDIRECT_URI)
 	linkTokenCreateResp, err := p.CreateLinkToken(client, ctx, request)
 	if err != nil {
 		renderError(c, err, PlaidClient{})
@@ -211,9 +229,9 @@ func retrieveTransactions(c *gin.Context, dbhandler controller.DBHandler) {
 	profile, err := dbhandler.RetrieveProfile(db, user)
 	var transactions []model.Transaction
 	if err == nil {
-		transactions, err = dbhandler.RetrieveTransaction(db, model.Transaction{ 
-			ProfileID: profile.ID, 
-			Query: model.Querys{ 
+		transactions, err = dbhandler.RetrieveTransaction(db, model.Transaction{
+			ProfileID: profile.ID,
+			Query: model.Querys{
 				Select: model.QueryParameters{
 					Desc: true,
 					OrderBy: "transaction_date",

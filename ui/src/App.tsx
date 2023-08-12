@@ -1,62 +1,60 @@
 import { useEffect, useContext, useCallback } from "react";
-import Login from "./components/Login/LoginContainer"
+import Auth from "./components/Login/AuthContainer"
 import Context from "./context/Context";
 import Header from "./components/Header/Header";
 import Home from "./pages/Home/Home";
+import Menu from "./components/Menu/MenuContainer";
+import { EndPoint } from "./enums/endpoints";
+import { useAppStateActions } from "./redux/redux";
 
 const App = () => {
-  const { dispatch } = useContext(Context);
+  const { profile, dispatch } = useContext(Context);
+  const { setLinkTokenState } = useAppStateActions();
 
   const generateToken = useCallback(
     async () => {
-      const response = await fetch("/api/create_link_token", {
+      const baseURL = window.location.href;
+      const url = new URL(EndPoint.CREATE_LINK_TOKEN, baseURL)
+      const response = await fetch(url, {
         method: "POST",
+        body: new URLSearchParams ({
+          username: profile
+        })
       });
       if (!response.ok) {
-        dispatch({ type: "SET_STATE", state: { linkToken: null } });
+        setLinkTokenState("")
         return;
       }
       const data = await response.json();
       if (data) {
         if (data.error != null) {
-          dispatch({
-            type: "SET_STATE",
-            state: {
-              linkToken: null
-            },
-          });
+          setLinkTokenState("")
           return;
         }
-        dispatch({ type: "SET_STATE", state: { linkToken: data.link_token } });
+        setLinkTokenState(data.link_token);
       }
-      // Save the link_token to be used later in the Oauth flow.
       localStorage.setItem("link_token", data.link_token);
     },
-    [dispatch]
+    [dispatch, profile]
   );
 
   useEffect(() => {
     const init = async () => {
       if (window.location.href.includes("?oauth_state_id=")) {
-        dispatch({
-          type: "SET_STATE",
-          state: {
-            linkToken: localStorage.getItem("link_token"),
-          },
-        });
+        setLinkTokenState(localStorage.getItem("link_token"));
         return;
       }
       generateToken();
     };
     init();
-  }, [dispatch, generateToken]);
+  }, [dispatch, profile, generateToken]);
 
   return (
     <>
       <Header>
+        <Menu/>
+        <Auth/>
         <Home/>
-        {/* <PlaidLink/> */}
-        <Login/>
       </Header>
     </>
   );

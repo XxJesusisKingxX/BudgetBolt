@@ -1,16 +1,19 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import Login from "./Login";
-import Logout from "./Logout";
+import { useContext, useEffect, useState } from "react";
+import { validatePass, validateUser } from "../../utils/validator";
+import { AuthType } from "../../enums/auth"
+import Auth from "./Auth";
 import Context from "../../context/Context";
 import LoginWindow from "./LoginWindow/LoginWindow";
 import SignupWindow from "./SignupWindow/SignupWindow";
 import AccountWindow from "./AccountWindow/AccountWindow";
+import { useAppStateActions } from "../../redux/redux";
+import { EndPoint } from "../../enums/endpoints";
 
-const LoginContainer = () => {
-    const { isLoading, isLogin, mode, dispatch } = useContext(Context);
+const AuthContainer = () => {
+    const { isLoading, isLogin, mode } = useContext(Context);
+    const { setLoadingState, setLoginState, setProfileState } = useAppStateActions();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [validation, setValidation] = useState(false);
     const [showLogin, setShowLogin] = useState(true);
     const [showCreateWindow, setShowCreateWindow] = useState(false);
     const [showLoginWindow, setShowLoginWindow] = useState(false);
@@ -21,34 +24,30 @@ const LoginContainer = () => {
     const [showAuthError, setShowAuthError] = useState(false);
     const [showAccountWindow, setShowAccountWindow] = useState(false);
 
-    const AuthType = {
-        SignUp: 1,
-        Login: 2,
-    };
-    const validate = () => {
-        if (!validateUser(username)) {
-            setShowUsernameError(true);
-        } else {
-            setShowUsernameError(false);
-        }
-        if (!validatePass(password)) {
-            setShowPasswordError(true);
-        } else {
-            setShowPasswordError(false);
-        }
-    };
     useEffect(() => {
+        const validate = () => {
+            if (!validateUser(username)) {
+                setShowUsernameError(true);
+            } else {
+                setShowUsernameError(false);
+            }
+            if (!validatePass(password)) {
+                setShowPasswordError(true);
+            } else {
+                setShowPasswordError(false);
+            }
+        };
         validate();
     }, [username, password]);
-    
+    // ********* Handlers *************
     const handleAuthentication = (authType: number) => {
         if (!showUsernameError && !showPasswordError && username != "" && password != "") {
-            dispatch({ type:"SET_STATE", state:{ isLoading: true }});
+            setLoadingState(true);
             const startAuth = async () => {
                 try {
                     const response = await fetch(authType == AuthType.Login
-                    ? "/api/profile/get"
-                    : "/api/profile/create", {
+                    ? EndPoint.GET_PROFILE
+                    : EndPoint.CREATE_PROFILE, {
                         method: "POST",
                         body: new URLSearchParams ({
                             username: username,
@@ -56,54 +55,38 @@ const LoginContainer = () => {
                         })
                     });
                     if (response.ok) {
-                        dispatch({ type:"SET_STATE", state:{ profile: username.toLocaleLowerCase() }});
+                        setProfileState(username.toLocaleLowerCase())
                         if (authType == AuthType.SignUp) {
-                            setShowAccountWindow(true)
+                            setShowAccountWindow(true);
                             setShowLogin(false);
                         } else if (authType == AuthType.Login) {
-                            dispatch({ type:"SET_STATE", state:{ isLogin: true }});
+                            setLoginState(true);
                             clearFields();
                         }
                     } else if (response.status == 409) {
-                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+                        setLoadingState(false);
                         setShowNameError(true);
                     } else if (response.status == 401) {
-                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+                        setLoadingState(false);
                         setShowAuthError(true);
+                    } else if (response.status == 404) {
+                        setLoadingState(false);
+                        setShowNameError(true);
                     } else {
-                        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+                        setLoadingState(false);
                         setShowServerError(true);
                     }
                 } catch (error) {
-                    dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+                    setLoadingState(false);
                     setShowServerError(true);
                 }
             }
             startAuth()
         }
     };
-    const validateUser = (username: string) => {
-        let maxChar = 25
-        const validStart = new RegExp(`^_?[a-zA-Z][a-zA-Z0-9_]{1,${maxChar}}$`); // make sure starts with _ (if _ must have letter follow) or letter minimum and the following can be a number, letter , or underscore
-        const isUnder = username.length <= maxChar ? true : false;
-        if (validStart.test(username) && isUnder) {
-            return true
-        } else {
-            return false
-        }
-    }
-    const validatePass = (password: string) => {
-        let maxChar = 8
-        const complexityRegex = new RegExp(`^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{${maxChar},}$`)
-        if (complexityRegex.test(password)) {
-            return true
-        } else {
-            return false
-        }
-    }
     const handleAuthOnEnter = (event: React.KeyboardEvent<HTMLInputElement>, authType: number) => {
         if (event.key === "Enter") {
-            handleAuthentication(authType)
+            handleAuthentication(authType);
         }
     }
     const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,10 +101,11 @@ const LoginContainer = () => {
     const handlePassKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
         setPassword(event.currentTarget.value);
     }
+    // ********* Utils *************
     const clearFields = () => {
         setUsername("");
         setPassword("");
-        dispatch({ type:"SET_STATE", state:{ isLoading: false }});
+        setLoadingState(false);
         setShowServerError(false);
         setShowUsernameError(false);
         setShowPasswordError(false);
@@ -134,7 +118,7 @@ const LoginContainer = () => {
     const logout = () => {
         clearFields();
         localStorage.clear();
-        dispatch({ type:"SET_STATE", state:{ isLogin: false }});
+        setLoginState(false);
     }
     const login = () => {
         clearFields();
@@ -143,16 +127,18 @@ const LoginContainer = () => {
     return (
         <>
             {!isLogin && !showLoginWindow ? (
-            <Login
-                login={() => {
+            <Auth
+                authType={() => {
                     login();
                 }}
+                authName="Login"
             />
             ) : (isLogin ? (
-            <Logout
-                logout={() => {
+            <Auth
+                authType={() => {
                     logout();
                 }}
+                authName="Logout"
             />
             ) : (
                 null
@@ -163,6 +149,7 @@ const LoginContainer = () => {
                 isInvalidName={showUsernameError}
                 isInvalidPass={showPasswordError}
                 isAuthError={showAuthError}
+                isNameError={showNameError}
                 showLoading={isLoading}
                 loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
                 login={() => handleAuthentication(AuthType.Login)}
@@ -213,12 +200,7 @@ const LoginContainer = () => {
             )}
 
             {!isLogin && showAccountWindow ? (
-            <AccountWindow
-                close={() => {
-                    clearFields();
-                }}
-                mode={mode}
-            />
+            <AccountWindow/>
             ) : (
                 null
             )}
@@ -226,4 +208,4 @@ const LoginContainer = () => {
     );
 };
 
-export default LoginContainer;
+export default AuthContainer;

@@ -1,4 +1,3 @@
-import "./Refresh.css";
 import { FC } from "react";
 
 interface Props {
@@ -7,12 +6,10 @@ interface Props {
     refresh: Function
 };
 
-const Refresh: FC<Props> = ({ mode, isRefresh, refresh}) => {
+const Refresh: FC<Props> = ({ mode, isRefresh, refresh }) => {
     const refreshIcon = `/images/${mode}/refresh.png`;
     return (
-        <>
-            <img className={`sideview_refresh${isRefresh ? "_load" : ""}`} onClick={() => refresh()} src={refreshIcon}/>
-        </>
+        <img className={isRefresh ? "sidebar__refresh sidebar__refresh--load" : "sidebar__refresh sidebar__refresh--loadalt"} onClick={() => refresh()} src={refreshIcon}/>
     );
 };
 

@@ -1,4 +1,4 @@
-.overview-container {
+.overview {
     background-color: var(--WINDOW_MODE);
     width: 60rem;
     height: 35rem;
@@ -8,32 +8,24 @@
     right: 0;
     border-radius: 1rem;
     outline: var(--FONT_MODE) solid 0.2rem;
-    z-index: -1;
 }
-.overview-user {
-    margin-left: 2rem;
-    font-size: 1.4rem;
-    font-style: italic;
-}
-.overview-date {
-    margin-left: 1rem;
-    font-size: 1.6rem;
-}
-.overview-title {
-    margin-left: 6rem;
-    font-size: 2rem;
-    font-weight: 900;
-}
-.overview-border {
-    background-color: var(--FONT_MODE);
-    width: 100%;
-    height: 0.1rem;
-}
-.overview-divider {
-    background-color: var(--FONT_MODE);
-    height: 2.8rem;
-    width: 0.1rem;
-    position: relative;
-    left: 38rem;
-    top: -2.8rem;
-}
+    .overview__header {
+        display: flex;
+        border-bottom: 2px solid var(--FONT_MODE);
+        justify-content: space-around;
+        font-size: 1.4rem;
+    }
+        .overview__header__user {
+            font-style: italic;
+        }
+        .overview__header__date {
+            font-size: 1.4rem;
+            border-left: 2px solid var(--FONT_MODE);
+            padding-left: 4.5rem;
+        }
+        .overview__header__title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            border-left: 2px solid var(--FONT_MODE);
+            padding-left: 1.5rem;
+        }

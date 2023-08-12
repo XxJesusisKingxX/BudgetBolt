@@ -5,8 +5,6 @@ interface QuickstartState {
   profile: string,
   isLoading: boolean
   isLogin: boolean
-  showCreateWindow: boolean,
-  showLoginWindow: boolean,
   isTransactionsUpdated: boolean
   lastTransactionsUpdate: Date,
   isTransactionsRefresh: boolean
@@ -18,8 +16,6 @@ const initialState: QuickstartState = {
   profile: "",
   isLoading: false,
   isLogin: false,
-  showCreateWindow: false,
-  showLoginWindow: false,
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),
   isTransactionsRefresh: false,

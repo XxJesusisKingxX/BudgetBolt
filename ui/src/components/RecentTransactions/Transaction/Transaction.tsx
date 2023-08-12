@@ -5,17 +5,16 @@ interface Props {
     account: string
     transaction: string
     amount: number
-    bottom?: React.CSSProperties
 };
 
-const Transaction: React.FC<Props> = ({mode, account, transaction, amount, bottom}) => {
-    const reel = `/images/${mode}/reel.png`;
+const Transaction: React.FC<Props> = ({mode, account, transaction, amount}) => {
+    const reel = `/images/${mode}/transactions/reel.png`;
     return (
-        <div className="transaction-container" style={bottom}>
-            <img src={reel} className="transaction-icon"/>
-            <span className="account-name">{account}</span>
+        <div className="trans">
+            <img src={reel} className="trans__icon"/>
+            <span className="trans__acc">{account}</span>
             <br/>
-            <span className="transaction-name">{transaction}...${amount}</span>
+            <span className="trans__name">{transaction}...${amount}</span>
         </div>
     );
 };

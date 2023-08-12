@@ -9,6 +9,7 @@ import (
 
 func ViewTransaction(rows *sql.Rows) []model.Transaction {
 	var view []model.Transaction
+	defer rows.Close()
 	for rows.Next() {
 		var id int
 		var date string

@@ -1,5 +1,3 @@
-import "./PlaidLink.css"
-
 interface Props {
   plaidFunction: Function
   ready: boolean
@@ -7,9 +5,7 @@ interface Props {
 
 const PlaidLink: React.FC<Props> = ({ plaidFunction, ready }) => {
   return (
-    <button className="plaid-addbutton" onClick={() => plaidFunction()} disabled={!ready}>
-      Add Account
-    </button>
+    <button className="btn btn--plaid" onClick={() => plaidFunction()} disabled={!ready}>Add Account</button>
   );
 };
 
