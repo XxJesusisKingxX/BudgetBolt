@@ -8,6 +8,7 @@ import (
 
 func ViewAccount(rows *sql.Rows) []model.Account {
 	var view []model.Account
+	defer rows.Close()
 	for rows.Next() {
 		var id int
 		var name string

@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, useCallback } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import "./PlaidLink.css"
 import Context from "../../context/Context";
 import PlaidLink from "./PlaidLink";
 

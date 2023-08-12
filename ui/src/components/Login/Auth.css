@@ -1,0 +1,74 @@
+@keyframes press {
+    from {
+        box-shadow: 5px 5px 5px var(--FONT_MODE);
+    }
+    to {
+        box-shadow: 1px 1px 1px var(--FONT_MODE);
+    }
+}
+
+.auth {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+    .auth__input {
+        padding: 0.3rem;
+    }
+        .auth__input:hover {
+            background-color: var(--WINDOW_MODE);
+            transition: 0.2s;
+        }
+        .auth__input--roundedinsde {
+            color: var(--FONT_MODE);
+            border-color: var(--FONT_MODE);
+            border-radius: 0.5rem;
+        }
+.auth--username {
+    text-align: left;
+}
+.auth--password {
+    text-align: left;
+    position: relative;
+    top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.windowcont {
+    position: absolute;
+    text-align: center;
+}
+    .windowcont__title {
+        color: var(--FONT_MODE);
+        font-size: x-large;
+        margin: 0;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+    }
+.windowcont--auth {
+    background-color: var(--BACKGROUND_MODE);
+    height: 20rem;
+    width: 15rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+}
+.windowcont--plaid {
+    background-color: var(--BACKGROUND_MODE);
+    height: 10rem;
+    width: 15rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+}
+
+.closeicon {
+    width: 1rem;
+    position: absolute;
+    left: 90%;
+    cursor: pointer;
+}

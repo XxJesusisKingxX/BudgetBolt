@@ -444,7 +444,7 @@ func TestLinkTokenCreate(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-link-token", func(c *gin.Context) {
-		createLinkToken(c, PlaidClient{})
+		createLinkToken(c, PlaidClient{},controller.DB{})
 	})
 	// Create request
 	form := url.Values{}
@@ -466,7 +466,7 @@ func TestLinkTokenCreateFails(t *testing.T) {
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/create-link-token", func(c *gin.Context) {
-		createLinkToken(c, MockPlaidClient{Err: errors.New("Failed")})
+		createLinkToken(c, MockPlaidClient{Err: errors.New("Failed")}, controller.MockDB{})
 	})
 	// Create request
 	form := url.Values{}
@@ -772,7 +772,7 @@ func TestCreateProfile_ProfileCreated(t *testing.T) {
 	// Assert
 	tests.Equals(t, http.StatusOK, w.Code)
 }
-func TestRetrieveProfile_ProfileNotRetrieve(t *testing.T) {
+func TestRetrieveProfile_NotExist(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
@@ -780,25 +780,20 @@ func TestRetrieveProfile_ProfileNotRetrieve(t *testing.T) {
 	r.POST("/api/profile/get", func(c *gin.Context) {
 		retrieveProfile(c,
 			controller.MockDB{
-				ProfileErr: errors.New("Failed to retrieve profile"),
+				Profile: model.Profile{
+					ID: 0,
+				},
 			},
 		)
 	})
 	// Create request
 	form := url.Values{}
-	form.Set("username", "test_user")
-	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
 	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isRetrieved := !strings.Contains(string(responseBody), "\"Failed to retrieve profile\"")
 	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isRetrieved)
+	tests.Equals(t, http.StatusNotFound, w.Code)
 }
 func TestRetrieveProfile_AuthFailed(t *testing.T) {
 	// Create mock engine
@@ -809,6 +804,7 @@ func TestRetrieveProfile_AuthFailed(t *testing.T) {
 		retrieveProfile(c,
 			controller.MockDB{
 				Profile: model.Profile{
+					ID: 1,
 					Password: "abcdefghijklmnopqrstuvwxy",
 				},
 			},
@@ -835,6 +831,7 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 		retrieveProfile(c,
 			controller.MockDB{
 				Profile: model.Profile{
+					ID: 1,
 					Password: string(hashPass),
 				},
 			},

@@ -1,4 +1,3 @@
-import './Home.css';
 import Overview from '../../components/Overview/OverviewContainer';
 import Sideview from '../../components/RecentTransactions/SideviewContainer';
 

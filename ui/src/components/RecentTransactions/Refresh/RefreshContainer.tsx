@@ -1,24 +1,23 @@
-import "./Refresh.css";
-import { FC, useContext } from "react";
+import { useContext } from "react";
 import Context from "../../../context/Context"
 import Refresh from "./Refresh";
-
+import { useAppStateActions } from "../../../redux/redux";
 
 const RefreshContainer = () => {
-    const {mode, isTransactionsRefresh, dispatch} = useContext(Context);
+    const { mode, isTransactionsRefresh } = useContext(Context);
+    const { setLastTransactionsUpdateState, setTransactionsRefreshState } = useAppStateActions();
     const handleRefreshClick = () => {
-        dispatch({ type: "SET_STATE", state: { lastTransactionsUpdate: new Date(), isTransactionsRefresh: !isTransactionsRefresh }});
+        setLastTransactionsUpdateState(new Date())
+        setTransactionsRefreshState(!isTransactionsRefresh)
     };
     return (
-        <>
-            <Refresh
-                isRefresh={isTransactionsRefresh}
-                refresh={() => {
-                    handleRefreshClick();
-                }}
-                mode={mode}
-            />
-        </>
+        <Refresh
+            isRefresh={isTransactionsRefresh}
+            refresh={() => {
+                handleRefreshClick();
+            }}
+            mode={mode}
+        />
     );
 };
 

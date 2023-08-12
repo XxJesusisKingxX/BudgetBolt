@@ -7,14 +7,14 @@ interface Props {
 };
 const Sideview: React.FC<Props> = ({ lastUpdate }) => {
     return (
-        <>
-            <div className="sideview-container">
-                <div className="sideview-title">Recent Transaction<Refresh/></div>
-                <div className="sideview-border"></div>
-                <div className="sideview-footer">Last updated: {lastUpdate}</div>
-                <Transaction />
+        <div className="sidebar">
+            <div className="sidebar__border">
+                <span className="sidebar__border__title">Recent Transaction</span>
             </div>
-        </>
+            <span className="sidebar__footer">Last updated: {lastUpdate}</span>
+            <Refresh/>
+            <Transaction />
+        </div>
     );
 };
 
