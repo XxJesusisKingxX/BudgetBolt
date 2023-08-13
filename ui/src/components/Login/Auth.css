@@ -15,15 +15,15 @@
     .auth__input {
         padding: 0.3rem;
     }
-        .auth__input:hover {
-            background-color: var(--WINDOW_MODE);
-            transition: 0.2s;
-        }
-        .auth__input--roundedinsde {
-            color: var(--FONT_MODE);
-            border-color: var(--FONT_MODE);
-            border-radius: 0.5rem;
-        }
+    .auth__input:hover {
+        background-color: var(--WINDOW_MODE);
+        transition: 0.2s;
+    }
+    .auth__input--roundedinsde {
+        color: var(--FONT_MODE);
+        border-color: var(--FONT_MODE);
+        border-radius: 0.5rem;
+    }
 .auth--username {
     text-align: left;
 }

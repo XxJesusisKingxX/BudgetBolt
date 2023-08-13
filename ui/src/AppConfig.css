@@ -2,8 +2,13 @@
     --BACKGROUND_MODE: white;
     --FONT_MODE: black;
     --WINDOW_MODE: grey;
+    --WINDOW_MODE_L: rgb(201, 201, 201);
     --ERROR: red;
     --HOVER: grey;
+    --HEALTH_NONE: transparent;
+    --HEALTH_HIGH: red;
+    --HEALTH_MEDIUM: yellow;
+    --HEALTH_LOW: green;
 }
 .link {
     text-decoration: underline;
