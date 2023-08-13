@@ -115,9 +115,6 @@
     position: absolute;
     animation: loading 1.2s infinite;
 }
-    @keyframes loading {
-        to { rotate: 360deg; }
-    }
 .loading--create {
     width: 40px;
     left: 6.5rem;
@@ -134,6 +131,12 @@
     width: 5rem;
     animation: loading 1.2s infinite;
 }
+.loading--bills {
+    position: absolute;
+    top: 15rem;
+    width: 40px;
+    animation: loading 1.2s infinite;
+}
 
 body {
     background-color: var(--BACKGROUND_MODE);
@@ -144,4 +147,24 @@ body {
 }
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+@keyframes loading {
+    to { rotate: 360deg; }
+}
+@keyframes press {
+    from {
+        box-shadow: 5px 5px 5px var(--FONT_MODE);
+    }
+    to {
+        box-shadow: 1px 1px 1px var(--FONT_MODE);
+    }
 }

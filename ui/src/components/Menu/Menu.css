@@ -49,14 +49,6 @@
     .menu__list--show {
         animation: reveal 0.2s forwards
     }
-        @keyframes reveal {
-            from {
-                opacity: 0%;
-            }
-            to {
-                opacity: 100%;
-            }
-        }
 .menu:hover .menu__lines__line {
     background-color: var(--HOVER);
     transition: 0.2s;

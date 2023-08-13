@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import Context from "../../../context/Context"
+import Context from "../../context/Context"
 import Refresh from "./Refresh";
-import { useAppStateActions } from "../../../redux/redux";
+import { useAppStateActions } from "../../redux/redux";
 
 const RefreshContainer = () => {
     const { mode, isTransactionsRefresh } = useContext(Context);

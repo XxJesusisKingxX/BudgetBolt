@@ -1,6 +1,6 @@
 import "./Sideview.css";
-import Transaction from "./Transaction/TransactionContainer";
-import Refresh from "./Refresh/RefreshContainer";
+import Transaction from "../Transaction/TransactionContainer";
+import Refresh from "../Refresh/RefreshContainer";
 
 interface Props {
     lastUpdate: string

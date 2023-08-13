@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { EndPoint } from "../../../enums/endpoints"
-import { useAppStateActions } from "../../../redux/redux"
+import { EndPoint } from "../../enums/endpoints"
+import { useAppStateActions } from "../../redux/redux"
 import Transaction from "./Transaction";
-import Context from "../../../context/Context";
-import "./Transaction.css";
+import Context from "../../context/Context";
 
 interface Transaction {
     ID: number

@@ -1,4 +1,4 @@
-import './Menu.css';
+import "./Menu.css";
 import { useContext, FC }from 'react';
 import Context from '../../context/Context';
 

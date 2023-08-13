@@ -1,9 +1,9 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
-import { Health } from "../enums/style";
+import { Health, ModeType } from "../enums/style";
 
 interface QuickstartState {
   health: Health
-  mode: string,
+  mode: ModeType,
   profile: string,
   isLoading: boolean
   isLogin: boolean
@@ -15,7 +15,7 @@ interface QuickstartState {
 
 const initialState: QuickstartState = {
   health: Health.NONE,
-  mode: "light",
+  mode: ModeType.Light,
   profile: "",
   isLoading: false,
   isLogin: false,

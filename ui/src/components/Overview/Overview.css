@@ -29,3 +29,8 @@
             border-left: 2px solid var(--FONT_MODE);
             padding-left: 1.5rem;
         }
+    .overview_lwidgets {
+        display: flex;
+        flex-direction: column;
+        justify-content: left;
+    }
