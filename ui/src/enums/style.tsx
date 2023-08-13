@@ -1,6 +1,6 @@
 export enum ModeType {
-    Light = 1,
-    Dark = 2,
+    Light = "light",
+    Dark = "dark",
 };
 
 export enum Health {

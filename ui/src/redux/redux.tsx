@@ -41,16 +41,7 @@ export const useAppStateActions = () => {
             dispatch({ type: "SET_STATE", state: { linkToken: state } });
         },
         setModeState: (state: ModeType) => {
-            switch (state) {
-                case 1:
-                    dispatch({ type: "SET_STATE", state: { profile: "light" } });
-                    break;
-                case 2:
-                    dispatch({ type: "SET_STATE", state: { profile: "dark" } });
-                    break;
-                default:
-                    break;
-            }
+            dispatch({ type: "SET_STATE", state: { mode: state } });
         },
         setLastTransactionsUpdateState: (state: Date) => {
             dispatch({ type: "SET_STATE", state: { lastTransactionsUpdate: state } });
