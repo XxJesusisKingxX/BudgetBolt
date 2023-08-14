@@ -1,6 +1,7 @@
 import BudgetTrender from '../BudgetTrender/BudgetTrender';
 import FinancialsPeek from '../FinancialsPeek/FinancialsPeekContainer';
 import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
+import MiniWindow from '../MiniWindow/MiniWindowContainer';
 import Upcoming from '../Upcoming/Upcoming';
 import './Overview.css';
 
@@ -25,6 +26,7 @@ const Overview: React.FC<Props> = ({ user, date }) => {
                     </div>
                     <div className="overview__widgets__top__right">
                         <FinancialsPeek/>
+                        <MiniWindow/>
                     </div>
                 </div>
                 <div className="overview__widgets__bottom">
