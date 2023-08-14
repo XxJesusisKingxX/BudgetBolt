@@ -160,7 +160,7 @@ func createLinkToken(c *gin.Context, p Plaid, dbhandler controller.DBHandler) {
 func getAccessToken(c *gin.Context, p Plaid, dbhandler controller.DBHandler, testMode bool) {
 	ctx := context.Background()
 	publicToken := c.PostForm("public_token")
-	user := c.PostForm("profile")
+	user := c.PostForm("username")
 	exchangePublicTokenResp, err := p.ItemPublicTokenExchange(client, ctx, publicToken)
 	if err != nil {
 		renderError(c, err, PlaidClient{})

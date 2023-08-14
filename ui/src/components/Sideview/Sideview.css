@@ -9,6 +9,7 @@
     border-radius: 1rem;
     outline: auto;
     outline: var(--FONT_MODE) solid 0.2rem;
+    animation: reveal 1s forwards;
 }
     .sidebar__refresh {
         top: 0.5rem;

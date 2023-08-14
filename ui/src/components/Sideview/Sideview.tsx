@@ -7,7 +7,7 @@ interface Props {
 };
 const Sideview: React.FC<Props> = ({ lastUpdate }) => {
     return (
-        <div className="sidebar">
+        <div id="sidebar" className="sidebar">
             <div className="sidebar__border">
                 <span className="sidebar__border__title">Recent Transaction</span>
             </div>
