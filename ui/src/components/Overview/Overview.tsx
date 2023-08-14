@@ -1,3 +1,4 @@
+import BudgetTrender from '../BudgetTrender/BudgetTrender';
 import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
 import Upcoming from '../Upcoming/Upcoming';
 import './Overview.css';
@@ -15,9 +16,19 @@ const Overview: React.FC<Props> = ({ user, date }) => {
                 <span className="overview__header__date">~ Today is {date} ~</span>
                 <span className="overview__header__title">Budget Overview</span>
             </div>
-            <div className="overview__lwidgets">
-                <HealthIndicator/>
-                <Upcoming/>
+            <div className="overview__widgets">
+                <div className="overview__widgets__top">
+                    <div className="overview__widgets__top__left">
+                        <HealthIndicator/>
+                        <Upcoming/>
+                    </div>
+                    <div className="overview__widgets__top__right">
+                        {/* TODO add more widgets */}
+                    </div>
+                </div>
+                <div className="overview__widgets__bottom">
+                    <BudgetTrender/>
+                </div>
             </div>
         </div>
     );
