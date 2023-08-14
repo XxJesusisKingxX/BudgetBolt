@@ -1,4 +1,5 @@
 import BudgetTrender from '../BudgetTrender/BudgetTrender';
+import FinancialsPeek from '../FinancialsPeek/FinancialsPeekContainer';
 import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
 import Upcoming from '../Upcoming/Upcoming';
 import './Overview.css';
@@ -23,7 +24,7 @@ const Overview: React.FC<Props> = ({ user, date }) => {
                         <Upcoming/>
                     </div>
                     <div className="overview__widgets__top__right">
-                        {/* TODO add more widgets */}
+                        <FinancialsPeek/>
                     </div>
                 </div>
                 <div className="overview__widgets__bottom">
