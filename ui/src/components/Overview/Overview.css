@@ -29,8 +29,11 @@
             border-left: 2px solid var(--FONT_MODE);
             padding-left: 1.5rem;
         }
-    .overview_lwidgets {
+    .overview__widgets {
         display: flex;
         flex-direction: column;
-        justify-content: left;
     }
+        .overview__widgets__top {
+            display: flex;
+            justify-content: space-between;
+        }
