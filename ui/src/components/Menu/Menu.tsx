@@ -21,7 +21,7 @@ const Menu: FC<Props> = ({ showDropdown, onMouseOut, onMouseOver }) => {
     const budgetIcon = `/images/${mode}/menu/budget.png`;
     return (
         <>
-            {!isLogin ?
+            {isLogin ?
                 <div id="menu" className="menu">
                     <div className="menu__lines">
                         <div className="menu__lines__line"/>

@@ -2,9 +2,11 @@ import React, { useEffect, useContext, useCallback } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import Context from "../../context/Context";
 import PlaidLink from "./PlaidLink";
+import { useAppStateActions } from "../../redux/redux";
 
 const PlaidLinkContainer = () => {
   const { linkToken, profile, dispatch } = useContext(Context);
+  const { setLoginState, setLoadingState } = useAppStateActions();
 
   const onSuccess = useCallback(
     (public_token: string) => {
@@ -28,8 +30,8 @@ const PlaidLinkContainer = () => {
             profile: profile
           }),
         });
-        dispatch({ type: "SET_STATE", state: { isLogin: true } });
-        dispatch({ type: "SET_STATE", state: { isLoading: false } });
+        setLoginState(true);
+        setLoadingState(false);
       };
       linkAccounts();
       window.history.pushState("", "", "/");

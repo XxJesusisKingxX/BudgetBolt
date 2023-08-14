@@ -10,7 +10,7 @@ import { useAppStateActions } from "../../redux/redux";
 import { EndPoint } from "../../enums/endpoints";
 
 const AuthContainer = () => {
-    const { isLoading, isLogin, mode } = useContext(Context);
+    const { isLoading, profile, isLogin, mode } = useContext(Context);
     const { setLoadingState, setLoginState, setProfileState } = useAppStateActions();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");

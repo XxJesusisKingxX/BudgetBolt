@@ -1,5 +1,5 @@
 import Overview from '../../components/Overview/OverviewContainer';
-import Sideview from '../../components/RecentTransactions/SideviewContainer';
+import Sideview from '../../components/Sideview/SideviewContainer';
 
 const Home = () => {
     return (

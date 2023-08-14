@@ -32,8 +32,8 @@ const App = () => {
           return;
         }
         setLinkTokenState(data.link_token);
+        localStorage.setItem("link_token", data.link_token);
       }
-      localStorage.setItem("link_token", data.link_token);
     },
     [dispatch, profile]
   );
