@@ -1,6 +1,6 @@
 .healthind {
     background-color: var(--BACKGROUND_MODE);
-    box-shadow: 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
     display: flex;
     justify-content: right;
     align-items: center;
