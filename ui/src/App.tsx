@@ -1,11 +1,12 @@
 import { useEffect, useContext, useCallback } from "react";
-import Auth from "./components/Login/AuthContainer"
+import Auth from "./pages/Login/AuthContainer"
 import Context from "./context/Context";
-import Header from "./components/Header/Header";
-import Home from "./pages/Home/Home";
-import Menu from "./components/Menu/MenuContainer";
-import { EndPoint } from "./enums/endpoints";
-import { useAppStateActions } from "./redux/redux";
+import Header from "./pages/Header/Header";
+import Menu from "./pages/Menu/MenuContainer";
+import { EndPoint } from "./constants/endpoints";
+import { useAppStateActions } from "./redux/useUserContextState";
+import Sideview from "./pages/Sideview/SideviewContainer";
+import Overview from "./pages/Overview/OverviewContainer";
 
 const App = () => {
   const { profile, dispatch } = useContext(Context);
@@ -50,13 +51,12 @@ const App = () => {
   }, [dispatch, profile, generateToken]);
 
   return (
-    <>
       <Header>
         <Menu/>
         <Auth/>
-        <Home/>
+        <Sideview/>
+        <Overview/>
       </Header>
-    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
-import { Health, ModeType } from "../enums/style";
+import { Health, ModeType } from "../constants/style";
 
-interface QuickstartState {
+interface State {
   health: Health
   mode: ModeType,
   profile: string,
@@ -13,7 +13,7 @@ interface QuickstartState {
   linkToken: string | null;
 }
 
-const initialState: QuickstartState = {
+const initialState: State = {
   health: Health.NONE,
   mode: ModeType.Light,
   profile: "",
@@ -25,27 +25,27 @@ const initialState: QuickstartState = {
   linkToken: "", // Don't set to null or error message will show up briefly when site loads
 };
 
-type QuickstartAction = {
+type Action = {
   type: "SET_STATE";
-  state: Partial<QuickstartState>;
+  state: Partial<State>;
 };
 
-interface QuickstartContext extends QuickstartState {
-  dispatch: Dispatch<QuickstartAction>;
+interface Context extends State {
+  dispatch: Dispatch<Action>;
 }
 
-const Context = createContext<QuickstartContext>(
-  initialState as QuickstartContext
+const UserContext = createContext<Context>(
+  initialState as Context
 );
 
-const { Provider } = Context;
-export const QuickstartProvider: React.FC<{ children: ReactNode }> = (
+const { Provider } = UserContext;
+export const UserProvider: React.FC<{ children: ReactNode }> = (
   props
 ) => {
   const reducer = (
-    state: QuickstartState,
-    action: QuickstartAction
-  ): QuickstartState => {
+    state: State,
+    action: Action
+  ): State => {
     switch (action.type) {
       case "SET_STATE":
         return { ...state, ...action.state };
@@ -57,4 +57,4 @@ export const QuickstartProvider: React.FC<{ children: ReactNode }> = (
   return <Provider value={{ ...state, dispatch }}>{props.children}</Provider>;
 };
 
-export default Context;
+export default UserContext;
