@@ -1,4 +1,4 @@
-import { formatOverviewDate } from "./formatDate";
+import { formatOverviewDate } from "../formatDate";
 
 test('Test formatOverviewDate functionality ', () => {
     const resultOne = formatOverviewDate(new Date('2000-1-1'));

@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import Context from "../../context/Context";
+import Context from "../../context/UserContext";
 import Bill from "./Bill"
 
 interface Bill {

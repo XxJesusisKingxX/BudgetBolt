@@ -1,23 +1,28 @@
-import { useContext, useEffect, useState } from "react";
-import { validatePass, validateUser } from "../../utils/validator";
-import { AuthType } from "../../constants/auth"
-import Auth from "./Auth";
-import Context from "../../context/Context";
-import LoginWindow from "./LoginWindow/LoginWindow";
-import SignupWindow from "./SignupWindow/SignupWindow";
-import AccountWindow from "./AccountWindow";
-import { useLogin } from "./useLogin";
+import { useContext, useEffect, useState } from 'react';
+import { validatePass, validateUser } from '../../utils/validator';
+import { AuthType } from '../../constants/auth'
+import AuthButton from './components/AuthButton';
+import LoginWindow from './components/LoginWindow';
+import SignupWindow from './components/SignupWindow';
+import AccountWindow from './components/AccountWindow';
+import { useLogin } from './useLogin';
+import UserContext from '../../context/UserContext';
+import LoginContext from '../../context/LoginContext';
+import "../../assets/auth/styles/Auth.css";
+import ThemeContext from '../../context/ThemeContext';
 
-const AuthContainer = () => {
-    const {profile, isLogin, mode, dispatch} = useContext(Context);
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+const Auth = () => {
+    const {mode} = useContext(ThemeContext);
+    const {isLogin, userDispatch} = useContext(UserContext);
+    const {showAccountWindow, showSignUpWindow, showLoginWindow, loginDispatch} = useContext(LoginContext);
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [showUsernameError, setShowUsernameError] = useState(false);
     const [showPasswordError, setShowPasswordError] = useState(false);
-    const valid = !showUsernameError && !showPasswordError && username != "" && password != ""
-    const {serverErr, nameErr, takenNameErr, authErr, showLoading, showAccountWindow, login} = useLogin(username, password, valid);
-    const [showCreateWindow, setShowCreateWindow] = useState(false);
-    const [showLoginWindow, setShowLoginWindow] = useState(false);
+
+    const valid = !showUsernameError && !showPasswordError && username != '' && password != '';
+    const {serverErr, nameErr, takenNameErr, authErr, showLoading, clearErrors, handleAuth} = useLogin(username, password, valid);
 
     useEffect(() => {
         const validate = () => {
@@ -36,8 +41,8 @@ const AuthContainer = () => {
     }, [username, password]);
    
     const handleAuthOnEnter = (event: React.KeyboardEvent<HTMLInputElement>, authType: number) => {
-        if (event.key === "Enter") {
-            login(authType);
+        if (event.key === "SET_STATE") {
+            handleAuth(authType);
         }
     }
     const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,54 +58,55 @@ const AuthContainer = () => {
         setPassword(event.currentTarget.value);
     }
     const handleWindowClose = () => {
-        setUsername("");
-        setPassword("");
-        setShowLoginWindow(false);
-        setShowCreateWindow(false);
+        setUsername('');
+        setPassword('');
+        clearErrors();
+        loginDispatch({ type: "SET_STATE", state: { showLoginWindow: false, showSignUpWindow: false, showAccountWindow: false }});
     }
-    const handleLoginWindow = () => {
+    const handleCreateWindow = () => {
         handleWindowClose();
-        setShowLoginWindow(false);
-        setShowCreateWindow(true);
+        loginDispatch({ type: "SET_STATE", state: { showSignUpWindow: true }});
+    }
+    const handleLogin = () => {
+        loginDispatch({ type: "SET_STATE", state: { showLoginWindow: true }});
+    }
+    const handleLogout = () => {
+        localStorage.clear();
+        userDispatch({ type: "SET_STATE", state: { isLogin: false }});
     }
 
     return (
         <>
-            {!isLogin && !showLoginWindow ? (
-            <Auth
-                authType={() => {
-                    setShowLoginWindow(true);
-                }}
-                authName="Login"
+            {!isLogin ? (
+            <AuthButton
+                action={handleLogin}
+                name="Login"
             />
             ) : (isLogin ? (
-            <Auth
-                authType={() => {
-                    localStorage.clear();
-                    dispatch({ type: "SET_STATE", state: { isLogin: false }});
-                }}
-                authName="Logout"
+            <AuthButton
+                action={handleLogout}
+                name="Logout"
             />
             ) : (
                 null
             ))}
-
             {showLoginWindow ? (
             <LoginWindow
                 isInvalidName={showUsernameError}
                 isInvalidPass={showPasswordError}
                 isAuthError={authErr}
                 isNameError={nameErr}
+                serverError={serverErr}
                 showLoading={showLoading}
                 loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
-                login={() => login(AuthType.Login)}
+                login={() => handleAuth(AuthType.Login)}
                 userKeyUp={handleUserKeyUp}
                 userChange={handleUserChange}
                 username={username}
                 passKeyUp={handlePassKeyUp}
                 passChange={handlePassChange}
                 password={password}
-                open={handleLoginWindow}
+                openSignUp={handleCreateWindow}
                 close={handleWindowClose}
                 mode={mode}
             />
@@ -108,14 +114,14 @@ const AuthContainer = () => {
                 null
             )}
 
-            {!showAccountWindow && showCreateWindow ? (
+            {showSignUpWindow ? (
             <SignupWindow
                 isTakenName={takenNameErr}
                 isInvalidName={showUsernameError}
                 isInvalidPass={showPasswordError}
                 showLoading={showLoading}
                 signupOnEnter={(event) => handleAuthOnEnter(event, AuthType.SignUp)}
-                signup={() => login(AuthType.SignUp)}
+                signup={() => handleAuth(AuthType.SignUp)}
                 userKeyUp={handleUserKeyUp}
                 userChange={handleUserChange}
                 username={username}
@@ -123,14 +129,14 @@ const AuthContainer = () => {
                 passChange={handlePassChange}
                 password={password}
                 close={handleWindowClose}
-                error={serverErr}
+                serverError={serverErr}
                 mode={mode}
             />
             ) : (
                 null
             )}
 
-            {!isLogin && showAccountWindow ? (
+            {showAccountWindow ? (
             <AccountWindow/>
             ) : (
                 null
@@ -139,4 +145,4 @@ const AuthContainer = () => {
     );
 };
 
-export default AuthContainer;
+export default Auth;

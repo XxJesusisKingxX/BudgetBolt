@@ -3,8 +3,9 @@ import { ChangeEventHandler, KeyboardEventHandler } from "react";
 interface Props {
     mode: string
     close: Function
-    open: Function
+    openSignUp: Function
     login: Function
+    serverError: boolean
     isAuthError: boolean
     isInvalidPass: boolean
     isInvalidName: boolean
@@ -18,16 +19,16 @@ interface Props {
     passKeyUp: KeyboardEventHandler<HTMLInputElement>
     loginOnEnter: KeyboardEventHandler<HTMLInputElement>
 }
-const LoginWindow: React.FC<Props> = ({ mode, close, open, isNameError, isAuthError, isInvalidPass, isInvalidName, showLoading, username, password,userKeyUp, userChange, passKeyUp, passChange, login, loginOnEnter}) => {
+const LoginWindow: React.FC<Props> = ({ mode, close, openSignUp, serverError, isNameError, isAuthError, isInvalidPass, isInvalidName, showLoading, username, password,userKeyUp, userChange, passKeyUp, passChange, login, loginOnEnter}) => {
     const cancel = `/images/${mode}/cancel.png`
     const loading = `/images/${mode}/loading.png`
     return (
-        <div className="windowcont windowcont--auth">
+        <div data-testid='login-window' className="windowcont windowcont--auth">
             <h1 className="windowcont__title">Sign In<img className="closeicon" src={cancel} onClick={() => close()}/></h1>
             <div className="auth auth--username">
-                <input className="auth__input auth__input--roundedinsde" value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder="User" required/>
+                <input aria-label="username" className="auth__input auth__input--roundedinsde" value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder="User" required/>
                 {isInvalidName ?
-                    <div className="err err--usernameinvalid">
+                    <div data-testid='invalid-name' className="err err--usernameinvalid">
                         Enter a valid username:
                         <br/>
                         - Must start with a letter or an underscore (_)
@@ -40,9 +41,9 @@ const LoginWindow: React.FC<Props> = ({ mode, close, open, isNameError, isAuthEr
                 }
             </div>
             <div className="auth auth--password">
-                <input className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required/>
+                <input aria-label="password" className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required/>
                 {isInvalidPass ?
-                    <div className="err err--passwordinvalid">
+                    <div data-testid='invalid-pass' className="err err--passwordinvalid">
                         Password is invalid.
                         <br/>
                         Must have the followings:
@@ -61,21 +62,30 @@ const LoginWindow: React.FC<Props> = ({ mode, close, open, isNameError, isAuthEr
                     null
                 }
             </div>
-            Create an Account:<span className="link link--signup" onClick={() => open()}>Sign Up</span>
+            Create an Account:<span data-testid='signup-link' className="link link--signup" onClick={() => openSignUp()}>Sign Up</span>
             {isAuthError ?
-                <div className="err err--passwordinvalid">Oops! The username or password is incorrect.</div>
+                <div data-testid='auth-err' className="err err--passwordinvalid">Oops! The username or password is incorrect.</div>
                 :
                 null
             }
             {isNameError ?
-                <div className="err err--passwordinvalid">Oops! The username does not exist</div>
+                <div data-testid='name-err' className="err err--passwordinvalid">Oops! The username does not exist</div>
+                :
+                null
+            }
+            {serverError ?
+                <div data-testid='server-err' className="err err--servererr">
+                    We apologize, but there seems to be an issue.
+                    <br/>
+                    Please try again later.
+                </div>
                 :
                 null
             }
             {showLoading ?
-                <img src={loading} className="loading loading--login"/>
+                <img data-testid='login-loading' src={loading} className="loading loading--login"/>
                 :
-                <button onClick={() =>login()} className="btn btn--login">Login</button>
+                <button data-testid='login-button' onClick={() =>login()} className="btn btn--login">Login</button>
             }
         </div>
     );

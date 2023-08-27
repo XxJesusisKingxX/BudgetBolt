@@ -1,6 +1,6 @@
 import "./Menu.css";
 import { useContext, FC }from 'react';
-import Context from '../../context/Context';
+import Context from '../../context/UserContext';
 
 interface Props {
     showDropdown: boolean

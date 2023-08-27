@@ -1,4 +1,4 @@
-import Context from "../../context/Context";
+import Context from "../../context/UserContext";
 import Sideview from "./Sideview";
 import { useContext } from "react";
 

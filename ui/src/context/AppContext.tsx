@@ -1,12 +1,6 @@
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
-import { Health, ModeType } from "../constants/style";
 
 interface State {
-  health: Health
-  mode: ModeType,
-  profile: string,
-  isLoading: boolean
-  isLogin: boolean
   isTransactionsUpdated: boolean
   lastTransactionsUpdate: Date,
   isTransactionsRefresh: boolean
@@ -14,11 +8,6 @@ interface State {
 }
 
 const initialState: State = {
-  health: Health.NONE,
-  mode: ModeType.Light,
-  profile: "",
-  isLoading: false,
-  isLogin: false,
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),
   isTransactionsRefresh: false,
@@ -34,12 +23,12 @@ interface Context extends State {
   dispatch: Dispatch<Action>;
 }
 
-const UserContext = createContext<Context>(
+const AppContext = createContext<Context>(
   initialState as Context
 );
 
-const { Provider } = UserContext;
-export const UserProvider: React.FC<{ children: ReactNode }> = (
+const { Provider } = AppContext;
+export const AppProvider: React.FC<{ children: ReactNode }> = (
   props
 ) => {
   const reducer = (
@@ -57,4 +46,4 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (
   return <Provider value={{ ...state, dispatch }}>{props.children}</Provider>;
 };
 
-export default UserContext;
+export default AppContext;

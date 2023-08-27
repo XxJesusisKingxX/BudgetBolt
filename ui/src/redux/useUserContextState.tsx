@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ModeType } from "../constants/style";
-import Context from "../context/Context";
+import Context from "../context/UserContext";
 
 export const useAppStateActions = () => {
     const { dispatch } = useContext(Context);

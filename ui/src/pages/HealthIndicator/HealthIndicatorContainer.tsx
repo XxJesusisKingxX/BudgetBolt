@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import HealthIndicator from './HealthIndicator';
-import Context from '../../context/Context';
+import Context from '../../context/UserContext';
 
 const HealthIndicatorContainer = () => {
     const { health } = useContext(Context)

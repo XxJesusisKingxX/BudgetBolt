@@ -5,7 +5,7 @@ interface Props {
 
 const PlaidLink: React.FC<Props> = ({ plaidFunction, ready }) => {
   return (
-    <button className="btn btn--plaid" onClick={() => plaidFunction()} disabled={!ready}>Add Account</button>
+    <button data-testid='plaid-button' className="btn btn--plaid" onClick={() => plaidFunction()} disabled={!ready}>Add Account</button>
   );
 };
 

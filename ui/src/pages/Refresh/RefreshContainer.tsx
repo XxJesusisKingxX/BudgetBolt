@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import Context from "../../context/Context"
+import Context from "../../context/UserContext"
 import Refresh from "./Refresh";
 import { useAppStateActions } from "../../redux/useUserContextState";
 

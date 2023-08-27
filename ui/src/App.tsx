@@ -1,12 +1,13 @@
 import { useEffect, useContext, useCallback } from "react";
-import Auth from "./pages/Login/AuthContainer"
-import Context from "./context/Context";
+import Auth from "./pages/Auth"
+import Context from "./context/UserContext";
 import Header from "./pages/Header/Header";
 import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
 import { useAppStateActions } from "./redux/useUserContextState";
 import Sideview from "./pages/Sideview/SideviewContainer";
 import Overview from "./pages/Overview/OverviewContainer";
+import { LoginProvider } from "./context/LoginContext";
 
 const App = () => {
   const { profile, dispatch } = useContext(Context);
@@ -53,7 +54,9 @@ const App = () => {
   return (
       <Header>
         <Menu/>
-        <Auth/>
+        <LoginProvider>
+          <Auth/>
+        </LoginProvider>
         <Sideview/>
         <Overview/>
       </Header>

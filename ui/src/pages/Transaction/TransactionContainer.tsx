@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { EndPoint } from "../../constants/endpoints"
 import { useAppStateActions } from "../../redux/useUserContextState"
 import Transaction from "./Transaction";
-import Context from "../../context/Context";
+import Context from "../../context/UserContext";
 
 interface Transaction {
     ID: number

@@ -1,4 +1,4 @@
-import { validateUser, validatePass } from "./validator";
+import { validateUser, validatePass } from "../validator";
 
 test('Test validator functionality ', () => {
     const resultOne = validatePass("P@ssw0rd");

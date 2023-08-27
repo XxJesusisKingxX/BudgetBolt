@@ -1,18 +1,26 @@
 import { useContext, useState } from "react";
 import { AuthType } from "../../constants/auth";
-import UserContext from "../../context/Context";
+import UserContext from "../../context/UserContext";
 import { EndPoint } from "../../constants/endpoints";
+import LoginContext from "../../context/LoginContext";
 
-export const useLogin =  (username: string, password: string, valid: boolean) => {
-    const { dispatch } = useContext(UserContext);
+export const useLogin = (username: string, password: string, valid: boolean) => {
+    const { userDispatch} = useContext(UserContext);
+    const { loginDispatch } = useContext(LoginContext);
     const [serverErr, setServerErr] = useState(false);
     const [nameErr, setNameErr] = useState(false);
     const [authErr, setAuthErr] = useState(false);
     const [takenNameErr, setTakenNameErr] = useState(false);
     const [showLoading, setShowLoading] = useState(false);
-    const [showAccountWindow, setShowAccountWindow] = useState(false);
 
-    const login = async (authType: number) => {
+    const clearErrors = () => {
+        setServerErr(false)
+        setAuthErr(false)
+        setNameErr(false)
+        setTakenNameErr(false)
+    }
+
+    const handleAuth = async (authType: number) => {
         if (valid) {
             setShowLoading(true);
             try {
@@ -41,10 +49,10 @@ export const useLogin =  (username: string, password: string, valid: boolean) =>
                 if (response?.ok) {
                     setShowLoading(false)
                     const lowercaseUsername = username.toLocaleLowerCase()
-                    dispatch({ type: "SET_STATE", state: { profile: lowercaseUsername }});
-                    dispatch({ type: "SET_STATE", state: { isLogin: true }});
+                    userDispatch({ type: "SET_STATE", state: { profile: lowercaseUsername }});
+                    userDispatch({ type: "SET_STATE", state: { isLogin: true }});
                     if (authType == AuthType.SignUp) {
-                        setShowAccountWindow(true);
+                        loginDispatch({ type: "SET_STATE", state: { showAccountWindow: true }});
                     }
                 } else if (response?.status == 409) {
                     setShowLoading(false);
@@ -66,13 +74,14 @@ export const useLogin =  (username: string, password: string, valid: boolean) =>
             }
         }
     }
+    
     return {
         serverErr,
         authErr,
         nameErr,
         takenNameErr,
         showLoading,
-        showAccountWindow,
-        login
+        clearErrors,
+        handleAuth
     };
 };

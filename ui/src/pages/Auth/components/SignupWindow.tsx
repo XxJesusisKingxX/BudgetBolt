@@ -4,7 +4,7 @@ interface Props {
     mode: string,
     close: Function
     signup: Function
-    error: boolean
+    serverError: boolean
     isTakenName: boolean
     isInvalidPass: boolean
     isInvalidName: boolean
@@ -18,15 +18,15 @@ interface Props {
     signupOnEnter: KeyboardEventHandler<HTMLInputElement>
 };
 
-const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInvalidPass, isInvalidName, showLoading, username, password, userKeyUp, userChange, passKeyUp, passChange, signup, signupOnEnter }) => {
+const SignupWindow: React.FC<Props> = ({ mode, close, serverError, isTakenName, isInvalidPass, isInvalidName, showLoading, username, password, userKeyUp, userChange, passKeyUp, passChange, signup, signupOnEnter }) => {
     const cancel = `/images/${mode}/cancel.png`
     const loading = `/images/${mode}/loading.png`
     return (
-        <div className="windowcont windowcont--auth">
+        <div data-testid='signup-window' className="windowcont windowcont--auth">
             <h1 className="windowcont__title">Create a Account<img className="closeicon" src={cancel} onClick={() => close()}/></h1>
             <div className="auth auth--username">
                 {isTakenName ?
-                    <div className="err err--usernameinvalid">
+                    <div data-testid='taken-err' className="err err--usernameinvalid">
                         Apologies, but the username is already in use.
                         <br/>
                         Please select a different username.
@@ -35,9 +35,9 @@ const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInva
                     :
                     null
                 }
-                <input className="auth__input auth__input--roundedinsde" value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder="User" required/>
+                <input aria-label="username" className="auth__input auth__input--roundedinsde" value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder="User" required/>
                 {isInvalidName ?
-                    <div className="err err--usernameinvalid">
+                    <div data-testid='invalid-name' className="err err--usernameinvalid">
                         Enter a valid username:
                         <br/>
                         - Must start with a letter or an underscore (_)
@@ -50,9 +50,9 @@ const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInva
                 }
             </div>
             <div className="auth auth--password">
-                <input className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={signupOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required/>
+                <input aria-label="password" className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={signupOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required/>
                 {isInvalidPass ?
-                    <div className="err err--passwordinvalid">
+                    <div data-testid='invalid-pass' className="err err--passwordinvalid">
                         Enter a valid password:
                         <br/>
                         Must have the followings:
@@ -70,8 +70,8 @@ const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInva
                     :
                     null
                 }
-                {error ?
-                    <div className="err err--servererr">
+                {serverError ?
+                    <div data-testid='server-err' className="err err--servererr">
                         We apologize, but there seems to be an issue.
                         <br/>
                         Please try again later.
@@ -81,9 +81,9 @@ const SignupWindow: React.FC<Props> = ({ mode, close, error, isTakenName, isInva
                 }
             </div>
             {showLoading ?
-                <img src={loading} className="loading loading--create"/>
+                <img data-testid='signup-loading' src={loading} className="loading loading--create"/>
                 :
-                <button onClick={() => signup()} className="btn btn--create">Submit</button>}
+                <button data-testid='signup-button' onClick={() => signup()} className="btn btn--create">Submit</button>}
         </div>
     );
 };

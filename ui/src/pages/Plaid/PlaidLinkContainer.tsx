@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useCallback } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import Context from "../../context/Context";
+import Context from "../../context/UserContext";
 import PlaidLink from "./PlaidLink";
 import { useAppStateActions } from "../../redux/useUserContextState";
 
