@@ -1,9 +1,9 @@
-import Chart from "../Charts/ChartsContainer";
-import "./BudgetTrender.css"
+import Chart from '../Charts/ChartsContainer';
+import './BudgetTrender.css'
 
 const BudgetTrender = () => {
     return (
-        <div className="budgettrender">
+        <div className='budgettrender'>
             <Chart/>
         </div>
     );

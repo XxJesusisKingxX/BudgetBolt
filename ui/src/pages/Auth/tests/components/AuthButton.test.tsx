@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { initState, renderWithLoginContext } from '../../../../context/mock/UserContext.mock';
+import { initState, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
 import AuthContainer from '../..';
 import { cleanup } from '@testing-library/react';
 

@@ -1,4 +1,4 @@
-import MiniWindow from "./MiniWindow";
+import MiniWindow from './MiniWindow';
 
 const MiniWindowContainer = () => {
     return (

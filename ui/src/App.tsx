@@ -1,17 +1,17 @@
 import { useEffect, useContext, useCallback } from "react";
 import Auth from "./pages/Auth"
-import Context from "./context/UserContext";
+import UserContext from "./context/UserContext";
 import Header from "./pages/Header/Header";
 import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
-import { useAppStateActions } from "./redux/useUserContextState";
 import Sideview from "./pages/Sideview/SideviewContainer";
 import Overview from "./pages/Overview/OverviewContainer";
+import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 
 const App = () => {
-  const { profile, dispatch } = useContext(Context);
-  const { setLinkTokenState } = useAppStateActions();
+  const { profile, userDispatch } = useContext(UserContext);
+  const { dispatch } = useContext(AppContext);
 
   const generateToken = useCallback(
     async () => {
@@ -24,32 +24,32 @@ const App = () => {
         })
       });
       if (!response.ok) {
-        setLinkTokenState("")
+        dispatch({ type: "SET_STATE", state: { linkToken: '' }});
         return;
       }
       const data = await response.json();
       if (data) {
         if (data.error != null) {
-          setLinkTokenState("")
+          dispatch({ type: "SET_STATE", state: { linkToken: '' }});
           return;
         }
-        setLinkTokenState(data.link_token);
+        dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
       }
     },
-    [dispatch, profile]
+    [userDispatch, profile]
   );
 
   useEffect(() => {
     const init = async () => {
       if (window.location.href.includes("?oauth_state_id=")) {
-        setLinkTokenState(localStorage.getItem("link_token"));
+        dispatch({ type: "SET_STATE", state: { linkToken: localStorage.getItem("link_token") }});
         return;
       }
       generateToken();
     };
     init();
-  }, [dispatch, profile, generateToken]);
+  }, [userDispatch, profile, generateToken]);
 
   return (
       <Header>

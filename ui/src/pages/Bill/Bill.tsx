@@ -1,36 +1,41 @@
-import { FC } from "react"
-import "./Bill.css"
-import { ModeType } from "../../constants/style"
+import { FC } from 'react';
+import './Bill.css';
 
 interface Props {
-    name: string
-    price: string
-    daysLeft: number
-    dueDate: string
-    category: string
-    spacing: number
-    mode: string
-    icon?: string
+    name: string;     // The name associated with the bill.
+    price: string;    // The price or amount of the bill.
+    daysLeft: number; // The number of days left until the bill's due date.
+    dueDate: string;  // The due date of the bill.
+    category: string; // The category or type of the bill (e.g., utility, rent, subscription).
+    spacing: number;  // The spacing value for positioning the component.
+    mode: string;     // The current mode of the component (e.g., light mode, dark mode).
+    icon?: string;    // An optional icon for the bill.
 }
+
 const Bill: FC<Props> = ({ icon, mode, name, price, daysLeft, dueDate, category, spacing }) => {
     const pic = `/images/${mode}/bills/${icon}.png`;
+
     return (
-        <div className="bill">
-            {/* TODO remove if statmemnt/optional for icon when can handling */}
-            {icon ? <img className="bill__icon" src={pic}/> : ""}{name}: ${price} ~ {daysLeft} days
-            <div style={{top:`${7+spacing}rem`}} className="bill__fullview">
-                <div className="bill__fullview__cont"/>
-                <div className="bill__fullview__txt">
-                    <div className="bill__fullview__txt__title">
+        <div className='bill'>
+            {/* Display the icon if provided */}
+            {icon ? <img className='bill__icon' src={pic} alt={`${name} icon`} /> : ''}
+            {/* Display the bill name, price, and days left */}
+            {name}: ${price} ~ {daysLeft} days
+            {/* Expanded view */}
+            <div style={{ top: `${7 + spacing}rem` }} className='bill__fullview'>
+                {/* Placeholder for expanded view content */}
+                <div className='bill__fullview__cont'/>
+                <div className='bill__fullview__txt'>
+                    <div className='bill__fullview__txt__title'>
                         {name}
                     </div>
-                    <div className="bill__fullview__txt__cols">
-                        <div className="bill__fullview__txt__cols__lcol">
+                    <div className='bill__fullview__txt__cols'>
+                        <div className='bill__fullview__txt__cols__lcol'>
                             Due Date:
                             <br/>
                             {dueDate}
                         </div>
-                        <div className="bill__fullview__txt__cols__rcol">
+                        <div className='bill__fullview__txt__cols__rcol'>
                             Category:
                             <br/>
                             {category}
@@ -42,34 +47,4 @@ const Bill: FC<Props> = ({ icon, mode, name, price, daysLeft, dueDate, category,
     );
 }
 
-export default Bill
-
-// Full Name:
-// Displaying the full name of the person or entity associated with the bill can provide quick identification.
-
-// Bill Due Date:
-// Include the due date of the bill to let users know when it needs to be paid.
-
-// Bill Amount:
-// Show the total amount of the bill so users can immediately see how much they owe.
-
-// Bill Type or Category:
-// Categorize the bill (e.g., utility, rent, subscription) so users can understand what the bill is for.
-
-// Bill Status:
-// Indicate whether the bill has been paid or is pending.
-
-// Payment History:
-// If applicable, show a summary of past payments made toward this bill.
-
-// Bill Description:
-// Provide a brief description of the bill to remind users of its purpose.
-
-// Contact Information:
-// Include contact details (e.g., phone number, email) for the bill issuer in case users have questions.
-
-// Options for Action:
-// Offer buttons or links for users to take actions like making a payment or viewing more details.
-
-// Additional Notes or Comments:
-// Allow users to add and view any notes or comments related to the bill.
+export default Bill;

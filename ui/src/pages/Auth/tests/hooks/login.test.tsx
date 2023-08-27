@@ -12,6 +12,7 @@ const initLoginState = {
     showAccountWindow: false,
     showLoginWindow: false,
     showSignUpWindow: false,
+    isLogin: false,
     loginDispatch: mockLoginDispatch
 };
 
@@ -19,7 +20,6 @@ const initLoginState = {
 const mockUserDispatch = jest.fn();
 const initUserState = {
     profile: "",
-    isLogin: false,
     userDispatch: mockUserDispatch
 };
 
@@ -65,7 +65,7 @@ describe("Login",() => {
         // Login success now verify: setup account window does not shows, login is set, and profile name is updated
         await waitFor(()=> {
             expect(mockUserDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
-            expect(mockUserDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
+            expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
             expect(mockLoginDispatch).not.toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
         })
         // Cleanup

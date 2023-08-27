@@ -1,27 +1,38 @@
-import { useContext, useEffect, useState } from "react";
-import { EndPoint } from "../../constants/endpoints"
-import { useAppStateActions } from "../../redux/useUserContextState"
-import Transaction from "./Transaction";
-import Context from "../../context/UserContext";
+import { useContext, useEffect, useState } from 'react';
+import { EndPoint } from '../../constants/endpoints';
+import Transaction from './Transaction';
+import AppContext from '../../context/AppContext';
+import ThemeContext from '../../context/ThemeContext';
+import LoginContext from '../../context/LoginContext';
+import UserContext from '../../context/UserContext';
 
+// Transaction interface for a single transaction
 interface Transaction {
-    ID: number
-    From: string
-    Amount: number
-    Vendor: string
+    ID: number;
+    From: string;
+    Amount: number;
+    Vendor: string;
 }
 
+// TransactionContainer component
 const TransactionContainer = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const { mode, profile, isLogin, isTransactionsRefresh } = useContext(Context);
-    const { setLastTransactionsUpdateState, setTransactionsRefreshState } = useAppStateActions();
-    const maxPeek = 6;
-    const maxChar = 18;
-    const everyHour = 3600000;
-    
+
+    // Accessing profile, isTransactionsRefresh, dispatch, mode, and isLogin from contexts
+    const { profile } = useContext(UserContext);
+    const { isTransactionsRefresh, dispatch } = useContext(AppContext);
+    const { mode } = useContext(ThemeContext);
+    const { isLogin } = useContext(LoginContext);
+
+    const maxPeek = 6; // Maximum number of transactions to display
+    const maxChar = 18; // Maximum number of characters for transaction name
+    const everyHour = 3600000; // Interval for hourly update check
+
     useEffect(() => {
         const sidebar = document.getElementById("sidebar");
+
+        // Function to handle sidebar animation completion
         const isAnimationDone = (done: boolean) => {
             if (done) {
                 if (sidebar) {
@@ -30,39 +41,47 @@ const TransactionContainer = () => {
             } else {
                 if (sidebar) {
                     sidebar.onanimationend = () => {
-                        setIsLoading(true)
+                        setIsLoading(true);
                     };
                 }
             }
-        }
-        const checkHourlyUpdate = () => {
-            setLastTransactionsUpdateState( new Date() )
-            setTransactionsRefreshState(!isTransactionsRefresh)
         };
+
+        // Function to update transactions every hour
+        const checkHourlyUpdate = () => {
+            dispatch({ type: "SET_STATE", state: { lastTransactionsUpdate: new Date(), isTransactionsRefresh: !isTransactionsRefresh } });
+        };
+
+        // Function to retrieve transactions from the server
         const retrieveTransactions = async () => {
             try {
                 await fetch(EndPoint.CREATE_TRANSACTIONS, {
                     method: "POST",
-                    body: new URLSearchParams ({
-                        username: profile
-                    })
+                    body: new URLSearchParams({
+                        username: profile,
+                    }),
                 });
-                const baseURL = window.location.href
+
+                const baseURL = window.location.href;
                 const url = new URL(EndPoint.GET_TRANSACTIONS, baseURL);
-                url.search = new URLSearchParams(({
-                    username: profile
-                })).toString();
+                url.search = new URLSearchParams({
+                    username: profile,
+                }).toString();
+
                 const retrieveResponse = await fetch(url, {
                     method: "GET",
                 });
+
                 const data = await retrieveResponse.json();
                 setTransactions(data["transactions"]);
                 isAnimationDone(true);
                 setIsLoading(false);
             } catch (error) {
-                console.log("failed to retrieve transactions")
+                console.log("failed to retrieve transactions");
             }
         };
+
+        // If logged in, initiate animations and transaction retrieval
         if (isLogin) {
             isAnimationDone(false);
             retrieveTransactions();
@@ -72,6 +91,7 @@ const TransactionContainer = () => {
     }, [isTransactionsRefresh, isLogin]);
 
     const loading = `/images/${mode}/loading.png`;
+
     return (
         <>
             {!isLoading ? transactions.slice(0, maxPeek).map((transaction) => (
@@ -83,7 +103,7 @@ const TransactionContainer = () => {
                     mode={mode}
                 />
             )) : (
-                <img className="loading loading--trans" src={loading}/>
+                <img className="loading loading--trans" src={loading} alt="Loading" />
             )}
         </>
     );

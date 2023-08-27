@@ -1,9 +1,10 @@
-import "./Upcoming.css"
-import Bill from "../Bill/BillContainer"
+import './Upcoming.css'
+import Bill from '../Bill/BillContainer'
+
 const Upcoming = () => {
     return (
-        <div className="upcoming">
-            <span className="upcoming__txt">Upcoming Bills</span>
+        <div className='upcoming'>
+            <span className='upcoming__txt'>Upcoming Bills</span>
             <Bill/>
         </div>
     );

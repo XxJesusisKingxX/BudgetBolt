@@ -1,5 +1,5 @@
-import { FC } from "react";
-import "./MiniWindow.css"
+import { FC } from 'react';
+import './MiniWindow.css'
 
 interface Props {
     // TODO add props needed
@@ -7,7 +7,7 @@ interface Props {
 
 const MiniWindow: FC<Props> = () => {
     return (
-        <div className="miniwindow">
+        <div className='miniwindow'>
 
         </div>
     );

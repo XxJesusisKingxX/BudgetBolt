@@ -1,22 +1,34 @@
-import { useContext } from "react";
-import Context from "../../context/UserContext"
-import Refresh from "./Refresh";
-import { useAppStateActions } from "../../redux/useUserContextState";
+import { useContext } from 'react';
+import Refresh from './Refresh';
+import AppContext from '../../context/AppContext';
+import ThemeContext from '../../context/ThemeContext';
 
+// RefreshContainer component
 const RefreshContainer = () => {
-    const { mode, isTransactionsRefresh } = useContext(Context);
-    const { setLastTransactionsUpdateState, setTransactionsRefreshState } = useAppStateActions();
+    // Accessing mode from ThemeContext and isTransactionsRefresh, dispatch from AppContext
+    const { mode } = useContext(ThemeContext);
+    const { isTransactionsRefresh, dispatch } = useContext(AppContext);
+
+    // Click event handler for the refresh button
     const handleRefreshClick = () => {
-        setLastTransactionsUpdateState(new Date())
-        setTransactionsRefreshState(!isTransactionsRefresh)
+        // Toggling the isTransactionsRefresh state and updating the lastTransactionsUpdate time
+        dispatch({
+            type: "SET_STATE",
+            state: {
+                lastTransactionsUpdate: new Date(),
+                isTransactionsRefresh: !isTransactionsRefresh,
+            },
+        });
     };
+
     return (
+        // Render the Refresh component with necessary props
         <Refresh
-            isRefresh={isTransactionsRefresh}
+            isRefresh={isTransactionsRefresh} // Current refreshing state
             refresh={() => {
                 handleRefreshClick();
-            }}
-            mode={mode}
+            }} // Function to handle refresh button click
+            mode={mode} // Theme mode for image path
         />
     );
 };

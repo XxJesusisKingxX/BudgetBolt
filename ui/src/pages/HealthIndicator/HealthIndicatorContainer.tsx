@@ -1,11 +1,15 @@
-import { useContext } from 'react';
-import HealthIndicator from './HealthIndicator';
-import Context from '../../context/UserContext';
+import React, { useContext } from 'react';
+import HealthIndicator from './HealthIndicator'; // Importing the HealthIndicator component
+import ThemeContext from '../../context/ThemeContext'; // Importing the ThemeContext
 
+// HealthIndicatorContainer component
 const HealthIndicatorContainer = () => {
-    const { health } = useContext(Context)
+    // Accessing the health value from ThemeContext
+    const { health } = useContext(ThemeContext);
 
     let healthClassName = "";
+
+    // Calculate the appropriate CSS class based on the health value
     if (health > 0) {
         if (health === 1) {
             healthClassName = "healthind__dot healthind__dot--red";
@@ -19,6 +23,7 @@ const HealthIndicatorContainer = () => {
     }
 
     return (
+        // Render the HealthIndicator component with the calculated class
         <HealthIndicator
             healthClassName={healthClassName}
         />

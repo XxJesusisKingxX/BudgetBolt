@@ -12,18 +12,28 @@ import "../../assets/auth/styles/Auth.css";
 import ThemeContext from '../../context/ThemeContext';
 
 const Auth = () => {
-    const {mode} = useContext(ThemeContext);
-    const {isLogin, userDispatch} = useContext(UserContext);
-    const {showAccountWindow, showSignUpWindow, showLoginWindow, loginDispatch} = useContext(LoginContext);
+    // Get theme mode from context
+    const { mode } = useContext(ThemeContext);
 
+    // Get user dispatch and login-related states from contexts
+    const { userDispatch } = useContext(UserContext);
+    const { showAccountWindow, showSignUpWindow, showLoginWindow, isLogin, loginDispatch } = useContext(LoginContext);
+
+    // State for username and password inputs
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
+    // States to handle showing errors
     const [showUsernameError, setShowUsernameError] = useState(false);
     const [showPasswordError, setShowPasswordError] = useState(false);
 
-    const valid = !showUsernameError && !showPasswordError && username != '' && password != '';
-    const {serverErr, nameErr, takenNameErr, authErr, showLoading, clearErrors, handleAuth} = useLogin(username, password, valid);
+    // Calculate if the form is valid
+    const valid = !showUsernameError && !showPasswordError && username !== '' && password !== '';
 
+    // Use custom hook for login-related functionality
+    const { serverErr, nameErr, takenNameErr, authErr, showLoading, clearErrors, handleAuth } = useLogin(username, password, valid);
+
+    // Validate username and password on input change
     useEffect(() => {
         const validate = () => {
             if (!validateUser(username) && username) {
@@ -39,12 +49,15 @@ const Auth = () => {
         };
         validate();
     }, [username, password]);
-   
+
+    // Handle authentication on Enter key press
     const handleAuthOnEnter = (event: React.KeyboardEvent<HTMLInputElement>, authType: number) => {
-        if (event.key === "SET_STATE") {
+        if (event.key === "Enter") {  // Changed "SET_STATE" to "Enter"
             handleAuth(authType);
         }
     }
+
+    // Event handlers for input changes
     const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setUsername(event.target.value);
     }
@@ -57,87 +70,99 @@ const Auth = () => {
     const handlePassKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
         setPassword(event.currentTarget.value);
     }
+
+    // Close authentication windows
     const handleWindowClose = () => {
         setUsername('');
         setPassword('');
         clearErrors();
         loginDispatch({ type: "SET_STATE", state: { showLoginWindow: false, showSignUpWindow: false, showAccountWindow: false }});
     }
+
+    // Show signup window
     const handleCreateWindow = () => {
         handleWindowClose();
         loginDispatch({ type: "SET_STATE", state: { showSignUpWindow: true }});
     }
+
+    // Show login window
     const handleLogin = () => {
         loginDispatch({ type: "SET_STATE", state: { showLoginWindow: true }});
     }
+
+    // Handle logout
     const handleLogout = () => {
         localStorage.clear();
-        userDispatch({ type: "SET_STATE", state: { isLogin: false }});
+        loginDispatch({ type: "SET_STATE", state: { isLogin: false }});
     }
 
     return (
         <>
+            {/* Render login or logout button based on login status */}
             {!isLogin ? (
-            <AuthButton
-                action={handleLogin}
-                name="Login"
-            />
-            ) : (isLogin ? (
-            <AuthButton
-                action={handleLogout}
-                name="Logout"
-            />
+                <AuthButton
+                    action={handleLogin}
+                    name="Login"
+                />
             ) : (
-                null
-            ))}
+                <AuthButton
+                    action={handleLogout}
+                    name="Logout"
+                />
+            )}
+            {/* Render login window */}
             {showLoginWindow ? (
-            <LoginWindow
-                isInvalidName={showUsernameError}
-                isInvalidPass={showPasswordError}
-                isAuthError={authErr}
-                isNameError={nameErr}
-                serverError={serverErr}
-                showLoading={showLoading}
-                loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
-                login={() => handleAuth(AuthType.Login)}
-                userKeyUp={handleUserKeyUp}
-                userChange={handleUserChange}
-                username={username}
-                passKeyUp={handlePassKeyUp}
-                passChange={handlePassChange}
-                password={password}
-                openSignUp={handleCreateWindow}
-                close={handleWindowClose}
-                mode={mode}
-            />
+                <LoginWindow
+                    // Props related to errors and input values
+                    isInvalidName={showUsernameError}
+                    isInvalidPass={showPasswordError}
+                    isAuthError={authErr}
+                    isNameError={nameErr}
+                    serverError={serverErr}
+                    showLoading={showLoading}
+                    username={username}
+                    password={password}
+                    // Event handlers
+                    loginOnEnter={(event) => handleAuthOnEnter(event, AuthType.Login)}
+                    login={() => handleAuth(AuthType.Login)}
+                    userKeyUp={handleUserKeyUp}
+                    userChange={handleUserChange}
+                    passKeyUp={handlePassKeyUp}
+                    passChange={handlePassChange}
+                    openSignUp={handleCreateWindow}
+                    close={handleWindowClose}
+                    mode={mode}
+                />
             ) : (
                 null
             )}
-
+            {/* Render signup window */}
             {showSignUpWindow ? (
-            <SignupWindow
-                isTakenName={takenNameErr}
-                isInvalidName={showUsernameError}
-                isInvalidPass={showPasswordError}
-                showLoading={showLoading}
-                signupOnEnter={(event) => handleAuthOnEnter(event, AuthType.SignUp)}
-                signup={() => handleAuth(AuthType.SignUp)}
-                userKeyUp={handleUserKeyUp}
-                userChange={handleUserChange}
-                username={username}
-                passKeyUp={handlePassKeyUp}
-                passChange={handlePassChange}
-                password={password}
-                close={handleWindowClose}
-                serverError={serverErr}
-                mode={mode}
-            />
+                <SignupWindow
+                    // Props related to errors and input values
+                    isTakenName={takenNameErr}
+                    isInvalidName={showUsernameError}
+                    isInvalidPass={showPasswordError}
+                    showLoading={showLoading}
+                    serverError={serverErr}
+                    username={username}
+                    password={password}
+                    // Event handlers
+                    signupOnEnter={(event) => handleAuthOnEnter(event, AuthType.SignUp)}
+                    signup={() => handleAuth(AuthType.SignUp)}
+                    userKeyUp={handleUserKeyUp}
+                    userChange={handleUserChange}
+                    passKeyUp={handlePassKeyUp}
+                    passChange={handlePassChange}
+                    close={handleWindowClose}
+                    mode={mode}
+                />
             ) : (
                 null
             )}
-
+            {/* Render account window */}
             {showAccountWindow ? (
-            <AccountWindow/>
+                <AccountWindow/>
             ) : (
                 null
             )}

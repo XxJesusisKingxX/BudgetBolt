@@ -1,6 +1,6 @@
 interface Props {
-    action: Function
-    name: string
+    action: Function // any action for the button to perform
+    name: string     // the name of the button to be displayed
 };
 
 const AuthButton: React.FC<Props> = ({ action, name }) => {
