@@ -1,4 +1,4 @@
-.upcoming {
+.billtracker {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -9,7 +9,7 @@
     height: 18rem;
     margin: 1.5rem;
 }
-    .upcoming__txt {
+    .billtracker__txt {
         padding-top: 0.5rem;
         padding-right: 0.5rem;
         font-size: 1.3rem;
