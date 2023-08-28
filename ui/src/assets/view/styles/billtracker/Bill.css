@@ -25,6 +25,15 @@
         width: 15px;
         padding-right: 0.2rem;
     }
+    .bill__name {
+        padding-right: 0.3rem;
+    }
+    .bill__amount {
+        padding-right: 1.2rem;
+    }
+    .bill__daysleft {
+        padding-right: 0.3rem;
+    }
     .bill__fullview {
         pointer-events: none;
         opacity: 0%;

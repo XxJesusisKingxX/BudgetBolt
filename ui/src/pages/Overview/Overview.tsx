@@ -3,7 +3,7 @@ import BudgetTrender from '../BudgetTrender/BudgetTrender';
 import FinancialsPeek from '../FinancialsPeek/FinancialsPeekContainer';
 import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
 import MiniWindow from '../MiniWindow/MiniWindowContainer';
-import Upcoming from '../Upcoming/Upcoming';
+import BillTracker from '../BillTracker';
 import './Overview.css';
 
 // Props interface for the Overview component
@@ -29,8 +29,8 @@ const Overview: React.FC<Props> = ({ user, date }) => {
                     <div className='overview__widgets__top__left'>
                         {/* HealthIndicator component */}
                         <HealthIndicator />
-                        {/* Upcoming component */}
-                        <Upcoming />
+                        {/* BillTracker component */}
+                        <BillTracker />
                     </div>
                     {/* Right side top widgets */}
                     <div className='overview__widgets__top__right'>

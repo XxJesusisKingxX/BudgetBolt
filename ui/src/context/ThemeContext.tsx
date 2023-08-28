@@ -11,7 +11,7 @@ interface State {
 // Set initial state values
 const initialState: State = {
   health: Health.NONE,
-  mode: ModeType.Light,
+  mode: ModeType.LIGHT,
 };
 
 // Define possible actions that can modify the state

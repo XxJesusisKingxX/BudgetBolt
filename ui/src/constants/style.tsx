@@ -1,6 +1,6 @@
 export enum ModeType {
-    Light = "light",
-    Dark = "dark",
+    LIGHT = "light",
+    DARK = "dark",
 };
 
 export enum Health {
@@ -8,4 +8,8 @@ export enum Health {
     LOW = 1,
     MEDIUM = 2,
     HIGH = 3
+};
+
+export enum BillCategory {
+    ENTERTAINMENT = "entertainment",
 };
