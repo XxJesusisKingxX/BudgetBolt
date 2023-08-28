@@ -1,15 +1,18 @@
 import { useEffect, useContext, useCallback } from "react";
-import Auth from "./components/Login/AuthContainer"
-import Context from "./context/Context";
-import Header from "./components/Header/Header";
-import Home from "./pages/Home/Home";
-import Menu from "./components/Menu/MenuContainer";
-import { EndPoint } from "./enums/endpoints";
-import { useAppStateActions } from "./redux/redux";
+import Auth from "./pages/Auth"
+import UserContext from "./context/UserContext";
+import Header from "./pages/Header/Header";
+import Menu from "./pages/Menu/MenuContainer";
+import { EndPoint } from "./constants/endpoints";
+import Sideview from "./pages/Sideview/SideviewContainer";
+import Overview from "./pages/Overview/OverviewContainer";
+import AppContext, { AppProvider } from "./context/AppContext";
+import { LoginProvider } from "./context/LoginContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
-  const { profile, dispatch } = useContext(Context);
-  const { setLinkTokenState } = useAppStateActions();
+  const { profile, userDispatch } = useContext(UserContext);
+  const { dispatch } = useContext(AppContext);
 
   const generateToken = useCallback(
     async () => {
@@ -22,41 +25,46 @@ const App = () => {
         })
       });
       if (!response.ok) {
-        setLinkTokenState("")
+        dispatch({ type: "SET_STATE", state: { linkToken: '' }});
         return;
       }
       const data = await response.json();
       if (data) {
         if (data.error != null) {
-          setLinkTokenState("")
+          dispatch({ type: "SET_STATE", state: { linkToken: '' }});
           return;
         }
-        setLinkTokenState(data.link_token);
+        dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
       }
     },
-    [dispatch, profile]
+    [userDispatch, profile]
   );
 
   useEffect(() => {
     const init = async () => {
       if (window.location.href.includes("?oauth_state_id=")) {
-        setLinkTokenState(localStorage.getItem("link_token"));
+        dispatch({ type: "SET_STATE", state: { linkToken: localStorage.getItem("link_token") }});
         return;
       }
       generateToken();
     };
     init();
-  }, [dispatch, profile, generateToken]);
+  }, [userDispatch, profile, generateToken]);
 
   return (
-    <>
       <Header>
-        <Menu/>
-        <Auth/>
-        <Home/>
+        <AppProvider>
+          <ThemeProvider>
+            <Menu/>
+            <LoginProvider>
+              <Auth/>
+            </LoginProvider>
+            <Sideview/>
+            <Overview/>
+          </ThemeProvider>
+        </AppProvider>
       </Header>
-    </>
   );
 };
 

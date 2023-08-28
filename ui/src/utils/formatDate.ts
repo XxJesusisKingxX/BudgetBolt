@@ -1,4 +1,9 @@
-// Format date in a MMM DD YYYY with month placeholder being first 3 letters of month
+/**
+ * Format date in a MM DD YYYY with month placeholder being first 3 letters of month
+ *
+ * @param {Date} currentDate - the current local time date object
+ * @returns {boolean} Format date as such: `Jan 03, 2023`
+ */
 export function formatOverviewDate(currentDate: Date) {
     const year = currentDate.getFullYear().toString();
     let month = currentDate.getMonth() + 1; // Months are zero-indexed, so add 1

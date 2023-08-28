@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import './AppConfig.css';
-import { QuickstartProvider } from "./context/Context";
+import './index.css';
+import { AppProvider } from "./context/AppContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <QuickstartProvider>
+    <AppProvider>
       <App />
-    </QuickstartProvider>
+    </AppProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
