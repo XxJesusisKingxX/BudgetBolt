@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import './Bill.css';
+import '../../assets/transaction/styles/Bill.css';
 
 interface Props {
     name: string;     // The name associated with the bill.
@@ -16,9 +16,9 @@ const Bill: FC<Props> = ({ icon, mode, name, price, daysLeft, dueDate, category,
     const pic = `/images/${mode}/bills/${icon}.png`;
 
     return (
-        <div className='bill'>
+        <div data-testid='bill' className='bill'>
             {/* Display the icon if provided */}
-            {icon ? <img className='bill__icon' src={pic} alt={`${name} icon`} /> : ''}
+            {icon ? <img data-testid='bill-icon' className='bill__icon' src={pic} alt={`${name} icon`} /> : ''}
             {/* Display the bill name, price, and days left */}
             {name}: ${price} ~ {daysLeft} days
             {/* Expanded view */}

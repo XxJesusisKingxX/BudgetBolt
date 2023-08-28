@@ -6,8 +6,9 @@ import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
 import Sideview from "./pages/Sideview/SideviewContainer";
 import Overview from "./pages/Overview/OverviewContainer";
-import AppContext from "./context/AppContext";
+import AppContext, { AppProvider } from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
   const { profile, userDispatch } = useContext(UserContext);
@@ -53,12 +54,16 @@ const App = () => {
 
   return (
       <Header>
-        <Menu/>
-        <LoginProvider>
-          <Auth/>
-        </LoginProvider>
-        <Sideview/>
-        <Overview/>
+        <AppProvider>
+          <ThemeProvider>
+            <Menu/>
+            <LoginProvider>
+              <Auth/>
+            </LoginProvider>
+            <Sideview/>
+            <Overview/>
+          </ThemeProvider>
+        </AppProvider>
       </Header>
   );
 };

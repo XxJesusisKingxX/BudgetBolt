@@ -1,5 +1,5 @@
 import './Upcoming.css'
-import Bill from '../Bill/BillContainer'
+import Bill from '../Bill'
 
 const Upcoming = () => {
     return (

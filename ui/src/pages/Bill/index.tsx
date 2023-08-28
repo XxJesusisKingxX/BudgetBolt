@@ -1,6 +1,8 @@
 import { useContext, useState } from 'react';
 import Bill from './Bill';
 import ThemeContext from '../../context/ThemeContext';
+import { useCreate } from '../../hooks/useCreate';
+import { ModeType } from '../../constants/style';
 
 // Interface for the shape of a bill
 interface Bill {
@@ -63,6 +65,7 @@ const BillContainer = () => {
     // const [bills, setBills] = useState<Bill[]>([]);
     const { mode } = useContext(ThemeContext);
     const [isLoading, setIsLoading] = useState(true);
+    const { createBill } = useCreate();
     const maxPeek = 6;
     const spacing = 2;
 
@@ -74,7 +77,7 @@ const BillContainer = () => {
     const loading = `/images/${mode}/loading.png`;
     return (
         <>
-            {isLoading ? bills.slice(0, maxPeek).map((bill, idx) => (
+            {/* {isLoading ? bills.slice(0, maxPeek).map((bill, idx) => (
                 <Bill
                     key={bill.ID}
                     name={bill.Vendor}                         // Vendor associated with the bill
@@ -88,7 +91,9 @@ const BillContainer = () => {
                 />
             )) : (
                 <img className='loading loading--bills' src={loading} alt='Loading' />
-            )}
+            )} */}
+            {isLoading ? createBill(ModeType.Light) : <img className='loading loading--bills' src={loading} alt='Loading'/>
+            }
         </>
     );
 };
