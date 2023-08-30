@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
-import Charts from './Charts';
 
-const ChartsContainer = () => {
+const SavingsTrend = () => {
     // Create a ref to hold the canvas element
     const ref = useRef<HTMLCanvasElement | null>(null);
 
+    // *TODO* remove anbd use real data points
     // Generate a random number within a specified range
     const random = (max: number, min: number) => {
         return Math.random() * (max - min) + min;
@@ -49,12 +49,12 @@ const ChartsContainer = () => {
 
     return (
         // Render the Charts component with canvas and dimensions
-        <Charts
-            canvasRef={ref}     // Reference to the canvas element
+        <canvas
+            ref={ref}     // Reference to the canvas element
             width={10450}       // Width of the canvas
             height={1100}       // Height of the canvas
         />
     );
 }
 
-export default ChartsContainer;
+export default SavingsTrend;
