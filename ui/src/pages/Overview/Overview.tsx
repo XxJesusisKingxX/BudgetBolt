@@ -1,5 +1,5 @@
 import React from 'react';
-import BudgetTrender from '../BudgetTrender/BudgetTrender';
+import BudgetTrender from '../Charts/Chart';
 import FinancialsPeek from '../FinancialsPeek/FinancialsPeekContainer';
 import HealthIndicator from '../HealthIndicator/HealthIndicatorContainer';
 import MiniWindow from '../MiniWindow/MiniWindowContainer';

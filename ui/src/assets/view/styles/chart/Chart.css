@@ -1,4 +1,4 @@
-.budgettrender {
+.chart {
     display: flex;
     position: relative;
     background-color: var(--BACKGROUND_MODE);
