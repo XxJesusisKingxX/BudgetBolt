@@ -50,6 +50,7 @@ const SavingsTrend = () => {
     return (
         // Render the Charts component with canvas and dimensions
         <canvas
+            data-testid='saving-trend-canvas'
             ref={ref}     // Reference to the canvas element
             width={10450}       // Width of the canvas
             height={1100}       // Height of the canvas

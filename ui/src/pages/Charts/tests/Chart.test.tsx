@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { setupJestCanvasMock } from 'jest-canvas-mock';
-import { cleanup, render} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import SavingsTrend from '../SavingsTrend';
 
 
@@ -9,16 +9,10 @@ beforeEach(() => {
     setupJestCanvasMock();
 })
 
-afterEach(() => {
-    cleanup();
-})
-
 describe("Render Charts", () => {
     test("show savings trend chart", () => {
-        // Get canvas
-        const { container } = render(<SavingsTrend/>);
-        // Verify chart renders
-        expect(container).toBeInTheDocument();
+        render(<SavingsTrend/>)
+        expect(screen.getByTestId('saving-trend-canvas')).toBeInTheDocument();
     });
     test("show savings trend chart w/ default settings", () => {
         // Get canvas context

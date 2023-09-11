@@ -1,18 +1,16 @@
 import { useEffect, useContext, useCallback } from "react";
 import Auth from "./pages/Auth"
-import UserContext from "./context/UserContext";
 import Header from "./pages/Header/Header";
 import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
-import Sideview from "./pages/Sideview/SideviewContainer";
-import Overview from "./pages/Overview/OverviewContainer";
+import Sideview from "./pages/Sideview";
+import Dashboard from "./pages/Dashboard";
 import AppContext, { AppProvider } from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
-  const { profile, userDispatch } = useContext(UserContext);
-  const { dispatch } = useContext(AppContext);
+  const { profile, dispatch } = useContext(AppContext);
 
   const generateToken = useCallback(
     async () => {
@@ -38,7 +36,7 @@ const App = () => {
         localStorage.setItem("link_token", data.link_token);
       }
     },
-    [userDispatch, profile]
+    [dispatch, profile]
   );
 
   useEffect(() => {
@@ -50,7 +48,7 @@ const App = () => {
       generateToken();
     };
     init();
-  }, [userDispatch, profile, generateToken]);
+  }, [dispatch, profile, generateToken]);
 
   return (
       <Header>
@@ -61,7 +59,7 @@ const App = () => {
               <Auth/>
             </LoginProvider>
             <Sideview/>
-            <Overview/>
+            <Dashboard/>
           </ThemeProvider>
         </AppProvider>
       </Header>

@@ -48,10 +48,10 @@ const LoginWindow: React.FC<Props> = ({ mode, close, openSignUp, serverError, is
                 <input aria-label="password" className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required />
                 {/* Display error if the password is invalid */}
                 {isInvalidPass ?
-                    <div data-testid='invalid-pass' className="err err--passwordinvalid">
+                    <p data-testid='invalid-pass' className="err err--passwordinvalid">
                         Password is invalid.
                         {/* Password requirements */}
-                    </div>
+                    </p>
                     :
                     null
                 }

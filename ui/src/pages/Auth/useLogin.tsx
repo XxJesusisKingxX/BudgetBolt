@@ -1,13 +1,13 @@
 import { useContext, useState } from 'react';
 import { AuthType } from '../../constants/auth';
-import UserContext from '../../context/UserContext';
 import { EndPoint } from '../../constants/endpoints';
 import LoginContext from '../../context/LoginContext';
+import AppContext from '../../context/AppContext';
 
 // Custom hook for handling user authentication (login and signup)
 export const useLogin = (username: string, password: string, valid: boolean) => {
     // Accessing user and login context
-    const { userDispatch } = useContext(UserContext);
+    const { dispatch } = useContext(AppContext);
     const { loginDispatch } = useContext(LoginContext);
 
     // State variables to manage various error states and loading state
@@ -60,18 +60,18 @@ export const useLogin = (username: string, password: string, valid: boolean) => 
                     setShowLoading(false);
                     const lowercaseUsername = username.toLocaleLowerCase();
                     // Update user and login context upon successful authentication
-                    userDispatch({ type: "SET_STATE", state: { profile: lowercaseUsername } });
+                    dispatch({ type: "SET_STATE", state: { profile: lowercaseUsername } });
                     loginDispatch({ type: "SET_STATE", state: { isLogin: true } });
-                    if (authType == AuthType.SignUp) {
+                    if (authType === AuthType.SignUp) {
                         loginDispatch({ type: "SET_STATE", state: { showAccountWindow: true } });
                     }
-                } else if (response?.status == 409) {
+                } else if (response?.status === 409) {
                     setShowLoading(false);
                     setTakenNameErr(true);
-                } else if (response?.status == 401) {
+                } else if (response?.status === 401) {
                     setShowLoading(false);
                     setAuthErr(true);
-                } else if (response?.status == 404) {
+                } else if (response?.status === 404) {
                     setShowLoading(false);
                     setNameErr(true);
                 } else {

@@ -3,6 +3,7 @@ import { createContext, useReducer, Dispatch, ReactNode } from "react";
 
 // Define the shape of the state
 interface State {
+  profile: string
   isTransactionsUpdated: boolean;
   lastTransactionsUpdate: Date;
   isTransactionsRefresh: boolean;
@@ -11,6 +12,7 @@ interface State {
 
 // Set initial state values
 const initialState: State = {
+  profile: '',
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),
   isTransactionsRefresh: false,
