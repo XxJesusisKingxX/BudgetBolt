@@ -6,7 +6,7 @@ import LoginContext from '../../context/LoginContext';
 // PlaidLinkContainer component
 const PlaidLink = () => {
   // Accessing the user's profile, linkToken, and loginDispatch from contexts
-  const { profile, dispatch } = useContext(AppContext);
+  const { profile } = useContext(AppContext);
   const { linkToken } = useContext(AppContext);
   const { loginDispatch } = useContext(LoginContext);
 
@@ -46,7 +46,7 @@ const PlaidLink = () => {
       linkAccounts();
       window.history.pushState("", "", "/");
     },
-    [dispatch, loginDispatch, profile]
+    [loginDispatch, profile]
   );
 
   let isOauth = false;

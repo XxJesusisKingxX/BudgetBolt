@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { EndPoint } from '../../constants/endpoints';
-import Transaction from './TransactionComponent';
+import TransactionComponent from './TransactionComponent';
 import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
-import TransactionComponent from './TransactionComponent';
 
 // Transaction interface for a single transaction
 interface Transaction {
@@ -76,7 +75,7 @@ const TransactionContainer = () => {
             const intervalId = setInterval(checkHourlyUpdate, everyHour);
             return () => clearInterval(intervalId);
         }
-    }, [isTransactionsRefresh, isLogin]);
+    }, [isTransactionsRefresh, isLogin, profile, dispatch]);
 
     const loading = `/images/${mode}/loading.png`;
 

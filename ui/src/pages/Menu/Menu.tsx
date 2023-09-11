@@ -45,14 +45,14 @@ const Menu: FC<Props> = ({ showDropdown, onMouseOut, onMouseOver }) => {
                         className={showDropdown ? 'menu__list menu__list--default menu__list--show' : 'menu__list menu__list--hide'}
                     >
                         {/* Menu items with icons and links */}
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={budgetIcon}/><a href=''>Budget Overview</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={transactionIcon}/><a href=''>Transactions</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={expenseIcon}/><a href=''>Expenses</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={incomeIcon}/><a href=''>Income</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={goalIcon}/><a href=''>Goals and Savings</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={reminderIcon}/><a href=''>Reminders and Alerts</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={settingsIcon}/><a href=''>Settings</a></ul>
-                        <ul className='menu__list__item'><img className='menu__list__item__icon' src={helpIcon}/><a href=''>Help and Support</a></ul>
+                        <ul className='menu__list__item'><img alt='budget icon' className='menu__list__item__icon' src={budgetIcon}/><a href=''>Budget Overview</a></ul>
+                        <ul className='menu__list__item'><img alt='transactions icon' className='menu__list__item__icon' src={transactionIcon}/><a href=''>Transactions</a></ul>
+                        <ul className='menu__list__item'><img alt='expenses icon' className='menu__list__item__icon' src={expenseIcon}/><a href=''>Expenses</a></ul>
+                        <ul className='menu__list__item'><img alt='income icon' className='menu__list__item__icon' src={incomeIcon}/><a href=''>Income</a></ul>
+                        <ul className='menu__list__item'><img alt='goals and savings icon' className='menu__list__item__icon' src={goalIcon}/><a href=''>Goals and Savings</a></ul>
+                        <ul className='menu__list__item'><img alt='remninders and alerts icon' className='menu__list__item__icon' src={reminderIcon}/><a href=''>Reminders and Alerts</a></ul>
+                        <ul className='menu__list__item'><img alt='settings icon' className='menu__list__item__icon' src={settingsIcon}/><a href=''>Settings</a></ul>
+                        <ul className='menu__list__item'><img alt='help icon' className='menu__list__item__icon' src={helpIcon}/><a href=''>Help and Support</a></ul>
                     </div>
                 </div>
                 :

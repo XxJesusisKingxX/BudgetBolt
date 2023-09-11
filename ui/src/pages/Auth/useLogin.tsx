@@ -62,16 +62,16 @@ export const useLogin = (username: string, password: string, valid: boolean) => 
                     // Update user and login context upon successful authentication
                     dispatch({ type: "SET_STATE", state: { profile: lowercaseUsername } });
                     loginDispatch({ type: "SET_STATE", state: { isLogin: true } });
-                    if (authType == AuthType.SignUp) {
+                    if (authType === AuthType.SignUp) {
                         loginDispatch({ type: "SET_STATE", state: { showAccountWindow: true } });
                     }
-                } else if (response?.status == 409) {
+                } else if (response?.status === 409) {
                     setShowLoading(false);
                     setTakenNameErr(true);
-                } else if (response?.status == 401) {
+                } else if (response?.status === 401) {
                     setShowLoading(false);
                     setAuthErr(true);
-                } else if (response?.status == 404) {
+                } else if (response?.status === 404) {
                     setShowLoading(false);
                     setNameErr(true);
                 } else {
