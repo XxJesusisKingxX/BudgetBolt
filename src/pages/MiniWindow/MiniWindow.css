@@ -1,0 +1,9 @@
+.miniwindow {
+    display: flex;
+    background-color: var(--BACKGROUND_MODE);
+    box-shadow: -0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    height: 14rem;
+    width: 39rem;
+    margin: 1.5rem;
+    border-radius: 0.5rem;
+}

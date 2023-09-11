@@ -1,0 +1,10 @@
+.chart {
+    display: flex;
+    position: relative;
+    background-color: var(--BACKGROUND_MODE);
+    border-radius: 0.5rem;
+    box-shadow: inset 0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    height: 6rem;
+    margin: 1.5rem;
+    bottom: 1.5rem;
+}

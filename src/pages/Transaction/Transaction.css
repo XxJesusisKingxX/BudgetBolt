@@ -1,0 +1,35 @@
+.trans {
+    background:linear-gradient(var(--BACKGROUND_MODE), rgba(255, 255, 255, 0));
+    top: 0.5rem;
+    margin: 1rem;
+    margin-bottom: -2.2rem;
+    width: 90%;
+    height: 6rem;
+    position: relative;
+    text-align: left;
+    animation: reveal 2s backwards;
+}
+    .trans__icon {
+        margin: 0.3rem;
+        top: 0.5rem;
+        width: 2rem;
+        position: absolute;
+        animation: reveal 2s backwards;
+    }
+    .trans__acc {
+        position: relative;
+        top: 1rem;
+        margin-left: 2.5rem;
+        font-weight: 900;
+        font-size: larger;
+        white-space: nowrap;
+        animation: reveal 2s backwards;
+    }
+    .trans__name {
+        position: relative;
+        top: 1.5rem;
+        margin-left: 3.5rem;
+        font-weight: 500;
+        white-space: nowrap;
+        animation: reveal 2s backwards;
+    }
