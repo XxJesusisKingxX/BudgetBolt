@@ -1,12 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { validatePass, validateUser } from '../../utils/validator';
 import { AuthType } from '../../constants/auth'
-import AuthButton from './components/AuthButton';
 import LoginWindow from './components/LoginWindow';
 import SignupWindow from './components/SignupWindow';
 import AccountWindow from './components/AccountWindow';
 import { useLogin } from './useLogin';
-import UserContext from '../../context/UserContext';
 import LoginContext from '../../context/LoginContext';
 import "../../assets/auth/styles/Auth.css";
 import ThemeContext from '../../context/ThemeContext';
@@ -15,8 +13,7 @@ const Auth = () => {
     // Get theme mode from context
     const { mode } = useContext(ThemeContext);
 
-    // Get user dispatch and login-related states from contexts
-    const { userDispatch } = useContext(UserContext);
+    // Get login-related states from contexts
     const { showAccountWindow, showSignUpWindow, showLoginWindow, isLogin, loginDispatch } = useContext(LoginContext);
 
     // State for username and password inputs
@@ -100,15 +97,9 @@ const Auth = () => {
         <>
             {/* Render login or logout button based on login status */}
             {!isLogin ? (
-                <AuthButton
-                    action={handleLogin}
-                    name="Login"
-                />
+                <button data-testid='auth-button' className="btn btn--auth" onClick={() => handleLogin()}>Login</button>
             ) : (
-                <AuthButton
-                    action={handleLogout}
-                    name="Logout"
-                />
+                <button data-testid='auth-button' className="btn btn--auth" onClick={() => handleLogout()}>Logout</button>
             )}
             {/* Render login window */}
             {showLoginWindow ? (

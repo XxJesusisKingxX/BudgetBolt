@@ -1,21 +1,8 @@
-import { fireEvent, getByLabelText } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-export const loginFormFill = (username: string, password: string, element: HTMLElement) => {
-    const user = getByLabelText(element, "username");
-    const pass = getByLabelText(element, "password");
-    fireEvent.change(user, { target: { value: username }});
-    fireEvent.change(pass, { target: { value: password }});
+export const loginFormFill = (username: string, password: string) => {
+    userEvent.type(screen.getByLabelText('username'), username)
+    userEvent.type(screen.getByLabelText('password'), password)
 }
 
-export const mockingFetch = (statuscode: number) => {
-    const mock = jest.spyOn(global, 'fetch').mockResolvedValue(
-        new Response (
-            JSON.stringify({
-                id: 1
-            }),
-            {
-                status: statuscode,
-            }
-    ));
-    return mock;
-}

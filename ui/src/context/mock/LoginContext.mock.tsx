@@ -2,7 +2,7 @@ import LoginContext from '../LoginContext'
 import { render } from '@testing-library/react'
 
 // Mock dispatch function for testing
-export const mockDispatch = jest.fn();
+export const mockLoginDispatch = jest.fn();
 
 // Initial state for the LoginContext mock
 export const initState = {
@@ -10,7 +10,7 @@ export const initState = {
     showSignUpWindow: false,
     showLoginWindow: false,
     isLogin: false,
-    loginDispatch: mockDispatch
+    loginDispatch: mockLoginDispatch
 };
 
 /**

@@ -1,20 +1,17 @@
 import '@testing-library/jest-dom'
-import { mockDispatch, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
-import AuthContainer from '../..';
-import { fireEvent, cleanup } from '@testing-library/react';
-
-afterEach(() => {
-    cleanup();
-})
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { mockLoginDispatch, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
+import Auth from '../..';
 
 describe("Show LoginWindow:", () => {
     test("click login button", async () => {
-        const { getByTestId } = renderWithLoginContext(<AuthContainer/>);
+        renderWithLoginContext(<Auth/>);
         // Login button exists
-        expect(getByTestId("auth-button")).toBeTruthy();
+        expect(screen.getByRole('button', { name: "Login" })).toBeTruthy();
         // Click login button
-        fireEvent.click(getByTestId("auth-button"));
-        // Login window trigger state changes and displayed
-        expect(mockDispatch).toHaveBeenNthCalledWith(1, { type: "SET_STATE", state: { showLoginWindow: true } });
+        userEvent.click(screen.getByRole('button', { name: "Login" }));
+        // Assertion
+        expect(mockLoginDispatch).toHaveBeenNthCalledWith(1, { type: "SET_STATE", state: { showLoginWindow: true } });
     });
 });

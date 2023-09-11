@@ -1,24 +1,25 @@
 import '@testing-library/jest-dom'
-import { initState, mockDispatch, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
-import AuthContainer from '../..';
-import { fireEvent, cleanup } from '@testing-library/react';
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event';
+import { initState, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
+import Auth from '../..';
 
 // Global States Intialization
 const showAccountWindow = initState.showAccountWindow;
 
 afterEach(() => {
-    cleanup();
     initState.showAccountWindow = showAccountWindow;
 })
 
 describe("Show LoginWindow:", () => {
     test("click login button", async () => {
         initState.showAccountWindow = true;
-        const { getByTestId } = renderWithLoginContext(<AuthContainer/>);
+        renderWithLoginContext(<Auth/>);
         // Plaid button exists
-        expect(getByTestId("plaid-button")).toBeTruthy();
+        expect(screen.getByRole('button', { name: "Add Account" })).toBeTruthy();
         // Click plaid button
-        fireEvent.click(getByTestId("plaid-button"));
+        userEvent.click(screen.getByRole('button', { name: "Add Account" }));
         // No need to test mock trigger because a succesful sign up will test it
+        // No need to test plaid button since already tested here
     });
 });

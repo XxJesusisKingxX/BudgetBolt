@@ -1,28 +1,27 @@
 import '@testing-library/jest-dom'
 import { initState, renderWithLoginContext } from '../../../../context/mock/LoginContext.mock';
-import AuthContainer from '../..';
-import { cleanup, queryByTestId } from '@testing-library/react';
+import Auth from '../..';
+import { screen } from '@testing-library/react';
 
 // Global States Intialization
 const showAccountWindow = initState.showAccountWindow;
 
 afterEach(() => {
-    cleanup();
     initState.showAccountWindow = showAccountWindow;
 })
 
 describe("Render AccountWindow:", () => {
     test("hide form", () => {
-        const {queryByTestId} = renderWithLoginContext(<AuthContainer/>);
-        expect(queryByTestId('account-window')).toBeFalsy();
+        renderWithLoginContext(<Auth/>);
+        expect(screen.queryByRole('heading', {name: "Setup Account"})).toBeFalsy();
     });
 
     test("show form", () => {
         initState.showAccountWindow = true
-        const {queryByTestId, getByTestId} = renderWithLoginContext(<AuthContainer/>);
-        expect(getByTestId('account-window')).toBeTruthy();
-        expect(queryByTestId('signup-window')).toBeFalsy();
-        expect(queryByTestId('login-window')).toBeFalsy();
+        renderWithLoginContext(<Auth/>);
+        expect(screen.queryByRole('heading', {name: "Setup Account"})).toBeTruthy();
+        expect(screen.queryByRole('heading', {name: "Create an Account"})).toBeFalsy();
+        expect(screen.queryByRole('heading', {name: "Sign In"})).toBeFalsy();
     });
 
 });

@@ -1,4 +1,4 @@
-import PlaidLink from '../../Plaid/PlaidLinkContainer';
+import PlaidLink from '../../Plaid/PlaidLink';
 
 const AccountWindow = () => {
     return (
