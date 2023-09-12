@@ -13,8 +13,8 @@ func SetupPlaidRoutes(router *gin.RouterGroup, ps plaidinterface.Plaid, db *sql.
     router.POST("create_link_token", func(c *gin.Context) {
         controller.CreateLinkToken(c, ps, dbs, db, plaid)
     })
-    router.POST("set_access_token", func(c *gin.Context) {
-        controller.GetAccessToken(c, ps, dbs, db, plaid, false)
+    router.POST("create_access_token", func(c *gin.Context) {
+        controller.CreateAccessToken(c, ps, dbs, db, plaid, false)
     })
     router.POST("accounts/create", func(c *gin.Context) {
         controller.CreateAccounts(c, ps, dbs, db, plaid, false)

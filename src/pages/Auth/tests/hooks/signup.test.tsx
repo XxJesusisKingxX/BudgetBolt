@@ -35,8 +35,10 @@ describe("Signup",() => {
         // Signup success now verify: setup account window does show, login is set, and profile name is updated
         await waitFor(()=> {
             expect(mockDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
-            expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
-            expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
+            expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { isLogin: true }});
+            expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
+            expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
+            expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showSignUpWindow: false }});
         })
         // Cleanup
         mockFetch.mockRestore();

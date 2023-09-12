@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import Auth from '../..';
 import { initLoginState, mockDispatch, mockLoginDispatch, renderAllContext } from '../../../../context/mock/Context.mock';
-import { mockingFetch } from '../../../../utils/test';
+import { mockLocalStorage, mockingFetch } from '../../../../utils/test';
 
 
 // Global States Intialization
@@ -14,6 +14,7 @@ afterEach(() => {
 })
 
 describe("Login",() => {
+    mockLocalStorage();
     const loginWorkFlow = (username: string = "test", password: string = "Password1!", loading = true) => {
         initLoginState.showLoginWindow = true
         renderAllContext(<Auth/>);
@@ -46,6 +47,7 @@ describe("Login",() => {
             expect(mockDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
         })
         expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
+        expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
         expect(mockLoginDispatch).not.toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
         mockFetch.mockRestore();
     })
@@ -57,6 +59,7 @@ describe("Login",() => {
             expect(mockDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
         })
         expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
+        expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
         expect(mockLoginDispatch).not.toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
         mockFetch.mockRestore();
     })

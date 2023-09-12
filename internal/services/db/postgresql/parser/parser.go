@@ -2,17 +2,18 @@ package controller
 
 import (
 	"database/sql"
-	"github.com/plaid/plaid-go/v12/plaid"
 	"services/db/postgresql/controller"
 	"services/db/postgresql/model"
+
+	"github.com/plaid/plaid-go/v12/plaid"
 )
 
 func ParseAccountsToDB(db *sql.DB, profileId int, accounts []plaid.AccountBase){
 	for _, v := range accounts {
 		acc := model.Account {
+			ID: v.AccountId,
 			Name: v.Name,
 			Balance: v.Balances.GetAvailable(),
-			PlaidAccountID: v.AccountId,
 			ProfileID: profileId,
 		}
 		controller.CreateAccount(db, acc)
@@ -21,9 +22,10 @@ func ParseAccountsToDB(db *sql.DB, profileId int, accounts []plaid.AccountBase){
 
 func ParseTransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Transaction){
 	for _, v := range transactions {
-    	acc, _ := controller.RetrieveAccount(db, model.Account{ PlaidAccountID: v.AccountId })
+    	acc, _ := controller.RetrieveAccount(db, model.Account{ ID: v.AccountId })
 		trans := model.Transaction {
-			From: acc[0].Name, //should never be dups for account id matches
+			ID: v.TransactionId,
+			From: acc[0].Name,
 			Vendor: v.GetMerchantName(),
 			Amount: v.Amount,
 			Date: v.Date,

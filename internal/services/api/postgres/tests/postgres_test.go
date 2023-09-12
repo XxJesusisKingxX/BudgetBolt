@@ -117,7 +117,7 @@ func TestGetTransactions_TransactionsReceived(t *testing.T) {
 	// Create mock transactions
 	var transactions []model.Transaction
 	transactions = append(transactions, model.Transaction{
-		ID:          1001,
+		ID:          "1",
 		Date:        "2023/01/01",
 		Amount:      12.34,
 		Method:      "",
@@ -379,12 +379,13 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
-	hashPass, _ := bcrypt.GenerateFromPassword([]byte("abcdefghijklmnopqrstuvwxyz"), 1)
-	r.GET("/api/profile/get", func(c *gin.Context) {
+	hashPass, _ := bcrypt.GenerateFromPassword([]byte("abc"), bcrypt.DefaultCost)
+	r.POST("/api/profile/get", func(c *gin.Context) {
 		postgresc.RetrieveProfile(c,
 			postgresinterface.MockDB{
 				Profile: model.Profile{
-					ID: 1,
+					Name:     "test",
+					ID:       1,
 					Password: string(hashPass),
 				},
 			},
@@ -394,9 +395,9 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 	})
 	// Create request
 	form := url.Values{}
-	form.Set("username", "test_user")
-	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
-	req, _ := http.NewRequest("GET", "/api/profile/get?" + form.Encode(), nil)
+	form.Set("username", "test")
+	form.Set("password", "abc")
+	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)

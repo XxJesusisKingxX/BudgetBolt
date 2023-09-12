@@ -5,38 +5,28 @@ import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
 import Sideview from "./pages/Sideview";
 import Dashboard from "./pages/Dashboard";
-import AppContext, { AppProvider } from "./context/AppContext";
+import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { getCookie } from "./utils/cookie";
 
 const App = () => {
   const { profile, dispatch } = useContext(AppContext);
 
   const generateToken = useCallback(
     async () => {
-      const baseURL = window.location.href;
-      const url = new URL(EndPoint.CREATE_LINK_TOKEN, baseURL)
-      const response = await fetch(url, {
+      const response = await fetch(EndPoint.CREATE_LINK_TOKEN, {
         method: "POST",
-        body: new URLSearchParams ({
-          username: profile
-        })
       });
-      if (!response.ok) {
-        dispatch({ type: "SET_STATE", state: { linkToken: '' }});
-        return;
-      }
+
       const data = await response.json();
       if (data) {
-        if (data.error != null) {
-          dispatch({ type: "SET_STATE", state: { linkToken: '' }});
-          return;
-        }
         dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
       }
+
     },
-    [dispatch, profile]
+    [dispatch]
   );
 
   useEffect(() => {
@@ -47,21 +37,25 @@ const App = () => {
       }
       generateToken();
     };
-    init();
-  }, [dispatch, profile, generateToken]);
+    if (getCookie("UID")) init();
+  }, [profile, generateToken, dispatch]);
 
   return (
       <Header>
-        <AppProvider>
+        <Menu/>
+        <LoginProvider>
           <ThemeProvider>
-            <Menu/>
-            <LoginProvider>
-              <Auth/>
-            </LoginProvider>
-            <Sideview/>
-            <Dashboard/>
+            <Auth/>
+            {getCookie("UID") != null ?
+            <>
+              <Sideview/>
+              <Dashboard/>
+            </>
+            :
+            null
+            }
           </ThemeProvider>
-        </AppProvider>
+        </LoginProvider>
       </Header>
   );
 };
