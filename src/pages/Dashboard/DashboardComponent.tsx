@@ -17,7 +17,7 @@ const DashboardComponent: React.FC<Props> = ({ user, date }) => {
             {/* Header section with user, date, and title */}
             <div className='dashboard__header'>
                 <span className='dashboard__header__user'>Welcome, {user}</span>
-                <span className='dashboard__header__date'>~ Today is {date} ~</span>
+                <span data-testid='dashboard-date' className='dashboard__header__date'>~ Today is {date} ~</span>
                 <span className='dashboard__header__title'>Budget Dashboard</span>
             </div>
             {/* Widgets section */}
