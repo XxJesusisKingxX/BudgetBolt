@@ -4,6 +4,7 @@ import TransactionComponent from './TransactionComponent';
 import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
+import { getCookie } from '../../utils/cookie';
 
 // Transaction interface for a single transaction
 interface Transactions {
@@ -17,8 +18,8 @@ const Transaction = () => {
     const [transactions, setTransactions] = useState<Transactions[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Accessing profile, isTransactionsRefresh, dispatch, mode, and isLogin from contexts
-    const { profile, isTransactionsRefresh, dispatch } = useContext(AppContext);
+    // Accessing isTransactionsRefresh, dispatch, mode, and isLogin from contexts
+    const { isTransactionsRefresh, dispatch } = useContext(AppContext);
     const { mode } = useContext(ThemeContext);
     const { isLogin } = useContext(LoginContext);
 
@@ -40,18 +41,10 @@ const Transaction = () => {
                 // Store new transactions for users
                 await fetch(EndPoint.CREATE_TRANSACTIONS, {
                     method: "POST",
-                    body: new URLSearchParams({
-                        profile: localStorage.getItem('v') || '' ,
-                    }),
                 });
 
                 // Get transactions for user
-                const baseURL = window.location.href;
-                const url = new URL(EndPoint.GET_TRANSACTIONS, baseURL);
-                url.search = new URLSearchParams({
-                    profile: localStorage.getItem('v') || '',
-                }).toString();
-                const retrieveResponse = await fetch(url, {
+                const retrieveResponse = await fetch(EndPoint.GET_TRANSACTIONS, {
                     method: "GET",
                 });
                 
@@ -72,13 +65,13 @@ const Transaction = () => {
         };
 
         // If logged in, initiate animations and transaction retrieval
-        if (isLogin) {
+        if (getCookie("UID")) {
             if (sidebar) sidebar.onanimationend = () => { setIsLoading(true) }; //set loading after animation of sidebar
             retrieveTransactions();
             const intervalId = setInterval(checkHourlyUpdate, everyHour);
             return () => clearInterval(intervalId);
         }
-    }, [isTransactionsRefresh, isLogin, profile, dispatch]);
+    }, [isTransactionsRefresh, isLogin, dispatch]);
 
     const loading = `/images/${mode}/loading.png`;
 

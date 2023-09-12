@@ -2,12 +2,15 @@ package controller
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	plaidinterface "services/api/plaid"
 	"services/api/postgres"
 	"services/api/utils"
 	"services/db/postgresql/model"
 	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,7 +18,7 @@ import (
 // CreateProfile handles the creation of a user profile.
 func CreateProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
 	// Extract the username and password from the HTTP POST request.
-	user := c.PostForm("profile")
+	user := c.PostForm("username")
 	pass := c.PostForm("password")
 
 	// Test if username is already taken by attempting to retrieve the profile.
@@ -39,20 +42,34 @@ func CreateProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, 
 	}
 
 	// Create the user profile with the hashed password.
-	err = dbs.CreateProfile(db, strings.ToLower(user), string(hashedPass), utils.GenerateRandomString(11))
+	uid := utils.GenerateRandomString(64)
+	err = dbs.CreateProfile(db, strings.ToLower(user), string(hashedPass), uid)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{})
+
+	// Set a cookie with the SID token
+	cookie := &http.Cookie{
+		Name:     "UID",
+		Value:    uid,
+		Expires:  time.Now().Add(24 * time.Hour), // Set an expiration time
+		HttpOnly: false,                           // Cookie is not accessible via JavaScript
+		Secure:   false,                           // Cookie is transmitted over HTTPS only
+		Path: "/",
+	}
+	http.SetCookie(c.Writer, cookie)
+	// test cookie creation
+	c.JSON(http.StatusOK, gin.H{
+		"uid": uid,
+	})
 }
 
 // RetrieveProfile retrieves a user's profile and checks the provided password.
 func RetrieveProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
 	// Extract the username and password from the HTTP GET request.
-	user := c.Query("profile")
-	pass := c.Query("password")
-
+	user := c.PostForm("username")
+	pass := c.PostForm("password")
 	// Retrieve the user's profile based on the username.
 	userProfile, _ := dbs.RetrieveProfile(db, user, false)
 	if userProfile.ID == 0 {
@@ -62,10 +79,20 @@ func RetrieveProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB
 
 	// Compare the provided password with the stored hashed password.
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
+	fmt.Println(auth)
 	if auth == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"uid": userProfile.RandomUID,
-		})
+		// Set a cookie with the session token
+		cookie := &http.Cookie{
+			Name:     "UID",
+			Value:    userProfile.RandomUID,
+			Expires:  time.Now().Add(24 * time.Hour), // Set an expiration time
+			HttpOnly: false,                           // Cookie is not accessible via JavaScript
+			Secure:   false,                           // Cookie is transmitted over HTTPS only
+			Path: "/",
+		}
+		http.SetCookie(c.Writer, cookie)
+		
+		c.JSON(http.StatusOK, gin.H{})
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{})
 	}
@@ -73,8 +100,8 @@ func RetrieveProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB
 
 // RetrieveAccounts retrieves a user's accounts.
 func RetrieveAccounts(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
-	// Extract the username from the HTTP GET request.
-	uid := c.Query("profile")
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
 
 	// Retrieve the user's profile based on the username.
 	profile, err := dbs.RetrieveProfile(db, uid, true)
@@ -97,8 +124,8 @@ func RetrieveAccounts(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.D
 
 // RetrieveTransactions retrieves a user's transactions.
 func RetrieveTransactions(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
-	// Extract the username from the HTTP GET request.
-	uid := c.Query("profile")
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
 
 	// Retrieve the user's profile based on the username.
 	profile, err := dbs.RetrieveProfile(db, uid, true)

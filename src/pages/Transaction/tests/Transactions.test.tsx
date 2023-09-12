@@ -1,12 +1,17 @@
 import { screen, waitFor } from '@testing-library/react';
 import { initLoginState, renderAllContext } from '../../../context/mock/Context.mock';
 import Transaction from '../index';
+import { mockLocalStorage } from '../../../utils/test';
+import { deleteCookie } from '../../../utils/cookie';
 
-beforeEach(() => {
+afterEach(() => {
+    window.localStorage.clear();
+    deleteCookie("UID");
     jest.clearAllMocks();
 });
 
 describe("Transactions", () => {
+    mockLocalStorage();
     test('renders all transactions', async () => {
         // Add fake transactions as needed
         const transactionsData = [
@@ -26,7 +31,7 @@ describe("Transactions", () => {
                     status: 200,
                 }
         ));
-        initLoginState.isLogin = true
+        document.cookie = "UID=123";
         await waitFor(() => {
             renderAllContext(<Transaction />);
         });

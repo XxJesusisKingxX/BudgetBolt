@@ -9,6 +9,7 @@ import LoginContext from '../../context/LoginContext';
 import "../../assets/auth/styles/Auth.css";
 import ThemeContext from '../../context/ThemeContext';
 import AppContext from '../../context/AppContext';
+import { deleteCookie, getCookie } from '../../utils/cookie';
 
 const Auth = () => {
     // Get theme mode from context
@@ -16,7 +17,7 @@ const Auth = () => {
     const { dispatch } = useContext(AppContext);
 
     // Get login-related states from contexts
-    const { showAccountWindow, showSignUpWindow, showLoginWindow, isLogin, loginDispatch } = useContext(LoginContext);
+    const { showAccountWindow, showSignUpWindow, showLoginWindow, loginDispatch } = useContext(LoginContext);
 
     // State for username and password inputs
     const [username, setUsername] = useState('');
@@ -92,15 +93,15 @@ const Auth = () => {
     // Handle logout
     const handleLogout = () => {
         localStorage.clear();
-        dispatch({ type: "SET_STATE", state: { profile: '' }});
-        loginDispatch({ type: "SET_STATE", state: { isLogin: false }});
+        deleteCookie("UID");
         handleWindowClose();
+        dispatch({ type: "SET_STATE", state: { profile: '' }});
     }
 
     return (
         <>
             {/* Render login or logout button based on login status */}
-            {!isLogin ? (
+            {!getCookie('UID') ? (
                 <button data-testid='auth-button' className="btn btn--auth" onClick={() => handleLogin()}>Login</button>
             ) : (
                 <button data-testid='auth-button' className="btn btn--auth" onClick={() => handleLogout()}>Logout</button>

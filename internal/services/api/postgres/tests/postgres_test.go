@@ -379,14 +379,14 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
-	hashPass, _ := bcrypt.GenerateFromPassword([]byte("abcdefghijklmnopqrstuvwxyz"), 1)
-	r.GET("/api/profile/get", func(c *gin.Context) {
+	hashPass, _ := bcrypt.GenerateFromPassword([]byte("abc"), bcrypt.DefaultCost)
+	r.POST("/api/profile/get", func(c *gin.Context) {
 		postgresc.RetrieveProfile(c,
 			postgresinterface.MockDB{
 				Profile: model.Profile{
-					ID: 1,
+					Name:     "test",
+					ID:       1,
 					Password: string(hashPass),
-					RandomUID: "rerfw",
 				},
 			},
 			nil,
@@ -395,17 +395,12 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 	})
 	// Create request
 	form := url.Values{}
-	form.Set("username", "test_user")
-	form.Set("password", "abcdefghijklmnopqrstuvwxyz")
-	req, _ := http.NewRequest("GET", "/api/profile/get?" + form.Encode(), nil)
+	form.Set("username", "test")
+	form.Set("password", "abc")
+	req, _ := http.NewRequest("POST", "/api/profile/get", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isUID := strings.Contains(string(responseBody), "rerfw")
 	// Assert
 	tests.Equals(t, http.StatusOK, w.Code)
-	tests.Equals(t, true, isUID)
 }

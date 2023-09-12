@@ -8,19 +8,15 @@ import Dashboard from "./pages/Dashboard";
 import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { getCookie } from "./utils/cookie";
 
 const App = () => {
   const { profile, dispatch } = useContext(AppContext);
 
   const generateToken = useCallback(
     async () => {
-      const baseURL = window.location.href;
-      const url = new URL(EndPoint.CREATE_LINK_TOKEN, baseURL)
-      const response = await fetch(url, {
+      const response = await fetch(EndPoint.CREATE_LINK_TOKEN, {
         method: "POST",
-        body: new URLSearchParams ({
-          profile: localStorage.getItem('v') || ''
-        })
       });
 
       const data = await response.json();
@@ -28,6 +24,7 @@ const App = () => {
         dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
       }
+
     },
     [dispatch]
   );
@@ -40,7 +37,7 @@ const App = () => {
       }
       generateToken();
     };
-    if (profile) init();
+    if (getCookie("UID")) init();
   }, [profile, generateToken, dispatch]);
 
   return (
@@ -49,7 +46,7 @@ const App = () => {
         <LoginProvider>
           <ThemeProvider>
             <Auth/>
-            {localStorage.getItem('v') != null ?
+            {getCookie("UID") != null ?
             <>
               <Sideview/>
               <Dashboard/>

@@ -7,7 +7,6 @@ import { EndPoint } from '../../constants/endpoints';
 // PlaidLinkContainer component
 const PlaidLink = () => {
   // Accessing the user's profile, linkToken, and loginDispatch from contexts
-  const { profile } = useContext(AppContext);
   const { linkToken } = useContext(AppContext);
   const { loginDispatch } = useContext(LoginContext);
 
@@ -18,44 +17,31 @@ const PlaidLink = () => {
         // Step 1. Create plaid access token
         const getToken = await fetch(EndPoint.CREATE_ACCESS_TOKEN, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          },
           body: new URLSearchParams({
             public_token: public_token,
-            profile: profile,
           }),
         });
 
         // Step 2. Create all accounts
         const getAccounts = await fetch(EndPoint.CREATE_ACCOUNTS, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          },
-          body: new URLSearchParams({
-            profile: profile,
-          }),
         });
 
         // Step 3. Create transactions for users
         const createTrans = await fetch(EndPoint.CREATE_TRANSACTIONS, {
           method: "POST",
-          body: new URLSearchParams({
-              profile: profile,
-          }),
         });
 
         if (getAccounts.ok && getToken.ok && createTrans.ok) {
           loginDispatch({ type: "SET_STATE", state: { isLogin: true } });
         } else {
-          console.error("ERROR: Accounts#%d & Token#%d", getAccounts.status, getToken.status)
+          console.error("ERROR: Accounts#%d & Token#%d & Transactions#%d", getAccounts.status, getToken.status, createTrans.status)
         }
       };
       linkAccounts();
       window.history.pushState("", "", "/");
     },
-    [loginDispatch, profile]
+    [loginDispatch]
   );
 
   let isOauth = false;

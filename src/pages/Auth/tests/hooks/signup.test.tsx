@@ -30,7 +30,7 @@ describe("Signup",() => {
     }
 
     test("successfully signup", async () => {
-        const mockFetch = mockingFetch(200,{uid:'retr'});
+        const mockFetch = mockingFetch(200);
         signupWorkflow();
         // Signup success now verify: setup account window does show, login is set, and profile name is updated
         await waitFor(()=> {
@@ -39,7 +39,6 @@ describe("Signup",() => {
             expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
             expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
             expect(mockLoginDispatch).toBeCalledWith({type: "SET_STATE", state: { showSignUpWindow: false }});
-            expect(window.localStorage.getItem('v')).toBe("retr")
         })
         // Cleanup
         mockFetch.mockRestore();

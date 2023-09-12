@@ -2,18 +2,18 @@ import '@testing-library/jest-dom'
 import { waitFor } from '@testing-library/react'
 import { mockLocalStorage, mockingFetch } from './utils/test';
 import App from './App';
-import { initAppState, mockDispatch, renderWithAppContext } from './context/mock/AppContext.mock';
+import { mockDispatch, renderWithAppContext } from './context/mock/AppContext.mock';
+import { deleteCookie } from './utils/cookie';
 
-const profile = initAppState.profile;
 afterEach(() => {
-    initAppState.profile = profile;
+    deleteCookie("UID")
 })
 
 describe("App",() => {
     mockLocalStorage();
     test("generate token", async () => {
         const mockFetch = mockingFetch(200, {link_token:"token"})
-        initAppState.profile = "testing"
+        document.cookie = "UID=123; path=/";
         renderWithAppContext(<App/>)
         await waitFor(() => {
             expect(mockDispatch). toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
@@ -24,7 +24,7 @@ describe("App",() => {
     })
     test("generate token from local storage if already oauth", async () => {
         const mockFetch = mockingFetch(200, {link_token:"token"})
-        initAppState.profile = "testing"
+        document.cookie = "UID=123; path=/";
         // Mock window
         Object.defineProperty(window, 'location', {
             value: {

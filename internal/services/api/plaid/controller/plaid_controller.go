@@ -19,7 +19,7 @@ import (
 
 func CreateLinkToken(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient) {
 	ctx := context.Background()
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
@@ -39,7 +39,7 @@ func CreateLinkToken(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterf
 func CreateAccessToken(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient, debug bool) {
 	ctx := context.Background()
 	publicToken := c.PostForm("public_token")
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	exchangePublicTokenResp, err := ps.ItemPublicTokenExchange(plaidapi, ctx, publicToken)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
@@ -62,7 +62,7 @@ func CreateAccessToken(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinte
 
 func CreateAccounts(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient, debug bool) {
 	ctx := context.Background()
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
@@ -88,7 +88,7 @@ func CreateAccounts(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterfa
 
 func CreateTransactions(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient, debug bool) {
 	ctx := context.Background()
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
@@ -122,7 +122,7 @@ func CreateTransactions(c *gin.Context, ps plaidinterface.Plaid, dbs postgresint
 
 func CreateInvestmentTransactions(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient, debug bool) {
 	ctx := context.Background()
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})
@@ -150,7 +150,7 @@ func CreateInvestmentTransactions(c *gin.Context, ps plaidinterface.Plaid, dbs p
 
 func CreateHoldings(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterface.DBHandler, db *sql.DB, plaidapi *plaid.APIClient, debug bool) {
 	ctx := context.Background()
-	uid := c.PostForm("profile")
+	uid, _ := c.Cookie("UID")
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})

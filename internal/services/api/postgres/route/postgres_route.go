@@ -11,7 +11,7 @@ func SetupPostgresRoutes(router *gin.RouterGroup, dbs postgresinterface.DBHandle
     router.POST("profile/create", func(c *gin.Context) {
         controller.CreateProfile(c, dbs, db, false)
     })
-    router.GET("profile/get", func(c *gin.Context) {
+    router.POST("profile/get", func(c *gin.Context) {
         controller.RetrieveProfile(c, dbs, db, false)
     })
     router.GET("transactions/get", func(c *gin.Context) {

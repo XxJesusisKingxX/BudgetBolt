@@ -39,10 +39,9 @@ type Transaction struct {
 
 }
 type Account struct {
-	ID             int	   `db:"account_id"`
+	ID             string  `db:"account_id"`
 	Name           string  `db:"account_name"`
 	Balance        float64 `db:"account_balance"`
-	PlaidAccountID string  `db:"plaid_account_id"`
 	ProfileID      int     `db:"profile_id"`
 }
 type Investment struct {

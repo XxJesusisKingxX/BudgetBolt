@@ -34,24 +34,20 @@ export const useLogin = (username: string, password: string, valid: boolean) => 
             try {
                 let response = null;
                 if (authType === AuthType.Login) {
-                    // Construct URL for login
-                    const baseURL = window.location.href;
-                    const GET_PROFILE_URL = new URL(EndPoint.GET_PROFILE, baseURL);
-                    GET_PROFILE_URL.search = new URLSearchParams({
-                        profile: username,
-                        password: password
-                    }).toString();
-
-                    // Fetch login endpoint
-                    response = await fetch(GET_PROFILE_URL, {
-                        method: "GET"
+                    // Fetch signup endpoint
+                    response = await fetch(EndPoint.GET_PROFILE, {
+                        method: "POST",
+                        body: new URLSearchParams({
+                            username: username,
+                            password: password
+                        })
                     });
                 } else if (authType === AuthType.SignUp) {
                     // Fetch signup endpoint
                     response = await fetch(EndPoint.CREATE_PROFILE, {
                         method: "POST",
                         body: new URLSearchParams({
-                            profile: username,
+                            username: username,
                             password: password
                         })
                     });
@@ -61,9 +57,8 @@ export const useLogin = (username: string, password: string, valid: boolean) => 
                 if (response?.ok) {
                     setShowLoading(false);
                     // Update user and login context upon successful authentication
-                    const data = await response.json();
-                    localStorage.setItem('v', data.uid)
                     dispatch({ type: "SET_STATE", state: { profile: username } });
+                    localStorage.setItem('profile', username) //not tested
                     loginDispatch({ type: "SET_STATE", state: { isLogin: true } });
                     if (authType === AuthType.SignUp) {
                         loginDispatch({ type: "SET_STATE", state: { showAccountWindow: true } });
