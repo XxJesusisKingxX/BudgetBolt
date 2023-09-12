@@ -18,7 +18,7 @@ func BuildTransactionCreateQuery(m model.Transaction) (string, error) {
 }
 
 func BuildTransactionUpdateQuery(m model.Transaction) (string, error) {
-	query := "UPDATE transaction SET %v WHERE transaction_id=%v" // TODO have the ability to update multiple transactions
+	query := "UPDATE transaction SET %v WHERE transaction_id='%v'" // TODO have the ability to update multiple transactions
 	set := SetColumnsAndValues(m)
 	if set == "" {
 		err := errors.New("Empty model")

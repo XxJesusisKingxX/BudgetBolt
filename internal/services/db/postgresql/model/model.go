@@ -26,7 +26,7 @@ type Income struct {
 	DueDate       string    `db:"due_date"`// YYYYMMDD
 }
 type Transaction struct {
-	ID          int       `db:"transaction_id"`
+	ID          string     `db:"transaction_id"`
 	Date        string    `db:"transaction_date"`// YYYYMMDD
 	Amount      float64   `db:"net_amount"`
 	Method      string    `db:"payment_method"`
@@ -68,6 +68,7 @@ type Profile struct {
 	ID          int  `db:"profile_id"`
 	Name      string `db:"profile_name"`
 	Password  string `db:"profile_password"`
+	RandomUID string `db:"v"`
 }
 type Token struct {
 	ID          int  `db:"token_id"`

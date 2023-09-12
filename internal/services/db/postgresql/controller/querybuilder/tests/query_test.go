@@ -12,7 +12,7 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	type TestStruct struct{ Test string }
 	type TestStructNoTag struct{ ID int }
 	testOne := model.Budget{}
-	testTwo := model.Transaction{ ID: 1, Vendor: "Test", IsRecurring: true, Amount: 123.45 }
+	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45 }
 	testThree := TestStructNoTag{ ID: 1 }
 	testFour := TestStruct{ Test: "Test" }
 
@@ -36,10 +36,10 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	}
 func TestSetColumnsAndValues(t *testing.T) {
 	type TestStruct struct{ Test string }
-	type TestStructNoTag struct{ ID int; Name string }
+	type TestStructNoTag struct{ ID string; Name string }
 	testOne := model.Budget{}
-	testTwo := model.Transaction{ ID: 1, Vendor: "Test", IsRecurring: true, Amount: 123.45}
-	testThree := TestStructNoTag{ID: 1, Name: "Test"}
+	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
+	testThree := TestStructNoTag{ID: "1", Name: "Test"}
 	testFour := TestStruct{Test: "Test"}
 
 	resOne := querybuilder.SetColumnsAndValues(testOne)
@@ -62,11 +62,11 @@ func TestSetColumnsAndValues(t *testing.T) {
 }
 func TestCreateWhereCondition(t *testing.T) {
 	type TestStruct struct{ Test string }
-	type TestStructNoTag struct{ ID int }
+	type TestStructNoTag struct{ ID string }
 	testOne := model.Budget{}
-	testTwo := model.Transaction{ ID: 1, Vendor: "Test", IsRecurring: true, Amount: 123.45}
+	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
 	testThree := TestStruct{Test: "Test"}
-	testFour := TestStructNoTag{ID: 1}
+	testFour := TestStructNoTag{ID: "1"}
 
 	resOne := querybuilder.CreateWhereCondition(testOne)
 	resTwo := querybuilder.CreateWhereCondition(testTwo)
@@ -74,7 +74,7 @@ func TestCreateWhereCondition(t *testing.T) {
 	// Test an empty string returns
 	tests.Equals(t, "", resOne)
 	// Test if a string returns
-	tests.Equals(t, "transaction_id = 1 AND net_amount = 123.45 AND vendor = 'Test' AND is_recurring = true", resTwo)
+	tests.Equals(t, "transaction_id = '1' AND net_amount = 123.45 AND vendor = 'Test' AND is_recurring = true", resTwo)
 	// Test if struct not passed as arg
 	defer func() {
 		if resThree := recover(); resThree != nil {
@@ -217,7 +217,7 @@ func TestTransactionBuildCreateQuery(t *testing.T) {
 func TestTransactionBuildUpdateQuery(t *testing.T) {
 	err := errors.New("Empty model")
 	testOne := model.Transaction{}
-	testTwo := model.Transaction{From: "Test"}
+	testTwo := model.Transaction{ID: "1", From: "Test"}
 
 	_, resOne := querybuilder.BuildTransactionUpdateQuery(testOne)
 	resTwo, _ := querybuilder.BuildTransactionUpdateQuery(testTwo)
@@ -225,7 +225,7 @@ func TestTransactionBuildUpdateQuery(t *testing.T) {
 	// Test if columns and values are empty
 	tests.EqualsErr(t, err, resOne)
 	// Test if columns and values are not empty
-	tests.Equals(t, "UPDATE transaction SET payment_account_from_to = 'Test' WHERE transaction_id=0", resTwo)
+	tests.Equals(t, "UPDATE transaction SET payment_account_from_to = 'Test' WHERE transaction_id='1'", resTwo)
 }
 func TestTransactionBuildRetrieveQuery(t *testing.T) {
 	err := errors.New("Empty model")

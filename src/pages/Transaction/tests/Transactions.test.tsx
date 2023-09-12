@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import { initLoginState, renderAllContext } from '../../../context/mock/Context.mock';
-import Transaction from '..';
+import Transaction from '../index';
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -41,7 +41,8 @@ describe("Transactions", () => {
         expect(screen.getByText("Vendor2...$200")).toBeTruthy();
         expect(mockSetInterval).toBeCalledWith(expect.any(Function), 3600000);
     });
-    test('no transactions', async () => {;
+    test('no transactions', async () => {
+        initLoginState.isLogin = true
         await waitFor(() => {
             renderAllContext(<Transaction />);
         });

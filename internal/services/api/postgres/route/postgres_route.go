@@ -14,10 +14,10 @@ func SetupPostgresRoutes(router *gin.RouterGroup, dbs postgresinterface.DBHandle
     router.GET("profile/get", func(c *gin.Context) {
         controller.RetrieveProfile(c, dbs, db, false)
     })
-    router.GET("accounts/get", func(c *gin.Context) {
+    router.GET("transactions/get", func(c *gin.Context) {
         controller.RetrieveTransactions(c, dbs, db, false)
     })
-    router.GET("transactions/get", func(c *gin.Context) {
+    router.GET("accounts/get", func(c *gin.Context) {
         controller.RetrieveAccounts(c, dbs, db, false)
     })
     //TODO investment transactions

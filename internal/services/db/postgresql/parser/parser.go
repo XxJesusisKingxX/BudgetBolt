@@ -2,9 +2,10 @@ package controller
 
 import (
 	"database/sql"
-	"github.com/plaid/plaid-go/v12/plaid"
 	"services/db/postgresql/controller"
 	"services/db/postgresql/model"
+
+	"github.com/plaid/plaid-go/v12/plaid"
 )
 
 func ParseAccountsToDB(db *sql.DB, profileId int, accounts []plaid.AccountBase){
@@ -23,6 +24,7 @@ func ParseTransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Trans
 	for _, v := range transactions {
     	acc, _ := controller.RetrieveAccount(db, model.Account{ PlaidAccountID: v.AccountId })
 		trans := model.Transaction {
+			ID: v.TransactionId,
 			From: acc[0].Name, //should never be dups for account id matches
 			Vendor: v.GetMerchantName(),
 			Amount: v.Amount,

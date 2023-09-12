@@ -2,40 +2,29 @@ import '@testing-library/jest-dom'
 import { waitFor } from '@testing-library/react'
 import { mockLocalStorage, mockingFetch } from './utils/test';
 import App from './App';
-import { mockDispatch, renderAllContext } from './context/mock/Context.mock';
+import { initAppState, mockDispatch, renderWithAppContext } from './context/mock/AppContext.mock';
+
+const profile = initAppState.profile;
+afterEach(() => {
+    initAppState.profile = profile;
+})
 
 describe("App",() => {
     mockLocalStorage();
     test("generate token", async () => {
         const mockFetch = mockingFetch(200, {link_token:"token"})
+        initAppState.profile = "testing"
+        renderWithAppContext(<App/>)
         await waitFor(() => {
-            renderAllContext(<App/>)
+            expect(mockDispatch). toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
         })
-        expect(mockDispatch).toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
         // Assert successful login
         expect(window.localStorage.getItem('link_token')).not.toBeNull();
         mockFetch.mockRestore()
     })
-    test("generate token fetch failed", async () => {
-        const mockFetch = mockingFetch(500, {})
-        await waitFor(() => {
-            renderAllContext(<App/>)
-        })
-        // Assert successful login
-        expect(mockDispatch).toBeCalledWith({"state": {"linkToken": ""}, "type": "SET_STATE"});
-        mockFetch.mockRestore()
-    })
-    test("generate token fetch has error", async () => {
-        const mockFetch = mockingFetch(200, {error:"failed"})
-        await waitFor(() => {
-            renderAllContext(<App/>)
-        })
-        // Assert successful login
-        expect(mockDispatch).toBeCalledWith({"state": {"linkToken": ""}, "type": "SET_STATE"});
-        mockFetch.mockRestore()
-    })
     test("generate token from local storage if already oauth", async () => {
         const mockFetch = mockingFetch(200, {link_token:"token"})
+        initAppState.profile = "testing"
         // Mock window
         Object.defineProperty(window, 'location', {
             value: {
@@ -43,7 +32,7 @@ describe("App",() => {
             },
         });
         await waitFor(() => {
-            renderAllContext(<App/>)
+            renderWithAppContext(<App/>)
         })
         // Assert successful login
         expect(mockDispatch).toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});

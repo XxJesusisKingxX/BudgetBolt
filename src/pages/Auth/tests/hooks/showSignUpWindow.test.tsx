@@ -20,8 +20,10 @@ describe("Show SignupWindow:", () => {
         // Click signup link
         userEvent.click(screen.getByText("Sign Up"));
         // Signup link has triggered all other windows to close
-        expect(mockLoginDispatch).toHaveBeenNthCalledWith(1,{ type: "SET_STATE", state: { showLoginWindow: false, showSignUpWindow: false, showAccountWindow: false }});
+        expect(mockLoginDispatch).toBeCalledWith({ type: "SET_STATE", state: { showLoginWindow: false, showSignUpWindow: false, showAccountWindow: false }});
         // Signup window trigger state changes and displayed
-        expect(mockLoginDispatch).toHaveBeenNthCalledWith(2,{ type: "SET_STATE", state: { showSignUpWindow: true }});
+        expect(mockLoginDispatch).toBeCalledWith({ type: "SET_STATE", state: { showLoginWindow: false }});
+        expect(mockLoginDispatch).toBeCalledWith({ type: "SET_STATE", state: { showSignUpWindow: false }});
+        expect(mockLoginDispatch).toBeCalledWith({ type: "SET_STATE", state: { showSignUpWindow: true }});
     });
 });

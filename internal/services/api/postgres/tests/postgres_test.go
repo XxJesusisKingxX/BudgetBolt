@@ -117,7 +117,7 @@ func TestGetTransactions_TransactionsReceived(t *testing.T) {
 	// Create mock transactions
 	var transactions []model.Transaction
 	transactions = append(transactions, model.Transaction{
-		ID:          1001,
+		ID:          "1",
 		Date:        "2023/01/01",
 		Amount:      12.34,
 		Method:      "",
@@ -386,6 +386,7 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 				Profile: model.Profile{
 					ID: 1,
 					Password: string(hashPass),
+					RandomUID: "rerfw",
 				},
 			},
 			nil,
@@ -400,6 +401,11 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
+	// Receive response
+	responseBody, _ := io.ReadAll(w.Result().Body)
+	defer w.Result().Body.Close()
+	isUID := strings.Contains(string(responseBody), "rerfw")
 	// Assert
 	tests.Equals(t, http.StatusOK, w.Code)
+	tests.Equals(t, true, isUID)
 }

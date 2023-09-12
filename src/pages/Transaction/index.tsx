@@ -6,16 +6,15 @@ import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
 
 // Transaction interface for a single transaction
-interface Transaction {
-    ID: number;
+interface Transactions {
+    ID: string;
     From: string;
     Amount: number;
     Vendor: string;
 }
 
-// TransactionContainer component
-const TransactionContainer = () => {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+const Transaction = () => {
+    const [transactions, setTransactions] = useState<Transactions[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Accessing profile, isTransactionsRefresh, dispatch, mode, and isLogin from contexts
@@ -38,17 +37,19 @@ const TransactionContainer = () => {
         // Function to retrieve transactions from the server
         const retrieveTransactions = async () => {
             try {
+                // Store new transactions for users
                 await fetch(EndPoint.CREATE_TRANSACTIONS, {
                     method: "POST",
                     body: new URLSearchParams({
-                        username: profile,
+                        profile: localStorage.getItem('v') || '' ,
                     }),
                 });
 
+                // Get transactions for user
                 const baseURL = window.location.href;
                 const url = new URL(EndPoint.GET_TRANSACTIONS, baseURL);
                 url.search = new URLSearchParams({
-                    username: profile,
+                    profile: localStorage.getItem('v') || '',
                 }).toString();
                 const retrieveResponse = await fetch(url, {
                     method: "GET",
@@ -59,12 +60,14 @@ const TransactionContainer = () => {
                     setTransactions(data["transactions"]);
                 } else {
                     console.error("failed to retrieve transactions");
+                    setIsLoading(false);
                 }
 
                 if (sidebar) sidebar.onanimationend = null
                 setIsLoading(false);
             } catch (error) {
                 console.log("failed to retrieve transactions");
+                setIsLoading(false);
             }
         };
 
@@ -81,7 +84,7 @@ const TransactionContainer = () => {
 
     return (
         <>
-            {!isLoading && transactions.length !== 0 ? transactions.slice(0, maxPeek).map((transaction) => (
+            {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction) => (
                 <TransactionComponent
                     key={transaction.ID}
                     account={transaction.From}
@@ -96,4 +99,4 @@ const TransactionContainer = () => {
     );
 };
 
-export default TransactionContainer;
+export default Transaction;

@@ -5,7 +5,7 @@ import Menu from "./pages/Menu/MenuContainer";
 import { EndPoint } from "./constants/endpoints";
 import Sideview from "./pages/Sideview";
 import Dashboard from "./pages/Dashboard";
-import AppContext, { AppProvider } from "./context/AppContext";
+import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -19,24 +19,17 @@ const App = () => {
       const response = await fetch(url, {
         method: "POST",
         body: new URLSearchParams ({
-          username: profile
+          profile: localStorage.getItem('v') || ''
         })
       });
-      if (!response.ok) {
-        dispatch({ type: "SET_STATE", state: { linkToken: '' }});
-        return;
-      }
+
       const data = await response.json();
       if (data) {
-        if (data.error != null) {
-          dispatch({ type: "SET_STATE", state: { linkToken: '' }});
-          return;
-        }
         dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
       }
     },
-    [dispatch, profile]
+    [dispatch]
   );
 
   useEffect(() => {
@@ -47,21 +40,25 @@ const App = () => {
       }
       generateToken();
     };
-    init();
-  }, [dispatch, profile, generateToken]);
+    if (profile) init();
+  }, [profile, generateToken, dispatch]);
 
   return (
       <Header>
-        <AppProvider>
+        <Menu/>
+        <LoginProvider>
           <ThemeProvider>
-            <Menu/>
-            <LoginProvider>
-              <Auth/>
-            </LoginProvider>
-            <Sideview/>
-            <Dashboard/>
+            <Auth/>
+            {localStorage.getItem('v') != null ?
+            <>
+              <Sideview/>
+              <Dashboard/>
+            </>
+            :
+            null
+            }
           </ThemeProvider>
-        </AppProvider>
+        </LoginProvider>
       </Header>
   );
 };

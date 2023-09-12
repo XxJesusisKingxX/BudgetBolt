@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import Auth from '../..';
 import { initLoginState, mockDispatch, mockLoginDispatch, renderAllContext } from '../../../../context/mock/Context.mock';
-import { mockingFetch } from '../../../../utils/test';
+import { mockLocalStorage, mockingFetch } from '../../../../utils/test';
 
 
 // Global States Intialization
@@ -14,6 +14,7 @@ afterEach(() => {
 })
 
 describe("Login",() => {
+    mockLocalStorage();
     const loginWorkFlow = (username: string = "test", password: string = "Password1!", loading = true) => {
         initLoginState.showLoginWindow = true
         renderAllContext(<Auth/>);
@@ -31,7 +32,7 @@ describe("Login",() => {
     }
 
     test("successfully login with 'enter' pressed", async () => {
-        const mockFetch = mockingFetch(200);
+        const mockFetch = mockingFetch(200,{uid:'retr'});
         initLoginState.showLoginWindow = true
         renderAllContext(<Auth/>)
         userEvent.type(screen.getByLabelText('username'), 'test')
@@ -46,18 +47,22 @@ describe("Login",() => {
             expect(mockDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
         })
         expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
+        expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
         expect(mockLoginDispatch).not.toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
+        expect(window.localStorage.getItem('v')).toBe("retr")
         mockFetch.mockRestore();
     })
     test("successfully login", async () => {
-        const mockFetch = mockingFetch(200);
+        const mockFetch = mockingFetch(200, {uid:'retr'});
         loginWorkFlow();
         // Login success now verify: setup account window does not shows, login is set, and profile name is updated
         await waitFor(()=> {
             expect(mockDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { profile: "test" }});
         })
         expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { isLogin: true }});
+        expect(mockLoginDispatch).toHaveBeenCalledWith({type: "SET_STATE", state: { showLoginWindow: false }});
         expect(mockLoginDispatch).not.toHaveBeenCalledWith({type: "SET_STATE", state: { showAccountWindow: true }});
+        expect(window.localStorage.getItem('v')).toBe("retr")
         mockFetch.mockRestore();
     })
     test("username input invalid", async () => {

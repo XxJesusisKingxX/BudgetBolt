@@ -17,13 +17,13 @@ import (
 	"github.com/plaid/plaid-go/v12/plaid"
 )
 
-func TestGetAccessToken(t *testing.T) {
+func TestCreateAccessToken(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		plaidc.GetAccessToken(c,
+		plaidc.CreateAccessToken(c,
 			plaidinterface.MockPlaidClient{Err: errors.New("Failed to get token")},
 			postgresinterface.MockDB{},
 			nil,
@@ -45,13 +45,13 @@ func TestGetAccessToken(t *testing.T) {
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
 	tests.Equals(t, false , isToken)
 }
-func TestGetAccessToken_ProfileFails(t *testing.T) {
+func TestCreateAccessToken_ProfileFails(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		plaidc.GetAccessToken(c,
+		plaidc.CreateAccessToken(c,
 			plaidinterface.MockPlaidClient{},
 			postgresinterface.MockDB{
 				ProfileErr: errors.New("Failed to get profile"),
@@ -71,13 +71,13 @@ func TestGetAccessToken_ProfileFails(t *testing.T) {
 	// Assert
 	tests.Equals(t, http.StatusInternalServerError, w.Code)
 }
-func TestGetAccessToken_Received(t *testing.T) {
+func TestCreateAccessToken_Received(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Handle mock route
 	r.POST("/get-access-token", func(c *gin.Context) {
-		plaidc.GetAccessToken(c,
+		plaidc.CreateAccessToken(c,
 			plaidinterface.MockPlaidClient{},
 			postgresinterface.MockDB{Profile: model.Profile{ ID: 1 }},
 			nil,

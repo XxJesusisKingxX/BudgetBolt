@@ -28,6 +28,7 @@
 .windowcont {
     position: absolute;
     text-align: center;
+    z-index: 1;
 }
     .windowcont__title {
         color: var(--FONT_MODE);

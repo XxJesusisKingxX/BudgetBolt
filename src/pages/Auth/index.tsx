@@ -8,10 +8,12 @@ import { useLogin } from './useLogin';
 import LoginContext from '../../context/LoginContext';
 import "../../assets/auth/styles/Auth.css";
 import ThemeContext from '../../context/ThemeContext';
+import AppContext from '../../context/AppContext';
 
 const Auth = () => {
     // Get theme mode from context
     const { mode } = useContext(ThemeContext);
+    const { dispatch } = useContext(AppContext);
 
     // Get login-related states from contexts
     const { showAccountWindow, showSignUpWindow, showLoginWindow, isLogin, loginDispatch } = useContext(LoginContext);
@@ -90,7 +92,9 @@ const Auth = () => {
     // Handle logout
     const handleLogout = () => {
         localStorage.clear();
+        dispatch({ type: "SET_STATE", state: { profile: '' }});
         loginDispatch({ type: "SET_STATE", state: { isLogin: false }});
+        handleWindowClose();
     }
 
     return (

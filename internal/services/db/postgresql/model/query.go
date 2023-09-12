@@ -1,4 +1,5 @@
 package model
+
 type QueryParameters struct {
 	Asc     bool
 	Desc    bool

@@ -11,7 +11,7 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 	var view []model.Transaction
 	defer rows.Close()
 	for rows.Next() {
-		var id int
+		var id string
 		var date string
 		var amount float64
 		var method *string
@@ -20,7 +20,7 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 		var isRecurring bool
 		var description *string
 		var profileId int
-		rows.Scan(&id, &date, &amount, &method, &from, &vendor, &isRecurring, &description, &profileId)
+		rows.Scan(&date, &amount, &method, &from, &vendor, &isRecurring, &description, &profileId, &id)
 		// If not pointing to empty string will lose information
 		na := ""
 		if description == nil {
@@ -34,7 +34,7 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 		}
 		view = append(view, model.Transaction{
 			ID: id, 
-			Date: strings.Split(date,"T")[0], 
+			Date: strings.Split(date,"T")[0],
 			Amount: amount,
 			Method: strings.TrimSpace(*method),
 			From: strings.TrimSpace(from),
