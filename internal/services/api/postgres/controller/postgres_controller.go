@@ -144,35 +144,8 @@ func RetrieveTransactions(c *gin.Context, dbs postgresinterface.DBHandler, db *s
 				},
 			},
 		})
-		// Get the category totals for all possible expenses
-		categoryTotals := make(map[string]float64)
-
-		for _, transaction := range transactions {
-			primary := transaction.PrimaryCategory
-			detailed := transaction.DetailCategory
-			categoryTotals[primary] += transaction.Amount
-			categoryTotals[detailed] += transaction.Amount
-		}
-		// Update expense total spent
-		var expenses []model.Expense
-		expenses, err = dbs.RetrieveExpense(db, model.Expense{
-			ProfileID: profile.ID,
-		})
-
-		for _, expense := range expenses {
-			var total float64
-			categoryList := strings.Split(expense.Category, ",")
-			for _, category := range categoryList {
-				total += categoryTotals[category]
-			}
-			total = math.Round(total*100) / 100 // round 2decimals
-			dbs.UpdateExpense(db, model.Expense{
-				Spent: total,
-			}, model.Expense{
-				ID: expense.ID,
-			})
-		}
-
+		// update expense every time retrieve transactions
+		updateExpenses(transactions, dbs, db, profile.ID)
 	}
 
 	if err != nil {
@@ -225,9 +198,9 @@ func CreateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB,
 		// Create the user's expenses based on the profile ID.
 		err = dbs.CreateExpense(db, model.Expense{
 			ProfileID: profile.ID,
-			Limit: limit,
+			Limit: &limit,
 			Name: name,
-			Spent: spent,
+			Spent: &spent,
 		})
 	}
 	if err != nil {
@@ -236,4 +209,59 @@ func CreateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB,
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+// Update a user's budgeted expenses.
+func UpdateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
+	limit, _ := strconv.ParseFloat(c.PostForm("limit"), 64)
+	id, _ := strconv.ParseInt(c.PostForm("id"), 10, 32)
+
+	// Check if user exist
+	profile, err := dbs.RetrieveProfile(db, uid, true)
+	if err == nil && profile.ID != 0 {
+		// Create the user's expenses based on the profile ID.
+		err = dbs.UpdateExpense(db, model.Expense {
+			Limit: &limit,
+		}, model.Expense{
+			ID: id,
+		})
+		
+	}
+	if err != nil {
+		utils.RenderError(c, err, plaidinterface.PlaidClient{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func updateExpenses(transactions []model.Transaction, dbs postgresinterface.DBHandler, db *sql.DB, profileId int) {
+	// Get the category totals for all possible expenses
+	categoryTotals := make(map[string]float64)
+	for _, transaction := range transactions {
+		primary := transaction.PrimaryCategory
+		detailed := transaction.DetailCategory
+		categoryTotals[primary] += transaction.Amount
+		categoryTotals[detailed] += transaction.Amount
+	}
+	// Update expense total spent
+	var expenses []model.Expense
+	expenses, _ = dbs.RetrieveExpense(db, model.Expense{
+		ProfileID: profileId,
+	})
+	for _, expense := range expenses {
+		var total float64
+		categoryList := strings.Split(expense.Category, ",")
+		for _, category := range categoryList {
+			total += categoryTotals[category]
+		}
+		total = math.Round(total*100) / 100 // round 2decimals
+		dbs.UpdateExpense(db, model.Expense{
+			Spent: &total,
+		}, model.Expense{
+			ID: expense.ID,
+		})
+	}
 }

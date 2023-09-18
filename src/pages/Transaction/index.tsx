@@ -6,7 +6,6 @@ import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
 import { getCookie } from '../../utils/cookie';
 import { getDateView } from '../../utils/formatDate';
-import { View } from '../../constants/view';
 
 // Transaction interface for a single transaction
 interface Transactions {
@@ -21,7 +20,7 @@ const Transaction = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     // Accessing isTransactionsRefresh, dispatch, mode, and isLogin from contexts
-    const { isTransactionsRefresh, dispatch } = useContext(AppContext);
+    const { budgetView, isTransactionsRefresh, dispatch } = useContext(AppContext);
     const { mode } = useContext(ThemeContext);
     const { isLogin } = useContext(LoginContext);
 
@@ -30,8 +29,6 @@ const Transaction = () => {
     const everyHour = 3600000; // Interval for hourly update check
 
     useEffect(() => {
-        const sidebar = document.getElementById("sidebar");
-
         // Function to update transactions every hour
         const checkHourlyUpdate = () => {
             dispatch({ type: "SET_STATE", state: { lastTransactionsUpdate: new Date(), isTransactionsRefresh: !isTransactionsRefresh } });
@@ -49,7 +46,7 @@ const Transaction = () => {
                 const baseURL = window.location.href;
                 const url = new URL(baseURL + EndPoint.GET_TRANSACTIONS);
                 url.search = new URLSearchParams({
-                    date: getDateView(new Date(), View.YEARLY) // update to be dynamic
+                    date: getDateView(new Date(), budgetView)
                 }).toString();
                 const retrieveResponse = await fetch(url, {
                     method: "GET",
@@ -63,7 +60,7 @@ const Transaction = () => {
                     setIsLoading(false);
                 }
 
-                if (sidebar) sidebar.onanimationend = null
+                dispatch({ type: "SET_STATE", state: { lastTransactionsUpdate: new Date()}});
                 setIsLoading(false);
             } catch (error) {
                 console.log("failed to retrieve transactions");
@@ -73,12 +70,12 @@ const Transaction = () => {
 
         // If logged in, initiate animations and transaction retrieval
         if (getCookie("UID")) {
-            if (sidebar) sidebar.onanimationend = () => { setIsLoading(true) }; //set loading after animation of sidebar
+            setIsLoading(true)
             retrieveTransactions();
             const intervalId = setInterval(checkHourlyUpdate, everyHour);
             return () => clearInterval(intervalId);
         }
-    }, [isTransactionsRefresh, isLogin, dispatch]);
+    }, [isTransactionsRefresh, budgetView, isLogin, dispatch]);
 
     const loading = `/images/${mode}/loading.png`;
 

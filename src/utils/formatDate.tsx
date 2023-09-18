@@ -1,4 +1,4 @@
-import { View } from "../constants/view";
+import { BudgetView } from "../constants/view";
 
 /**
  * Format date in a MM DD YYYY with month placeholder being first 3 letters of month
@@ -72,15 +72,20 @@ export function formatOverviewDate(currentDate: Date) {
     return date;
 };
 
-export const getDateView = (currentDate: Date, view: View) => {
+export const getDateView = (currentDate: Date, view: BudgetView) => {
     let year;
     let month;
     let day;
     let formattedDate;
-    
-    switch (view) {
-        case View.WEEKLY:
-            const dayOfWeek = currentDate.getDay()
+
+    const monthlyView = () => {
+        year = currentDate.getFullYear();
+        month = String(currentDate.getMonth() + 1).padStart(2, '0'); // it's zero-based so no need to backup 1
+        formattedDate = `${year}-${month}-01`;
+        return formattedDate;
+    }
+    const weeklyView = () => {
+        const dayOfWeek = currentDate.getDay()
             const newDate = new Date(currentDate);
             newDate.setDate(currentDate.getDate() - dayOfWeek); //subtract day of week to get back to beginning of week
             year = newDate.getFullYear();
@@ -88,14 +93,21 @@ export const getDateView = (currentDate: Date, view: View) => {
             day = String(newDate.getDate()).padStart(2, '0');
             formattedDate = `${year}-${month}-${day}`;
             return formattedDate;
-        case View.MONTHLY:
-            year = currentDate.getFullYear();
-            month = String(currentDate.getMonth() + 1).padStart(2, '0'); // it's zero-based so no need to backup 1
-            formattedDate = `${year}-${month}-01`;
-            return formattedDate;
-        case View.YEARLY:
-            year = currentDate.getFullYear();
+    }
+    const yearlyView = () => {
+        year = currentDate.getFullYear();
             formattedDate = `${year}-01-01`;
             return formattedDate;
+    }
+
+    switch (view) {
+        case BudgetView.WEEKLY:
+            return weeklyView();
+        case BudgetView.MONTHLY:
+            return monthlyView();
+        case BudgetView.YEARLY:
+            return yearlyView();
+        default:
+            return monthlyView();
     }
 }

@@ -31,6 +31,8 @@ func FormatColumnsAndValues(t interface{}) (string, string) {
 					value = append(value, fmt.Sprintf("%v", fieldValue))
 				} else if fieldValue.Kind() == reflect.Bool {
 					value = append(value, fmt.Sprintf("%v", fieldValue))
+				} else if fieldValue.Kind() == reflect.Pointer {
+					value = append(value, fmt.Sprintf("%v", fieldValue.Elem()))
 				} else {
 					value = append(value, fmt.Sprintf("'%v'", fieldValue))
 				}
@@ -66,6 +68,8 @@ func SetColumnsAndValues(t interface{}) string {
 						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue))
 					} else if fieldValue.Kind() == reflect.Bool {
 						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue))
+					} else if fieldValue.Kind() == reflect.Pointer {
+						sets = append(sets, fmt.Sprintf("%v = %v", columnName, fieldValue.Elem()))
 					} else {
 						sets = append(sets, fmt.Sprintf("%v = '%v'", columnName, fieldValue))
 					}
@@ -101,6 +105,8 @@ func CreateWhereCondition(t interface{}) string {
 					condition = append(condition, fmt.Sprintf("%v = %v", columnName, fieldValue))
 				} else if fieldValue.Kind() == reflect.Bool {
 					condition = append(condition, fmt.Sprintf("%v = %v", columnName, fieldValue))
+				} else if fieldValue.Kind() == reflect.Pointer {
+					condition = append(condition, fmt.Sprintf("%v = %v", columnName, fieldValue.Elem()))
 				} else {
 					condition = append(condition, fmt.Sprintf("%v = '%v'", columnName, fieldValue))
 				}

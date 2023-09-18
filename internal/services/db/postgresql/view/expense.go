@@ -11,7 +11,7 @@ func ViewExpense(rows *sql.Rows) []model.Expense {
 	var view []model.Expense
 	defer rows.Close()
 	for rows.Next() {
-		var id int
+		var id int64
 		var date sql.NullString
 		var name string
 		var limit sql.NullFloat64
@@ -24,8 +24,8 @@ func ViewExpense(rows *sql.Rows) []model.Expense {
 		view = append(view, model.Expense{
 			ID: id,
 			Name: strings.TrimSpace(name),
-			Spent: spent,
-			Limit: limit.Float64,
+			Spent: &spent,
+			Limit: &limit.Float64,
 			Category: strings.TrimSpace(category.String),
 			DueDate: date.String,
 			TransactionID: transactionId.Int32,

@@ -15,10 +15,13 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45 }
 	testThree := TestStructNoTag{ ID: 1 }
 	testFour := TestStruct{ Test: "Test" }
+	spent := 0.00
+	testFive := model.Expense{ Spent: &spent}
 
 	resOne, _ := querybuilder.FormatColumnsAndValues(testOne)
 	resTwo, _ := querybuilder.FormatColumnsAndValues(testTwo)
 	resThree, _ := querybuilder.FormatColumnsAndValues(testThree)
+	resFive, _ := querybuilder.FormatColumnsAndValues(testFive)
 	
 	// Test an empty string returns
 	tests.Equals(t, "", resOne)
@@ -26,30 +29,37 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	tests.Equals(t, "transaction_id, net_amount, vendor, is_recurring", resTwo)
 	// Test if we miss struct tag
 	tests.Equals(t, "", resThree)
+	// Test if a string returns - ptr values
+	tests.Equals(t, "expense_spent", resFive)
 	// Test if struct not passed as arg
 	defer func() {
 		if resFour := recover(); resFour != nil {
 			tests.Equals(t, "Invalid parameter type", resFour)
 		}
-		}()
-		querybuilder.FormatColumnsAndValues(testFour)
-	}
+	}()
+	querybuilder.FormatColumnsAndValues(testFour)
+}
 func TestSetColumnsAndValues(t *testing.T) {
 	type TestStruct struct{ Test string }
 	type TestStructNoTag struct{ ID string; Name string }
-	testOne := model.Budget{}
+	testOne := model.Expense{}
 	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
 	testThree := TestStructNoTag{ID: "1", Name: "Test"}
 	testFour := TestStruct{Test: "Test"}
+	spent := 0.00
+	testFive := model.Expense{ Spent: &spent }
 
 	resOne := querybuilder.SetColumnsAndValues(testOne)
 	resTwo := querybuilder.SetColumnsAndValues(testTwo)
 	resThree := querybuilder.SetColumnsAndValues(testThree)
+	resFive := querybuilder.SetColumnsAndValues(testFive)
 	
 	// Test an empty string returns
 	tests.Equals(t, "", resOne)
-	// Test if a string returns
+	// Test if only value defined set
 	tests.Equals(t, "net_amount = 123.45, vendor = 'Test', is_recurring = true", resTwo)
+	// Test if a pointer value is set
+	tests.Equals(t, "expense_spent = 0", resFive)
 	// Test if we miss struct tag
 	tests.Equals(t, "", resThree)
 	// Test if struct not passed as arg
@@ -67,14 +77,19 @@ func TestCreateWhereCondition(t *testing.T) {
 	testTwo := model.Transaction{ ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
 	testThree := TestStruct{Test: "Test"}
 	testFour := TestStructNoTag{ID: "1"}
+	spent := 0.00
+	testFive := model.Expense{ Spent: &spent}
 
 	resOne := querybuilder.CreateWhereCondition(testOne)
 	resTwo := querybuilder.CreateWhereCondition(testTwo)
+	resFive := querybuilder.CreateWhereCondition(testFive)
 
 	// Test an empty string returns
 	tests.Equals(t, "", resOne)
 	// Test if a string returns
 	tests.Equals(t, "transaction_id = '1' AND net_amount = 123.45 AND vendor = 'Test' AND is_recurring = true", resTwo)
+	// Test if a string returns
+	tests.Equals(t, "expense_spent = 0", resFive)
 	// Test if struct not passed as arg
 	defer func() {
 		if resThree := recover(); resThree != nil {

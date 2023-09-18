@@ -8,14 +8,14 @@ type Budget struct {
 	ProfileID   int    `db:"profile_id"`
 }
 type Expense struct {
-	ID            int     `db:"expense_id"`
-	DueDate       string  `db:"due_date"`// YYYYMMDD
-	Name          string  `db:"expense_name"`
-	Limit         float64 `db:"expense_limit"`
-	Spent         float64 `db:"expense_spent"`
-	ProfileID     int	  `db:"profile_id"`
-	TransactionID int32	  `db:"transaction_id"`
-	Category      string  `db:"expense_category"`
+	ID            int64    `db:"expense_id"`
+	DueDate       string   `db:"due_date"`// YYYYMMDD
+	Name          string   `db:"expense_name"`
+	Limit         *float64  `db:"expense_limit"`
+	Spent         *float64 `db:"expense_spent"`
+	ProfileID     int	   `db:"profile_id"`
+	TransactionID int32	   `db:"transaction_id"`
+	Category      string   `db:"expense_category"`
 }
 type Income struct {
 	ID            int       `db:"income_id"`

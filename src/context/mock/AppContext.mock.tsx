@@ -1,3 +1,4 @@
+import { BudgetView } from '../../constants/view';
 import AppContext from '../AppContext';
 import { render, RenderResult } from '@testing-library/react';
 
@@ -5,6 +6,7 @@ export const mockDispatch = jest.fn();
 
 export const initAppState = {
     profile: "",
+    budgetView: BudgetView.MONTHLY,
     isTransactionsUpdated: false,
     lastTransactionsUpdate: new Date(),
     isTransactionsRefresh: false,

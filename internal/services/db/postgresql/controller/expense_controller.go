@@ -2,7 +2,7 @@ package controller
 
 import (
 	"database/sql"
-	
+
 	q "services/db/postgresql/controller/querybuilder"
 	"services/db/postgresql/model"
 	"services/db/postgresql/view"

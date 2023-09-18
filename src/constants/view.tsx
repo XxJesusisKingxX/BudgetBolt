@@ -1,4 +1,4 @@
-export enum View {
+export enum BudgetView {
     WEEKLY = "weekly",
     MONTHLY = "monthly",
     YEARLY = "yearly"

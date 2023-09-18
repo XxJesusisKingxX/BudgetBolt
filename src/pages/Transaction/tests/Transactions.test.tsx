@@ -53,5 +53,5 @@ describe("Transactions", () => {
         });
         expect(screen.getByRole('img', { name: "Loading"})).toBeTruthy();
     });
-    // sidebar animation isnt tested or checkhourly
+    // checkhourly isnt tested
 })

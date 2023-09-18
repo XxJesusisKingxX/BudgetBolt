@@ -20,6 +20,9 @@ func SetupPostgresRoutes(router *gin.RouterGroup, dbs postgresinterface.DBHandle
     router.GET("expenses/get", func(c *gin.Context) {
         controller.RetrieveExpenses(c, dbs, db, false)
     })
+    router.POST("expenses/update", func(c *gin.Context) {
+        controller.UpdateExpenses(c, dbs, db, false)
+    })
     router.GET("transactions/get", func(c *gin.Context) {
         controller.RetrieveTransactions(c, dbs, db, false)
     })
