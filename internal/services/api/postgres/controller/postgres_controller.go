@@ -2,12 +2,13 @@ package controller
 
 import (
 	"database/sql"
-	"fmt"
+	"math"
 	"net/http"
 	plaidinterface "services/api/plaid"
 	"services/api/postgres"
 	"services/api/utils"
 	"services/db/postgresql/model"
+	"strconv"
 	"strings"
 	"time"
 
@@ -79,7 +80,6 @@ func RetrieveProfile(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB
 
 	// Compare the provided password with the stored hashed password.
 	auth := bcrypt.CompareHashAndPassword([]byte(userProfile.Password), []byte(pass))
-	fmt.Println(auth)
 	if auth == nil {
 		// Set a cookie with the session token
 		cookie := &http.Cookie{
@@ -126,6 +126,7 @@ func RetrieveAccounts(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.D
 func RetrieveTransactions(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
 	// Extract the session cookie
 	uid, _ := c.Cookie("UID")
+	date := c.Query("date")
 
 	// Retrieve the user's profile based on the username.
 	profile, err := dbs.RetrieveProfile(db, uid, true)
@@ -136,11 +137,42 @@ func RetrieveTransactions(c *gin.Context, dbs postgresinterface.DBHandler, db *s
 			ProfileID: profile.ID,
 			Query: model.Querys{
 				Select: model.QueryParameters{
-					Desc:     true,
-					OrderBy: "transaction_date",
+					GreaterThanEq: model.GreaterThanEq {
+						Value: date,
+						Column: "transaction_date",
+					},
 				},
 			},
 		})
+		// Get the category totals for all possible expenses
+		categoryTotals := make(map[string]float64)
+
+		for _, transaction := range transactions {
+			primary := transaction.PrimaryCategory
+			detailed := transaction.DetailCategory
+			categoryTotals[primary] += transaction.Amount
+			categoryTotals[detailed] += transaction.Amount
+		}
+		// Update expense total spent
+		var expenses []model.Expense
+		expenses, err = dbs.RetrieveExpense(db, model.Expense{
+			ProfileID: profile.ID,
+		})
+
+		for _, expense := range expenses {
+			var total float64
+			categoryList := strings.Split(expense.Category, ",")
+			for _, category := range categoryList {
+				total += categoryTotals[category]
+			}
+			total = math.Round(total*100) / 100 // round 2decimals
+			dbs.UpdateExpense(db, model.Expense{
+				Spent: total,
+			}, model.Expense{
+				ID: expense.ID,
+			})
+		}
+
 	}
 
 	if err != nil {
@@ -153,4 +185,55 @@ func RetrieveTransactions(c *gin.Context, dbs postgresinterface.DBHandler, db *s
 	})
 	// TODO: Handle investment transactions
 	// TODO: Handle holdings
+}
+
+// Retrieves a user's budgeted expenses.
+func RetrieveExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
+
+	// Retrieve the user's profile based on the username.
+	profile, err := dbs.RetrieveProfile(db, uid, true)
+	var expenses []model.Expense
+	if err == nil {
+		// Retrieve the user's expenses based on the profile ID.
+		expenses, err = dbs.RetrieveExpense(db, model.Expense{
+			ProfileID: profile.ID,
+		})
+	}
+	if err != nil {
+		utils.RenderError(c, err, plaidinterface.PlaidClient{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"expenses": expenses,
+	})
+}
+
+// Create a user's budgeted expenses.
+func CreateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
+	name := c.PostForm("name")
+	limit, _ := strconv.ParseFloat(c.PostForm("limit"), 64)
+	spent, _ := strconv.ParseFloat(c.PostForm("spent"), 64)
+
+	// Retrieve the user's profile based on the username.
+	profile, err := dbs.RetrieveProfile(db, uid, true)
+	if err == nil {
+		// Create the user's expenses based on the profile ID.
+		err = dbs.CreateExpense(db, model.Expense{
+			ProfileID: profile.ID,
+			Limit: limit,
+			Name: name,
+			Spent: spent,
+		})
+	}
+	if err != nil {
+		utils.RenderError(c, err, plaidinterface.PlaidClient{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }

@@ -3,6 +3,7 @@ package plaidinterface
 import (
 	"context"
 	"time"
+
 	"github.com/plaid/plaid-go/v12/plaid"
 )
 
@@ -128,7 +129,12 @@ func (t PlaidClient) NewLinkTokenCreateRequest(name string, user string, country
 	return request
 }
 func (t PlaidClient) NewTransactionsSyncRequest(client *plaid.APIClient, ctx context.Context, accessToken string, cursor *string) (plaid.TransactionsSyncResponse, error) {
+	include := true
+	options := plaid.TransactionsSyncRequestOptions{
+    	IncludePersonalFinanceCategory: &include,
+	}
 	request := plaid.NewTransactionsSyncRequest(accessToken)
+	request.SetOptions(options)
 	if cursor != nil {
 		request.SetCursor(*cursor)
 	}

@@ -21,16 +21,17 @@ func BuildCreateQuery(tableName string, model interface{}) (string, error) {
 	panic("Invalid parameter type")
 }
 
-func BuildUpdateQuery(tableName string, model interface{}) (string, error) {
-	id := reflect.ValueOf(model).FieldByName("ID")
+func BuildUpdateQuery(tableName string, setModel interface{}, whereModel interface{}) (string, error) {
+	id := reflect.ValueOf(setModel).FieldByName("ID")
 	if id.IsValid() {
-		query := "UPDATE %v SET %v WHERE transaction_id=%v" // TODO have the ability to update multiple transactions
-		set := SetColumnsAndValues(model)
+		query := "UPDATE %v SET %v WHERE %v" // TODO have the ability to update multiple transactions
+		set := SetColumnsAndValues(setModel)
+		conditions := CreateWhereCondition(whereModel)
 		if set == "" {
 			err := errors.New("Empty model")
 			return "", err
 		}
-		query = fmt.Sprintf(query, tableName, set, id)
+		query = fmt.Sprintf(query, tableName, set, conditions)
 		return query, nil
 	}
 	panic("Invalid parameter type")

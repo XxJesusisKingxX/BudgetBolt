@@ -49,16 +49,10 @@ func init() {
 	PLAID_CLIENT_ID = os.Getenv("PLAID_CLIENT_ID")
 	PLAID_SECRET = os.Getenv("PLAID_SECRET")
 	PLAID_ENV = os.Getenv("PLAID_ENV")
-	PLAID_PRODUCTS = os.Getenv("PLAID_PRODUCTS")
-	PLAID_COUNTRY_CODES = os.Getenv("PLAID_COUNTRY_CODES")
-	PLAID_REDIRECT_URI = os.Getenv("PLAID_REDIRECT_URI")
-
 	// create Plaid client
 	configuration := plaid.NewConfiguration()
 	configuration.AddDefaultHeader("PLAID-CLIENT-ID", PLAID_CLIENT_ID)
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
-	configuration.Scheme = "https"
-	configuration.Host = "sandbox.plaid.com"
 	configuration.UseEnvironment(environments[PLAID_ENV])
 	client = plaid.NewAPIClient(configuration)
 

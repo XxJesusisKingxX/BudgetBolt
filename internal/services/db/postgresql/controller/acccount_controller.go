@@ -17,8 +17,8 @@ func CreateAccount(db *sql.DB, m model.Account) error {
 	return err
 }
 
-func UpdateAccount(db *sql.DB, m model.Account) error {
-	query, err := q.BuildUpdateQuery("account", m)
+func UpdateAccount(db *sql.DB, setM model.Account, whereM model.Account) error {
+	query, err := q.BuildUpdateQuery("account", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

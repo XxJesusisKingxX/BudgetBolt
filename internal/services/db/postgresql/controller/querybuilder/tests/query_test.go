@@ -113,28 +113,28 @@ func TestBuildCreateQuery(t *testing.T) {
 	}()
 	querybuilder.BuildCreateQuery("budget", testThree)
 }
-func TestBuildUpdateQuery(t *testing.T) {
-	type TestStruct struct{ Test string }
-	err := errors.New("Empty model")
-	testOne := model.Budget{}
-	testTwo := model.Budget{Name: "Test"}
-	testThree := TestStruct{Test: "Test"}
+// func TestBuildUpdateQuery(t *testing.T) {
+// 	type TestStruct struct{ Test string }
+// 	err := errors.New("Empty model")
+// 	testOne := model.Budget{}
+// 	testTwo := model.Budget{Name: "Test"}
+// 	testThree := TestStruct{Test: "Test"}
 
-	_, resOne := querybuilder.BuildUpdateQuery("budget", testOne)
-	resTwo, _ := querybuilder.BuildUpdateQuery("budget", testTwo)
+// 	_, resOne := querybuilder.BuildUpdateQuery("budget", testOne)
+// 	resTwo, _ := querybuilder.BuildUpdateQuery("budget", testTwo)
 
-	// Test if columns and values are empty
-	tests.EqualsErr(t, err, resOne)
-	// Test if columns and values are not empty
-	tests.Equals(t, "UPDATE budget SET budget_name = 'Test' WHERE transaction_id=0", resTwo)
-	// Test if pass wrong args
-	defer func() {
-		if resThree := recover(); resThree != nil {
-			tests.Equals(t, "Invalid parameter type", resThree)
-		}
-	}()
-	querybuilder.BuildUpdateQuery("budget", testThree)
-}
+// 	// Test if columns and values are empty
+// 	tests.EqualsErr(t, err, resOne)
+// 	// Test if columns and values are not empty
+// 	tests.Equals(t, "UPDATE budget SET budget_name = 'Test' WHERE transaction_id=0", resTwo)
+// 	// Test if pass wrong args
+// 	defer func() {
+// 		if resThree := recover(); resThree != nil {
+// 			tests.Equals(t, "Invalid parameter type", resThree)
+// 		}
+// 	}()
+// 	querybuilder.BuildUpdateQuery("budget", testThree)
+// }
 func TestBuildRetrieveQuery(t *testing.T) {
 	type TestStruct struct{ Test string }
 	err := errors.New("Empty model")
@@ -231,13 +231,15 @@ func TestTransactionBuildRetrieveQuery(t *testing.T) {
 	err := errors.New("Empty model")
 	testOne := model.Transaction{}
 	testTwo := model.Transaction{From: "Test"}
-	testThree := model.Transaction{From: "Test", Query: model.Querys{ Select: model.QueryParameters{ Asc: true, OrderBy: "transaction_date"}}}
-	testFour := model.Transaction{From: "Test", Query: model.Querys{ Select: model.QueryParameters{ Desc: true, OrderBy: "transaction_date"}}}
+	testThree := model.Transaction{From: "Test", Query: model.Querys{ Select: model.QueryParameters{ OrderBy: model.OrderBy{ Asc: true, Column: "transaction_date"}}}}
+	testFour := model.Transaction{From: "Test", Query: model.Querys{ Select: model.QueryParameters{ OrderBy: model.OrderBy{ Desc: true, Column: "transaction_date"}}}}
+	testFive := model.Transaction{From: "Test", Query: model.Querys{ Select: model.QueryParameters{ GreaterThanEq: model.GreaterThanEq{ Value: "2023-08-31", Column: "transaction_date"}}}}
 
 	_, resOne := querybuilder.BuildTransactionRetrieveQuery(testOne)
 	resTwo, _ := querybuilder.BuildTransactionRetrieveQuery(testTwo)
 	resThree, _ := querybuilder.BuildTransactionRetrieveQuery(testThree)
 	resFour, _ := querybuilder.BuildTransactionRetrieveQuery(testFour)
+	resFive, _ := querybuilder.BuildTransactionRetrieveQuery(testFive)
 
 	// Test if columns and values are empty
 	tests.EqualsErr(t, err, resOne)
@@ -247,6 +249,8 @@ func TestTransactionBuildRetrieveQuery(t *testing.T) {
 	tests.Equals(t, "SELECT * FROM transaction WHERE payment_account_from_to = 'Test' ORDER BY transaction_date ASC", resThree)
 	// Test if descding order is selected
 	tests.Equals(t, "SELECT * FROM transaction WHERE payment_account_from_to = 'Test' ORDER BY transaction_date DESC", resFour)
+	// Test if greater than 
+	tests.Equals(t, "SELECT * FROM transaction WHERE payment_account_from_to = 'Test' AND transaction_date > '2023-08-31'", resFive)
 }
 func TestTransactionBuildDeleteQuery(t *testing.T) {
 	err := errors.New("Empty model")

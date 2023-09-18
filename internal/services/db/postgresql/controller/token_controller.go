@@ -17,8 +17,8 @@ func CreateToken(db *sql.DB, m model.Token) error {
 	return err
 }
 
-func UpdateToken(db *sql.DB, m model.Token) error {
-	query, err := q.BuildUpdateQuery("token", m)
+func UpdateToken(db *sql.DB, setM model.Token, whereM model.Token) error {
+	query, err := q.BuildUpdateQuery("token", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

@@ -26,7 +26,7 @@ func CreateLinkToken(c *gin.Context, ps plaidinterface.Plaid, dbs postgresinterf
 		return
 	}
 	countryCodes := convertCountryCodes(strings.Split("US", ","))
-	products := convertProducts(strings.Split("investments,auth,transactions", ","))
+	products := convertProducts(strings.Split("transactions", ","))
 	request := ps.NewLinkTokenCreateRequest(uid, strconv.Itoa(profile.ID), countryCodes, products, "")
 	linkTokenCreateResp, err := ps.CreateLinkToken(plaidapi, ctx, request)
 	if err != nil {

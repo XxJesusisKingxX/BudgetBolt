@@ -5,6 +5,8 @@ import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
 import { getCookie } from '../../utils/cookie';
+import { getDateView } from '../../utils/formatDate';
+import { View } from '../../constants/view';
 
 // Transaction interface for a single transaction
 interface Transactions {
@@ -44,7 +46,12 @@ const Transaction = () => {
                 });
 
                 // Get transactions for user
-                const retrieveResponse = await fetch(EndPoint.GET_TRANSACTIONS, {
+                const baseURL = window.location.href;
+                const url = new URL(baseURL + EndPoint.GET_TRANSACTIONS);
+                url.search = new URLSearchParams({
+                    date: getDateView(new Date(), View.YEARLY) // update to be dynamic
+                }).toString();
+                const retrieveResponse = await fetch(url, {
                     method: "GET",
                 });
                 
