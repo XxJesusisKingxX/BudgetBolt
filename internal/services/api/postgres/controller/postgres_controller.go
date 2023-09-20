@@ -2,6 +2,7 @@ package controller
 
 import (
 	"database/sql"
+	"errors"
 	"math"
 	"net/http"
 	plaidinterface "services/api/plaid"
@@ -189,9 +190,13 @@ func CreateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB,
 	// Extract the session cookie
 	uid, _ := c.Cookie("UID")
 	name := c.PostForm("name")
-	limit, _ := strconv.ParseFloat(c.PostForm("limit"), 64)
-	spent, _ := strconv.ParseFloat(c.PostForm("spent"), 64)
-
+	limit, limitErr := strconv.ParseFloat(c.PostForm("limit"), 64)
+	spent, spentErr := strconv.ParseFloat(c.PostForm("spent"), 64)
+	if limitErr != nil || spentErr != nil {
+		err := errors.New("Invalid limit and/or spent amount")
+		utils.RenderError(c, err, plaidinterface.PlaidClient{})
+		return
+	}
 	// Retrieve the user's profile based on the username.
 	profile, err := dbs.RetrieveProfile(db, uid, true)
 	if err == nil {
@@ -215,19 +220,22 @@ func CreateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB,
 func UpdateExpenses(c *gin.Context, dbs postgresinterface.DBHandler, db *sql.DB, debug bool) {
 	// Extract the session cookie
 	uid, _ := c.Cookie("UID")
-	limit, _ := strconv.ParseFloat(c.PostForm("limit"), 64)
-	id, _ := strconv.ParseInt(c.PostForm("id"), 10, 32)
-
+	limit, limitErr := strconv.ParseFloat(c.PostForm("limit"), 64)
+	id, idErr := strconv.ParseInt(c.PostForm("id"), 10, 32)
+	if limitErr != nil || idErr != nil {
+		err := errors.New("Invalid limit amount and/or id")
+		utils.RenderError(c, err, plaidinterface.PlaidClient{})
+		return
+	}
 	// Check if user exist
-	profile, err := dbs.RetrieveProfile(db, uid, true)
-	if err == nil && profile.ID != 0 {
+	_, err := dbs.RetrieveProfile(db, uid, true)
+	if err == nil {
 		// Create the user's expenses based on the profile ID.
 		err = dbs.UpdateExpense(db, model.Expense {
 			Limit: &limit,
 		}, model.Expense{
 			ID: id,
 		})
-		
 	}
 	if err != nil {
 		utils.RenderError(c, err, plaidinterface.PlaidClient{})

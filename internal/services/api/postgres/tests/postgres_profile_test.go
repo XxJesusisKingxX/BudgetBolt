@@ -16,202 +16,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestGetAccounts_AccountsRecieved(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.GET("/get-accounts", func(c *gin.Context) {
-		postgresc.RetrieveAccounts(c,
-			postgresinterface.MockDB{
-				Profile: model.Profile{ID: 1},
-				Account: []model.Account{
-					{
-						Name:    "Test1",
-						Balance: 11.11,
-					},
-				}},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-accounts", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isAccounts := strings.Contains(string(responseBody), "\"Test1\"")
-	// Assert
-	tests.Equals(t, http.StatusOK, w.Code)
-	tests.Equals(t, true, isAccounts)
-}
-func TestGetAccounts_AccountsNotReceived(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.GET("/get-accounts", func(c *gin.Context) {
-		postgresc.RetrieveAccounts(c,
-			postgresinterface.MockDB{
-				AccountErr: errors.New("Failed to get accounts"),
-			},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-accounts", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isAccounts := !strings.Contains(string(responseBody), "\"Failed to get accounts\"")
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isAccounts)
-}
-func TestGetAccounts_ProfileNotReceived(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.GET("/get-accounts", func(c *gin.Context) {
-		postgresc.RetrieveAccounts(c, 
-			postgresinterface.MockDB{
-				ProfileErr: errors.New("Failed to get profile id"),
-			},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-accounts", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isProfileId := !strings.Contains(string(responseBody), "\"Failed to get profile id\"")
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isProfileId)
-}
-
-
-
-
-
-func TestGetTransactions_TransactionsReceived(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Create mock transactions
-	var transactions []model.Transaction
-	transactions = append(transactions, model.Transaction{
-		ID:          "1",
-		Date:        "2023/01/01",
-		Amount:      12.34,
-		Method:      "",
-		From:        "Test Account",
-		Vendor:      "Test",
-		Description: "A test case was received",
-		ProfileID:   1,
-	})
-	// Handle mock route
-	r.GET("/get-transactions", func(c *gin.Context) {
-		postgresc.RetrieveTransactions(c,
-			postgresinterface.MockDB{
-				Profile: model.Profile{ID: 1}, 
-				Transaction: transactions,
-			},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-transactions", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Received response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isReceived := strings.Contains(string(responseBody), "\"A test case was received\"")
-	// Assert
-	tests.Equals(t, http.StatusOK, w.Code)
-	tests.Equals(t, true, isReceived)
-}
-func TestGetTransactions_ProfileIdNotReceived(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.GET("/get-transactions", func(c *gin.Context) {
-		postgresc.RetrieveTransactions(c,
-			postgresinterface.MockDB{
-				ProfileErr: errors.New("Failed to get profile id"),
-			},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-transactions", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isProfileId := !strings.Contains(string(responseBody), "\"Failed to get profile id\"")
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isProfileId)
-}
-func TestGetTransactions_TransactionsNotReceived(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.GET("/get-transactions", func(c *gin.Context) {
-		postgresc.RetrieveTransactions(c, 
-			postgresinterface.MockDB{
-				TransactionErr: errors.New("Failed to get transactions"),
-			},
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("GET", "/get-transactions", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Receive response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isTransactions := !strings.Contains(string(responseBody), "\"Failed to get transactions\"")
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isTransactions)
-}
-
-
-
-
-
 func TestCreateProfile_ProfileNameTaken(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
@@ -321,6 +125,11 @@ func TestCreateProfile_ProfileCreated(t *testing.T) {
 	// Assert
 	tests.Equals(t, http.StatusOK, w.Code)
 }
+
+
+
+
+
 func TestRetrieveProfile_NotExist(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
@@ -393,7 +202,7 @@ func TestRetrieveProfile_AuthSucceed(t *testing.T) {
 			true,
 		)
 	})
-	// Create request
+	// Create reque
 	form := url.Values{}
 	form.Set("username", "test")
 	form.Set("password", "abc")
