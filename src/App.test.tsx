@@ -1,29 +1,31 @@
 import '@testing-library/jest-dom'
 import { waitFor } from '@testing-library/react'
-import { mockLocalStorage, mockingFetch } from './utils/test';
+import { mockLocalStorage, mockingFetchJson } from './utils/test';
 import App from './App';
 import { mockDispatch, renderWithAppContext } from './context/mock/AppContext.mock';
 import { deleteCookie } from './utils/cookie';
 
+let mockFetch: jest.Mock<any, any>;
 afterEach(() => {
-    deleteCookie("UID")
+    deleteCookie("UID");
+    window.localStorage.clear;
+    mockFetch.mockRestore();
 })
 
 describe("App",() => {
     mockLocalStorage();
     test("generate token", async () => {
-        const mockFetch = mockingFetch(200, {link_token:"token"})
+        mockFetch = mockingFetchJson({link_token:"token"})
         document.cookie = "UID=123; path=/";
         renderWithAppContext(<App/>)
         await waitFor(() => {
-            expect(mockDispatch). toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
+            expect(mockDispatch).toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
         })
         // Assert successful login
-        expect(window.localStorage.getItem('link_token')).not.toBeNull();
-        mockFetch.mockRestore()
+        expect(window.localStorage.getItem('link_token')).toBe("token");
     })
     test("generate token from local storage if already oauth", async () => {
-        const mockFetch = mockingFetch(200, {link_token:"token"})
+        mockFetch = mockingFetchJson({link_token:"token"})
         document.cookie = "UID=123; path=/";
         // Mock window
         Object.defineProperty(window, 'location', {
@@ -36,6 +38,5 @@ describe("App",() => {
         })
         // Assert successful login
         expect(mockDispatch).toBeCalledWith({"state": {"linkToken": "token"}, "type": "SET_STATE"});
-        mockFetch.mockRestore()
     })
 })

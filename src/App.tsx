@@ -20,6 +20,7 @@ const App = () => {
       });
 
       const data = await response.json();
+
       if (data) {
         dispatch({ type: "SET_STATE", state: { linkToken: data.link_token }});
         localStorage.setItem("link_token", data.link_token);
@@ -34,8 +35,9 @@ const App = () => {
       if (window.location.href.includes("?oauth_state_id=")) {
         dispatch({ type: "SET_STATE", state: { linkToken: localStorage.getItem("link_token") }});
         return;
+      } else {
+        generateToken();
       }
-      generateToken();
     };
     if (getCookie("UID")) init();
   }, [profile, generateToken, dispatch]);

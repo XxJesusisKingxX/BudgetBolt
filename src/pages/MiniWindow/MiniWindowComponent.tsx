@@ -59,7 +59,7 @@ const MiniWindowComponent: FC<Props> = () => {
                     <button className={`miniwindow__budget__view__item miniwindow__budget__view__item__button${isLoading ? '--hide' : ''}`} onClick={() => setAddExpense(!addExpense)}>+ Create Expense</button>
                     {addExpense ?
                     <div className='miniwindow__budget__view__item'>
-                        <span><input className='miniwindow__budget__view__item__input' value={name} onChange={(event) => handleNameOnChange(event)}/></span>------------<span><input className='miniwindow__budget__view__item__input' value={amount} onChange={(event) => handleAmountOnChange(event)}/></span>------------<span className='miniwindow__budget__view__item__input miniwindow__budget__view__item__input--filled'>$0.00</span>
+                        <span><input aria-label='expense-name' className='miniwindow__budget__view__item__input' value={name} onChange={(event) => handleNameOnChange(event)}/></span>------------<span><input aria-label='expense-limit' className='miniwindow__budget__view__item__input' value={amount} onChange={(event) => handleAmountOnChange(event)}/></span>------------<span className='miniwindow__budget__view__item__input miniwindow__budget__view__item__input--filled'>$0.00</span>
                         <button className='miniwindow__budget__view__item__button miniwindow__budget__view__item__button--save' onClick={() => addExpenses(newExpense)}>Save</button>
                     </div>
                     :

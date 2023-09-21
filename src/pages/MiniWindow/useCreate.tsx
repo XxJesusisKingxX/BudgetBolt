@@ -51,10 +51,10 @@ export const useCreate = () => {
         }
     };
 
-    const showExpenses = () => {
-        const loading = `/images/${mode}/loading.png`;
-        return !isLoading && expenses ? (
-            expenses.slice().map((expense : Expense) => (
+    const showExpenses = (loading = isLoading, expensesList = expenses) => {
+        const loadingIcon = `/images/${mode}/loading.png`;
+        return !loading && expensesList ? (
+            expensesList.slice().map((expense : Expense) => (
               <ExpenseComponent
                 key={expense.ID}
                 update={updateExpense}
@@ -64,11 +64,11 @@ export const useCreate = () => {
                 spent={expense.Spent}
               />
             ))
-          ) : <img className='miniwindow__budget__view__loading' src={loading} alt="Loading" />;
+          ) : <img className='miniwindow__budget__view__loading' src={loadingIcon} alt="Loading" />;
     }
 
     const addExpenses = async (expense: Expense) => {
-        await fetch(EndPoint.CREATE_EXPENSES, {
+        const response = await fetch(EndPoint.CREATE_EXPENSES, {
             method: "POST",
             body: new URLSearchParams({
                 name: expense.Name,
@@ -76,8 +76,7 @@ export const useCreate = () => {
                 spent: expense.Spent
             })
         })
-
-        getExpenses();
+        if (response.ok) getExpenses();
     }
 
     return {
