@@ -17,7 +17,7 @@ const ExpenseComponent: FC<Props> = ({ update, id, name, limit, spent }) => {
 
     return (
         <div className='miniwindow__budget__view__item'>
-            <span>{name}</span>------------${edit ?<input className='miniwindow__budget__view__item__input' value={editedLimit} onChange={handleLimitOnChange}/> : <span>{limit}</span>}------------<span className='miniwindow__budget__view__item__text'>${spent}</span>
+            <span>{name}</span>------------${edit ? <input aria-label='expense-edit-limit' className='miniwindow__budget__view__item__input' value={editedLimit} onChange={handleLimitOnChange}/> : <span>{limit}</span>}------------<span className='miniwindow__budget__view__item__text'>${spent}</span>
             {!edit ? <button onClick={() => setEdit(true)}>Edit</button> : <button onClick={() => {setEdit(false); update(id, editedLimit)}}>Done</button>}
         </div>
     );

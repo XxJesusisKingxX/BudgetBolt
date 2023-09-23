@@ -1,21 +1,116 @@
 import '@testing-library/jest-dom'
+import fetchMock  from 'jest-fetch-mock';
 import { renderHook } from '@testing-library/react-hooks';
-import { act, render, screen, waitFor } from '@testing-library/react';
-import { mockingFetch } from '../../../utils/test';
-import MiniWindowComponent from '../MiniWindowComponent';
+import { act, waitFor } from '@testing-library/react';
+import * as Create from '../useCreate';
+import { EndPoint } from '../../../constants/endpoints';
 
-describe("Expenses", () => {
-    test("get expenses then show expenses", async () => {
-        mockingFetch(200, {"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]})
-        render(<MiniWindowComponent/>)
-        // Assert for loading spinner
-        expect(screen.getByRole('img', { name: "Loading" })).toBeTruthy();
-        // Assert for all expenses text display
-        await waitFor(() => {
-            expect(screen.getByText("Test")).toBeTruthy();
+
+beforeEach(() => {
+    fetchMock.resetMocks();
+});
+
+describe("useCreate", () => {
+
+    test('should update an expense when valid id and limit are provided', async () => {
+        // Assign
+        const id = '1';
+        const limit = '100.00';
+        // Mock
+        fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), { status: 200 });
+        // Render
+        const { result } = renderHook(Create.useCreate);
+        act(() => {
+            result.current.updateExpense(id,limit)
         })
-        expect(screen.getByText("100.00")).toBeTruthy();
-        expect(screen.getByText("$150.00")).toBeTruthy();
+        // Assert
+        await waitFor(() => {
+            expect(fetchMock).toHaveBeenCalledWith(EndPoint.UPDATE_EXPENSES, {
+              method: 'POST',
+              body: new URLSearchParams({
+                id: id,
+                limit: limit,
+              }),
+            });
+
+            expect(fetchMock).toHaveBeenCalledWith(
+                EndPoint.GET_EXPENSES,
+                {
+                    method: 'GET',
+                }
+            );
+        });
     });
-    // remainder functions are tested indireclty in budgetwindow
+
+    test('should update an expense when valid id and limit are provided', async () => {
+        // Assign
+        const id = "";
+        const limit = '100.00';
+        // Mock
+        fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), { status: 200 });
+        // Render
+        const { result } = renderHook(Create.useCreate);
+        act(() => {
+            result.current.updateExpense(id,limit)
+        })
+        // Assert
+        await waitFor(() => {
+            expect(fetchMock).not.toHaveBeenCalledWith(EndPoint.UPDATE_EXPENSES, {
+              method: 'POST',
+              body: new URLSearchParams({
+                id: id,
+                limit: limit,
+              }),
+            });
+
+            expect(fetchMock).not.toHaveBeenCalledWith(
+                EndPoint.GET_EXPENSES,
+                {
+                    method: 'GET',
+                }
+            );
+        });
+    });
+
+    test('add expense should POST with correct URL Params and call get expenses', async () => {
+        // Create mocks
+        fetchMock.enableMocks();
+        fetchMock.mockResponse(JSON.stringify({}), { status: 200 });
+
+        // Render
+        const expense: Create.Expense = {
+            ID: "1",
+            Name: "Test",
+            Limit: "100.00",
+            Spent: "0.00"
+        }
+        const { result } = renderHook(Create.useCreate);
+
+        act(() => {
+            result.current.addExpenses(expense)
+        })
+
+        // Assert
+        await waitFor(() => {
+            expect(fetchMock).toHaveBeenCalledWith(
+                EndPoint.CREATE_EXPENSES,
+                {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        name: expense.Name,
+                        limit: expense.Limit,
+                        spent: expense.Spent,
+                    }),
+                }
+            );
+            expect(fetchMock).toHaveBeenCalledWith(
+                EndPoint.GET_EXPENSES,
+                {
+                    method: 'GET',
+                }
+            );
+        })
+    });
 });

@@ -1,21 +1,17 @@
-import { ChangeEvent, FC, useContext, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import './MiniWindow.css'
 import { Expense, useCreate } from './useCreate';
 import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';
 
-interface Props {
-    // TODO add props needed
-}
-
-const MiniWindowComponent: FC<Props> = () => {
+const MiniWindowComponent = () => {
     const { getExpenses, addExpenses, showExpenses, isLoading } = useCreate();
     const { lastTransactionsUpdate, dispatch } = useContext(AppContext);
 
     const [addExpense, setAddExpense] = useState(false);
 
     const [name, setName] = useState('');
-    const [amount, setAmount] = useState('0.00');
+    const [amount, setAmount] = useState('');
     const newExpense: Expense = {
         ID: "0",
         Name: name,

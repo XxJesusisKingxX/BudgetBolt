@@ -18,40 +18,52 @@ export const useCreate = () => {
     const { mode } = useContext(ThemeContext)
 
     const updateExpense = async (id: string, limit: string) => {
+        
         if (id && limit) {
-            setLoading(true)
-            const response = await fetch(EndPoint.UPDATE_EXPENSES, {
-                method: "POST",
-                body: new URLSearchParams({
-                    id: id,
-                    limit: limit,
+            try {
+                setLoading(true)
+                const response = await fetch(EndPoint.UPDATE_EXPENSES, {
+                    method: "POST",
+                    body: new URLSearchParams({
+                        id: id,
+                        limit: limit,
+                    })
                 })
-            })
-    
-            if (response.ok) {
-                setLoading(false)
-                getExpenses()
+        
+                if (response.ok) {
+                    setLoading(false)
+                    getExpenses()
+                }
+            } catch (error) {
+                console.log(error)
             }
         }
         else {
-            console.error("ERROR: empty limit")
+            console.error("ERROR: empty limit and/or id")
         }
     };
 
     const getExpenses = async () => {
         setLoading(true)
-        const response = await fetch(EndPoint.GET_EXPENSES, {
-            method: "GET"
-        })
-
-        if (response.ok) {
-            const data = await response.json()
-            setExpenses(data["expenses"])
-            setLoading(false)
+        try {
+            const response = await fetch(EndPoint.GET_EXPENSES, {
+                method: "GET"
+            })
+            if (response.ok) {
+                const data = await response.json()
+                if (data) {
+                    setExpenses(data["expenses"])
+                }
+                setLoading(false)
+            }
+        } catch(error) {
+            console.log(error)
         }
+
     };
 
     const showExpenses = (loading = isLoading, expensesList = expenses) => {
+        
         const loadingIcon = `/images/${mode}/loading.png`;
         return !loading && expensesList ? (
             expensesList.slice().map((expense : Expense) => (
@@ -68,21 +80,27 @@ export const useCreate = () => {
     }
 
     const addExpenses = async (expense: Expense) => {
-        const response = await fetch(EndPoint.CREATE_EXPENSES, {
-            method: "POST",
-            body: new URLSearchParams({
-                name: expense.Name,
-                limit: expense.Limit,
-                spent: expense.Spent
-            })
-        })
-        if (response.ok) getExpenses();
+        try {
+            const response = await fetch(EndPoint.CREATE_EXPENSES, {
+                method: "POST",
+                body: new URLSearchParams({
+                    name: expense.Name,
+                    limit: expense.Limit,
+                    spent: expense.Spent,
+                }),
+            });
+            if (response.ok) getExpenses();
+        } catch (error) {
+            console.log(error)
+        }
+        
     }
 
     return {
         getExpenses,
         addExpenses,
         showExpenses,
+        updateExpense,
         isLoading
     };
 };
