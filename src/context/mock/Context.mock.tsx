@@ -3,6 +3,7 @@ import LoginContext from '../LoginContext';
 import AppContext from '../AppContext';
 import ThemeContext from '../ThemeContext';
 import { Health, ModeType } from '../../constants/style';
+import { BudgetView } from '../../constants/view';
 
 // Create mock Login Context
 export const mockLoginDispatch = jest.fn();
@@ -26,6 +27,7 @@ export const initThemeState = {
 export const mockDispatch = jest.fn();
 export const initAppState = {
     profile: "",
+    budgetView: BudgetView.MONTHLY,
     isTransactionsUpdated: false,
     lastTransactionsUpdate: new Date(),
     isTransactionsRefresh: false,

@@ -17,8 +17,8 @@ func CreateInvestment(db *sql.DB, m model.Investment) error {
 	return err
 }
 
-func UpdateInvestment(db *sql.DB, m model.Investment) error {
-	query, err := q.BuildUpdateQuery("investment", m)
+func UpdateInvestment(db *sql.DB, setM model.Investment, whereM model.Investment) error {
+	query, err := q.BuildUpdateQuery("investment", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

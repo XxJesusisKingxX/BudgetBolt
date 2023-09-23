@@ -24,6 +24,7 @@
     "react-scripts": "^5.0.1",
     "sass": "^1.32.8",
     "sass-loader": "^10.1.1",
+    "text-encoding": "^0.7.0",
     "typescript": "^4.0.3",
     "web-vitals": "^0.2.4"
   },
@@ -57,15 +58,24 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.22.5",
+    "@testing-library/react-hooks": "^7.0.2",
+    "@trendyol/jest-testcontainers": "^2.1.1",
     "@types/bcrypt": "^5.0.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/classnames": "^2.2.11",
+    "@types/pg": "^8.10.2",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "@types/text-encoding": "^0.0.37",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.6.4",
     "jest-environment-jsdom-global": "^4.0.0",
+    "jest-fetch-mock": "^3.0.3",
+    "pg": "^8.11.3",
     "ts-jest": "^29.1.1"
+  },
+  "jest": {
+    "resetMocks": false
   },
   "engines": {
     "node": ">=14.0.0"

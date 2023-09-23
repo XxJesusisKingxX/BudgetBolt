@@ -27,10 +27,13 @@ func ParseTransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Trans
 			ID: v.TransactionId,
 			From: acc[0].Name,
 			Vendor: v.GetMerchantName(),
+			Method: v.PaymentChannel,
 			Amount: v.Amount,
 			Date: v.Date,
 			Description: v.Name,
 			ProfileID: profileId,
+			PrimaryCategory: v.PersonalFinanceCategory.Get().Primary,
+			DetailCategory: v.PersonalFinanceCategory.Get().Detailed,
 		}
 		controller.CreateTransaction(db, trans)
 	}

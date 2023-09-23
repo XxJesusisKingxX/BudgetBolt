@@ -17,8 +17,8 @@ func CreateIncome(db *sql.DB, m model.Income) error {
 	return err
 }
 
-func UpdateIncome(db *sql.DB, m model.Income) error {
-	query, err := q.BuildUpdateQuery("income", m)
+func UpdateIncome(db *sql.DB, setM model.Income, whereM model.Income) error {
+	query, err := q.BuildUpdateQuery("income", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

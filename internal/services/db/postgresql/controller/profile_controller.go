@@ -17,8 +17,8 @@ func CreateProfile(db *sql.DB, m model.Profile) error {
 	return err
 }
 
-func UpdateProfile(db *sql.DB, m model.Profile) error {
-	query, err := q.BuildUpdateQuery("profile", m)
+func UpdateProfile(db *sql.DB, setM model.Profile, whereM model.Profile) error {
+	query, err := q.BuildUpdateQuery("profile", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

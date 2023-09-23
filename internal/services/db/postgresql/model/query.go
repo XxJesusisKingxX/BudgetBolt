@@ -1,9 +1,19 @@
 package model
 
 type QueryParameters struct {
+	OrderBy OrderBy
+	GreaterThanEq GreaterThanEq
+}
+
+type OrderBy struct {
 	Asc     bool
 	Desc    bool
-	OrderBy string
+	Column  string
+}
+
+type GreaterThanEq struct {
+	Column  string
+	Value   string
 }
 
 type Querys struct {

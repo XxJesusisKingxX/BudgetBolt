@@ -137,6 +137,13 @@
     width: 40px;
     animation: loading 1.2s infinite;
 }
+.loading--budget {
+    position: absolute;
+    top: 15rem;
+    left: 26rem;
+    width: 80px;
+    animation: loading 1.2s infinite;
+}
 
 body {
     background-color: var(--BACKGROUND_MODE);

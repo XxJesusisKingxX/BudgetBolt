@@ -14,34 +14,27 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 		var id string
 		var date string
 		var amount float64
-		var method *string
+		var method sql.NullString
 		var from string
-		var vendor *string
+		var vendor sql.NullString
 		var isRecurring bool
-		var description *string
+		var description sql.NullString
 		var profileId int
-		rows.Scan(&date, &amount, &method, &from, &vendor, &isRecurring, &description, &profileId, &id)
-		// If not pointing to empty string will lose information
-		na := ""
-		if description == nil {
-			description = &na
-		}
-		if vendor == nil {
-			vendor = description
-		}
-		if method == nil {
-			method = &na
-		}
+		var primary sql.NullString
+		var detail sql.NullString
+		rows.Scan(&date, &amount, &method, &from, &vendor, &isRecurring, &description, &profileId, &id, &primary, &detail)
 		view = append(view, model.Transaction{
-			ID: id, 
+			ID: id,
 			Date: strings.Split(date,"T")[0],
 			Amount: amount,
-			Method: strings.TrimSpace(*method),
+			Method: strings.TrimSpace(method.String),
 			From: strings.TrimSpace(from),
-			Vendor: strings.TrimSpace(*vendor),
+			Vendor: strings.TrimSpace(vendor.String),
 			IsRecurring: isRecurring,
-			Description: strings.TrimSpace(*description),
+			Description: strings.TrimSpace(description.String),
 			ProfileID: profileId,
+			PrimaryCategory: strings.TrimSpace(primary.String),
+			DetailCategory: strings.TrimSpace(detail.String),
 		})
 	}
 	return view

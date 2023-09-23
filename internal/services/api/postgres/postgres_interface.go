@@ -9,6 +9,9 @@ import (
 type DBHandler interface {
 	RetrieveProfile(db *sql.DB, id string, uid bool) (model.Profile, error)
 	CreateProfile(db *sql.DB, user string, password string, randomUID string) error
+	CreateExpense(db *sql.DB, m model.Expense) error
+	UpdateExpense(db *sql.DB, setM model.Expense, whereM model.Expense) error
+	RetrieveExpense(db *sql.DB, m model.Expense) ([]model.Expense, error)
 	RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, error)
 	RetrieveToken(db *sql.DB, profileId int) (model.Token, error)
 	RetrieveAccount(db *sql.DB, profileId int) ([]model.Account, error)
@@ -16,11 +19,13 @@ type DBHandler interface {
 
 type DB struct{}
 type MockDB struct {
+	Expense []model.Expense
 	Transaction []model.Transaction
 	Profile model.Profile
 	Token model.Token
 	Account []model.Account
 	ProfileErr error
+	ExpenseErr error
 	TransactionErr error
 	TokenErr error
 	AccountErr error
@@ -31,6 +36,15 @@ func (t MockDB) RetrieveProfile(db *sql.DB, id string, uid bool) (model.Profile,
 }
 func (t MockDB) CreateProfile(db *sql.DB, user string, password string, randomUID string) error {
 	return t.ProfileErr
+}
+func (t MockDB) CreateExpense(db *sql.DB, m model.Expense) error {
+	return t.ExpenseErr
+}
+func (t MockDB) RetrieveExpense(db *sql.DB, m model.Expense) ([]model.Expense, error) {
+	return t.Expense, t.ExpenseErr
+}
+func (t MockDB) UpdateExpense(db *sql.DB, setM model.Expense, whereM model.Expense) error {
+	return t.ExpenseErr
 }
 func (t MockDB) RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, error) {
 	return t.Transaction, t.TransactionErr
@@ -57,6 +71,18 @@ func (t DB) CreateProfile(db *sql.DB, user string, password string, randomUID st
 		Password: password,
 		RandomUID: randomUID,
 	})
+	return err
+}
+func (t DB) CreateExpense(db *sql.DB, m model.Expense) error {
+	err := controller.CreateExpense(db, m)
+	return err
+}
+func (t DB) RetrieveExpense(db *sql.DB, m model.Expense) ([]model.Expense, error) {
+	expenses, err := controller.RetrieveExpense(db, m)
+	return expenses, err
+}
+func (t DB) UpdateExpense(db *sql.DB, setM model.Expense, whereM model.Expense) error {
+	err := controller.UpdateExpense(db, setM, whereM)
 	return err
 }
 func (t DB) RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, error) {

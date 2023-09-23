@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react';
+import { setupJestCanvasMock } from 'jest-canvas-mock';
 import { mockLocalStorage } from '../../../utils/test';
 import Dashboard from '..';
+
+beforeEach(() => {
+  // Mock functions
+  setupJestCanvasMock();
+})
 
 afterEach(() => {
   window.localStorage.clear();

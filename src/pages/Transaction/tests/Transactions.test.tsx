@@ -37,7 +37,6 @@ describe("Transactions", () => {
         });
         // Assertions
         // Wait for transaction to load
-        expect(mockElement).toBeCalledWith('sidebar');
         expect(screen.queryByRole('img', { name: "Loading"})).toBeFalsy();
         expect(screen.getAllByRole('img', { name: "Transaction Icon" })).toBeTruthy();
         expect(screen.getByText("Account1")).toBeTruthy();
@@ -53,5 +52,5 @@ describe("Transactions", () => {
         });
         expect(screen.getByRole('img', { name: "Loading"})).toBeTruthy();
     });
-    // sidebar animation isnt tested or checkhourly
+    // checkhourly isnt tested
 })

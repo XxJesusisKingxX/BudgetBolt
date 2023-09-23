@@ -1,9 +1,11 @@
 // Import necessary components from React
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
+import { BudgetView } from "../constants/view";
 
 // Define the shape of the state
 interface State {
   profile: string
+  budgetView: BudgetView
   isTransactionsUpdated: boolean;
   lastTransactionsUpdate: Date;
   isTransactionsRefresh: boolean;
@@ -13,6 +15,7 @@ interface State {
 // Set initial state values
 const initialState: State = {
   profile: '',
+  budgetView: BudgetView.MONTHLY,
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),
   isTransactionsRefresh: false,

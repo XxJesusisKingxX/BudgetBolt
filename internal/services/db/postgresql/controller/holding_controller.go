@@ -17,8 +17,8 @@ func CreateHolding(db *sql.DB, m model.Holding) error {
 	return err
 }
 
-func UpdateHolding(db *sql.DB, m model.Holding) error {
-	query, err := q.BuildUpdateQuery("holding", m)
+func UpdateHolding(db *sql.DB, setM model.Holding, whereM model.Holding) error {
+	query, err := q.BuildUpdateQuery("holding", setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

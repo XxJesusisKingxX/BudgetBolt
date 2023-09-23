@@ -1,9 +1,10 @@
 package querybuilder
 
 import (
-	"services/db/postgresql/model"
 	"errors"
 	"fmt"
+	"reflect"
+	"services/db/postgresql/model"
 )
 
 func BuildTransactionCreateQuery(m model.Transaction) (string, error) {
@@ -31,17 +32,29 @@ func BuildTransactionUpdateQuery(m model.Transaction) (string, error) {
 
 func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 	query := "SELECT * FROM transaction WHERE %v" // TODO have the ability to make more complex where conditons sunch as nesting and other operators: >,<,IS NULL,etc
-	if m.Query.Select.Asc {
-		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy)
-	} else if m.Query.Select.Desc {
-		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy)
+
+	// Order by queries
+	if m.Query.Select.OrderBy.Asc {
+		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy.Column)
+	} else if m.Query.Select.OrderBy.Desc {
+		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy.Column)
 	}
+
 	conditions := CreateWhereCondition(m)
 	if conditions == "" {
 		err := errors.New("Empty model")
 		return "", err
 	}
 	query = fmt.Sprintf(query, conditions)
+
+	// Additional conditionals
+	if m.Query.Select.GreaterThanEq.Value != "" {
+		if reflect.TypeOf(m.Query.Select.GreaterThanEq.Value).Kind() == reflect.String {
+			query += fmt.Sprintf(" AND %v >= '%v'", m.Query.Select.GreaterThanEq.Column, m.Query.Select.GreaterThanEq.Value)
+		} else {
+			query += fmt.Sprintf(" AND %v >= %v", m.Query.Select.GreaterThanEq.Column, m.Query.Select.GreaterThanEq.Value)
+		}
+	}
 	return query, nil
 }
 

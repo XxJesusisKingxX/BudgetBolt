@@ -8,13 +8,14 @@ type Budget struct {
 	ProfileID   int    `db:"profile_id"`
 }
 type Expense struct {
-	ID            int       `db:"expense_id"`
-	DueDate       string    `db:"due_date"`// YYYYMMDD
-	Name          string    `db:"expense_name"`
-	Limit         float64   `db:"expense_limit"`
-	BudgetID      int	    `db:"budget_id"`
-	TransactionID int	    `db:"transaction_id"`
-	Category      string    `db:"expense_category"`
+	ID            int64    `db:"expense_id"`
+	DueDate       string   `db:"due_date"`// YYYYMMDD
+	Name          string   `db:"expense_name"`
+	Limit         *float64  `db:"expense_limit"`
+	Spent         *float64 `db:"expense_spent"`
+	ProfileID     int	   `db:"profile_id"`
+	TransactionID int32	   `db:"transaction_id"`
+	Category      string   `db:"expense_category"`
 }
 type Income struct {
 	ID            int       `db:"income_id"`
@@ -26,15 +27,17 @@ type Income struct {
 	DueDate       string    `db:"due_date"`// YYYYMMDD
 }
 type Transaction struct {
-	ID          string     `db:"transaction_id"`
-	Date        string    `db:"transaction_date"`// YYYYMMDD
-	Amount      float64   `db:"net_amount"`
-	Method      string    `db:"payment_method"`
-	From        string    `db:"payment_account_from_to"`
-	Vendor      string    `db:"vendor"`
-	IsRecurring bool      `db:"is_recurring"`
-	Description string    `db:"short_description"`
-	ProfileID   int       `db:"profile_id"`
+	ID               string    `db:"transaction_id"`
+	Date             string    `db:"transaction_date"`// YYYYMMDD
+	Amount           float64   `db:"net_amount"`
+	Method           string    `db:"payment_method"`
+	From             string    `db:"payment_account_from_to"`
+	Vendor           string    `db:"vendor"`
+	IsRecurring      bool      `db:"is_recurring"`
+	Description      string    `db:"short_description"`
+	ProfileID        int       `db:"profile_id"`
+	PrimaryCategory  string    `db:"primary_category"`
+	DetailCategory   string    `db:"detailed_category"`
 	Query       Querys
 
 }
