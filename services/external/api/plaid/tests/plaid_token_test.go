@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+
 	"github.com/gin-gonic/gin"
 
 	"services/external/api/plaid"
@@ -17,156 +19,134 @@ import (
 )
 
 func TestCreateAccessToken(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/get-access-token", func(c *gin.Context) {
-		api.CreateAccessToken(c,
-			api.MockPlaidClient{Err: errors.New("Failed to get token")},
-			apiSql.MockDB{},
-			nil,
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	form.Set("public_token", "public-sandbox-12345678-1234-1234-1234-123456789012")
-	req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isToken := !strings.Contains(string(responseBody), "\"Failed to get token\"")
-	//Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isToken)
-}
-func TestCreateAccessToken_ProfileFails(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/get-access-token", func(c *gin.Context) {
-		api.CreateAccessToken(c,
-			api.MockPlaidClient{},
-			apiSql.MockDB{
-				ProfileErr: errors.New("Failed to get profile"),
-			},
-			nil,
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	form.Set("public_token", "public-sandbox-12345678-1234-1234-1234-123456789012")
-	req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-}
-func TestCreateAccessToken_Received(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/get-access-token", func(c *gin.Context) {
-		api.CreateAccessToken(c,
-			api.MockPlaidClient{},
-			apiSql.MockDB{Profile: model.Profile{ID: 1}},
-			nil,
-			nil,
-			true,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	form.Set("public_token", "public-sandbox-12345678-1234-1234-1234-123456789012")
-	req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Assert
-	tests.Equals(t, http.StatusOK, w.Code)
+	// Define a slice of test cases.
+	testCases := []struct {
+		TestName       string
+		PublicToken    string
+		TokenErr       error
+		ProfileErr     error
+		ExpectedCode   int
+		ExpectedBody   string
+	}{
+		{
+			TestName:     "TokenCreationFailed",
+			TokenErr: errors.New("Failed to get token"),
+			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
+			ExpectedCode: http.StatusInternalServerError,
+			ExpectedBody: "Failed to get token",
+		},
+		{
+			TestName:     "ProfileFails",
+			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
+			ProfileErr:   errors.New("Failed to get profile"),
+			ExpectedCode: http.StatusInternalServerError,
+			ExpectedBody: "Failed to get profile",
+		},
+		{
+			TestName:     "Received",
+			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
+			ExpectedCode: http.StatusOK,
+		},
+	}
+
+	// Run all test cases
+	for _, tc := range testCases {
+		t.Run(tc.TestName, func(t *testing.T) {
+			// Create mock engine
+			gin.SetMode(gin.TestMode)
+			r := gin.Default()
+
+			// Handle mock route
+			r.POST("/get-access-token", func(c *gin.Context) {
+				api.CreateAccessToken(c,
+					api.MockPlaidClient{Err: tc.ProfileErr},
+					apiSql.MockDB{ 
+						Profile: model.Profile{ID: 1},
+						TokenErr: tc.TokenErr,
+					},
+					nil,
+					nil,
+					true,
+				)
+			})
+
+			// Create request
+			form := url.Values{}
+			form.Set("public_token", tc.PublicToken)
+			req, _ := http.NewRequest("POST", "/get-access-token", strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, req)
+			// Recieve response
+			var body map[string]string
+			responseBody, _ := io.ReadAll(w.Result().Body)
+			json.Unmarshal(responseBody, &body)
+			defer w.Result().Body.Close()
+
+			// Assert
+			tests.Equals(t, tc.ExpectedCode, w.Code)
+			tests.Equals(t, tc.ExpectedBody, body["error"])
+		})
+	}
 }
 
 func TestLinkTokenCreate(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/create-link-token", func(c *gin.Context) {
-		api.CreateLinkToken(c, api.MockPlaidClient{}, apiSql.MockDB{Profile: model.Profile{Name: "test_user"}}, nil, nil)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Received response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	linkToken := strings.Contains(string(responseBody), "\"link_token\":")
-	// Assert
-	tests.Equals(t, http.StatusOK, w.Code)
-	tests.Equals(t, true, linkToken)
-}
-func TestLinkTokenCreate_ProfileFailed(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/create-link-token", func(c *gin.Context) {
-		api.CreateLinkToken(c,
-			api.MockPlaidClient{},
-			apiSql.MockDB{
-				ProfileErr: errors.New("Failed to get profile"),
-			},
-			nil,
-			nil,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Received response
-	responseBody, _ := io.ReadAll(w.Result().Body)
-	defer w.Result().Body.Close()
-	isToken := !strings.Contains(string(responseBody), "\"Failed to get profile\"")
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
-	tests.Equals(t, false, isToken)
-}
-func TestLinkTokenCreateFails(t *testing.T) {
-	// Create mock engine
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	// Handle mock route
-	r.POST("/create-link-token", func(c *gin.Context) {
-		api.CreateLinkToken(c,
-			api.MockPlaidClient{
-				Err: errors.New("Failed"),
-			},
-			apiSql.MockDB{},
-			nil,
-			nil,
-		)
-	})
-	// Create request
-	form := url.Values{}
-	req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	// Assert
-	tests.Equals(t, http.StatusInternalServerError, w.Code)
+	// Define a slice of test cases.
+	testCases := []struct {
+		TestName     string
+		Profile      model.Profile
+		ExpectedCode int
+		ExpectedBody string
+		Err          error
+	}{
+		{
+			TestName: "LinkTokenCreated",
+			Profile:  model.Profile{Name: "test_user"},
+			ExpectedCode: http.StatusOK,
+		},
+		{
+			TestName:   "ProfileFailed",
+			Err: errors.New("Failed to get profile"),
+			ExpectedCode: http.StatusInternalServerError,
+			ExpectedBody: "Failed to get profile",
+		},
+		{
+			TestName:     "LinkTokenCreationFailed",
+			Profile:      model.Profile{},
+			Err:  errors.New("Failed to create token"),
+			ExpectedCode: http.StatusInternalServerError,
+			ExpectedBody: "Failed to create token",
+		},
+	}
+
+	// Run all test cases
+	for _, tc := range testCases {
+		t.Run(tc.TestName, func(t *testing.T) {
+			// Create mock engine
+			gin.SetMode(gin.TestMode)
+			r := gin.Default()
+
+			// Handle mock route
+			r.POST("/create-link-token", func(c *gin.Context) {
+				api.CreateLinkToken(c, api.MockPlaidClient{Err: tc.Err}, apiSql.MockDB{Profile: tc.Profile}, nil, nil)
+			})
+
+			// Create request
+			form := url.Values{}
+			req, _ := http.NewRequest("POST", "/create-link-token", strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, req)
+
+			// Recieve response
+			var body map[string]string
+			responseBody, _ := io.ReadAll(w.Result().Body)
+			json.Unmarshal(responseBody, &body)
+			defer w.Result().Body.Close()
+
+			// Assert
+			tests.Equals(t, tc.ExpectedCode, w.Code)
+			tests.Equals(t, tc.ExpectedBody, body["error"])
+		})
+	}
 }

@@ -1,14 +1,14 @@
 package main
 
 import (
+	api "services/external/api/plaid"
+	apiSql "services/internal/api/sql"
+	"services/internal/utils/sql/driver"
+
 	"database/sql"
 	"fmt"
 	"os"
-	plaidinterface "services/api/plaid"
-	plaidroute "services/api/plaid/route"
-	postgresinterface "services/api/postgres"
-	postgresroute "services/api/postgres/route"
-	driver "services/db/postgresql/driver"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	plaid "github.com/plaid/plaid-go/v12/plaid"
@@ -81,8 +81,8 @@ func init() {
 func main() {
 	r := gin.Default()
 	router := r.Group("/api")
-	plaidroute.SetupPlaidRoutes(router, plaidinterface.PlaidClient{}, db, postgresinterface.DB{}, client)
-	postgresroute.SetupPostgresRoutes(router, postgresinterface.DB{}, db )
+	api.SetupPlaidRoutes(router, api.PlaidClient{}, db, apiSql.DB{}, client)
+	apiSql.SetupPostgresRoutes(router, apiSql.DB{}, db )
 	APP_PORT := "8000"
 	err := r.Run(":" + APP_PORT)
 	if err != nil {

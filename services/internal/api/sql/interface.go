@@ -44,7 +44,7 @@ func (t MockDB) CreateProfile(db *sql.DB, user string, password string, randomUI
 	return t.ProfileErr
 }
 func (t MockDB) CreateToken(db *sql.DB, m user.Token) error{
-	return t.ExpenseErr
+	return t.TokenErr
 }
 func (t MockDB) CreateExpense(db *sql.DB, m budget.Expense) error {
 	return t.ExpenseErr

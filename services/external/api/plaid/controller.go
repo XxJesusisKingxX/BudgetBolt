@@ -49,8 +49,10 @@ func CreateAccessToken(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[strin
 	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
 	if err == nil {
 		id = profile.ID
-		if !debug {
-			dbs.CreateToken(db["user"], user.Token{ ProfileID: id, Item: itemID, Token: accessToken })
+		err := dbs.CreateToken(db["user"], user.Token{ ProfileID: id, Item: itemID, Token: accessToken })
+		if err != nil {
+			RenderError(c, err, PlaidClient{})
+			return
 		}
 		c.JSON(http.StatusOK, gin.H{})
 	} else {
