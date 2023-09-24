@@ -15,8 +15,8 @@ describe("Transactions", () => {
     test('renders all transactions', async () => {
         // Add fake transactions as needed
         const transactionsData = [
-            { ID: 1, From: 'Account1', Amount: 100, Vendor: 'Vendor1' },
-            { ID: 2, From: 'Account2', Amount: 200, Vendor: 'Vendor2' },
+            { ID: 1, AccountName: 'Account1', Amount: 100, Vendor: 'Vendor1' },
+            { ID: 2, AccountName: 'Account2', Amount: 200, Vendor: 'Vendor2' },
 
         ];
         // Add mocks
