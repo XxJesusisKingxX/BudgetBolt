@@ -10,7 +10,7 @@ import { getDateView } from '../../utils/formatDate';
 // Transaction interface for a single transaction
 interface Transactions {
     ID: string;
-    From: string;
+    AccountName: string;
     Amount: number;
     Vendor: string;
 }
@@ -84,7 +84,7 @@ const Transaction = () => {
             {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction) => (
                 <TransactionComponent
                     key={transaction.ID}
-                    account={transaction.From}
+                    account={transaction.AccountName}
                     transaction={transaction.Vendor.length < maxChar ? transaction.Vendor : "Click to see more"}
                     amount={transaction.Amount}
                     mode={mode}

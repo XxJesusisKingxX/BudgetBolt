@@ -38,10 +38,3 @@ export const mockingFetch = (statuscode: number, data?: object) => {
   ));
   return mock;
 }
-
-export const mockingFetchJson = (data: object) => {
-  const mock = global.fetch = jest.fn().mockResolvedValue({
-    json: () => Promise.resolve(data),
-  });
-  return mock;
-}
