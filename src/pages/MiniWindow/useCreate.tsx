@@ -2,6 +2,8 @@ import { useContext, useState } from "react";
 import ExpenseComponent from "./components/ExpenseComponent";
 import { EndPoint } from "../../constants/endpoints";
 import ThemeContext from "../../context/ThemeContext";
+import { getDateView } from "../../utils/formatDate";
+import { BudgetView } from "../../constants/view";
 
 // Interface for the shape of a expense
 export interface Expense {
@@ -17,6 +19,25 @@ export const useCreate = () => {
 
     const { mode } = useContext(ThemeContext)
 
+    const updateAllExpenses = async (currentView: BudgetView) => {
+        try {
+            setLoading(true)
+            const response = await fetch(EndPoint.UPDATE_ALL_EXPENSES, {
+                method: "POST",
+                body: new URLSearchParams({
+                    date: getDateView(new Date(), currentView),
+                })
+            })
+    
+            if (response.ok) {
+                setLoading(false);
+                getExpenses();
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     const updateExpense = async (id: string, limit: string) => {
         
         if (id && limit) {
@@ -31,11 +52,11 @@ export const useCreate = () => {
                 })
         
                 if (response.ok) {
-                    setLoading(false)
-                    getExpenses()
+                    setLoading(false);
+                    getExpenses();
                 }
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }
         }
         else {
@@ -50,14 +71,14 @@ export const useCreate = () => {
                 method: "GET"
             })
             if (response.ok) {
-                const data = await response.json()
+                const data = await response.json();
                 if (data) {
-                    setExpenses(data["expenses"])
+                    setExpenses(data["expenses"]);
                 }
-                setLoading(false)
+                setLoading(false);
             }
         } catch(error) {
-            console.log(error)
+            console.log(error);
         }
 
     };
@@ -66,14 +87,14 @@ export const useCreate = () => {
         
         const loadingIcon = `/images/${mode}/loading.png`;
         return !loading && expensesList ? (
-            expensesList.slice().map((expense : Expense) => (
+            expensesList.slice().map((expense: any) => (
               <ExpenseComponent
-                key={expense.ID}
+                key={expense.expense_id}
                 update={updateExpense}
-                id={expense.ID}
-                name={expense.Name}
-                limit={expense.Limit}
-                spent={expense.Spent}
+                id={expense.expense_id}
+                name={expense.expense_name}
+                limit={expense.expense_limit}
+                spent={expense.expense_spent}
               />
             ))
           ) : <img className='miniwindow__budget__view__loading' src={loadingIcon} alt="Loading" />;
@@ -91,7 +112,7 @@ export const useCreate = () => {
             });
             if (response.ok) getExpenses();
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
         
     }
@@ -101,6 +122,7 @@ export const useCreate = () => {
         addExpenses,
         showExpenses,
         updateExpense,
+        updateAllExpenses,
         isLoading
     };
 };

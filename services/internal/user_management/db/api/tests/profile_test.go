@@ -9,12 +9,11 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 
-	"services/internal/api/sql"
-	user "services/internal/user_managment/db/model"
+	"services/internal/user_management/db/api"
+	user "services/internal/user_management/db/model"
 	"services/internal/utils/testing"
 )
 func TestCreateProfile(t *testing.T) {
@@ -25,7 +24,7 @@ func TestCreateProfile(t *testing.T) {
 	testCases := []struct {
 		TestName     string
 		Form         url.Values
-		ProfileId    int
+		ProfileId    int64
 		ExpectedCode int
 		ExpectedBody string
 		ProfileErr   error
@@ -100,7 +99,7 @@ func TestRetrieveProfile(t *testing.T) {
 		TestName     string
 		Form         url.Values
 		Password     string
-		ProfileId    int
+		ProfileId    int64
 		ExpectedCode int
 		ExpectedBody string
 		ProfileErr   error

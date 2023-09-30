@@ -4,6 +4,7 @@ export enum EndPoint {
     GET_EXPENSES = "api/expenses/get",
     CREATE_EXPENSES = "api/expenses/create",
     UPDATE_EXPENSES = "api/expenses/update",
+    UPDATE_ALL_EXPENSES = "api/expenses/update/all",
     GET_PROFILE = "api/profile/get",
     CREATE_PROFILE = "api/profile/create",
     CREATE_ACCOUNTS = "api/accounts/create",

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	q "services/internal/utils/sql/querybuilder"
-	"services/internal/user_managment/db/view"
-	"services/internal/user_managment/db/model"
+	"services/internal/user_management/db/view"
+	"services/internal/user_management/db/model"
 )
 
 func CreateProfile(db *sql.DB, m model.Profile) error {

@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"strings"
 	
-	"services/internal/user_managment/db/model"
+	"services/internal/user_management/db/model"
 )
 
 func ViewProfile(rows *sql.Rows) model.Profile {
-	var id int
+	var id int64
 	var user string
 	var pass string
 	var randomUID string
@@ -20,7 +20,7 @@ func ViewProfile(rows *sql.Rows) model.Profile {
 }
 
 func ViewToken(rows *sql.Rows) model.Token {
-	var id int
+	var id int64
 	var itemId string
 	var accesstoken string
 	var profileId int

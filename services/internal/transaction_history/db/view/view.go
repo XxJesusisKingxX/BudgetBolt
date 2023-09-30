@@ -14,7 +14,7 @@ func ViewAccount(rows *sql.Rows) []model.Account {
 		var id string
 		var name string
 		var balance float64
-		var profileId int
+		var profileId int64
 		rows.Scan(&id, &name, &balance, &profileId)
 		view = append(view, model.Account{
 			ID: id,
@@ -39,7 +39,7 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 		var description string
 		var primaryCat sql.NullString
 		var secondaryCat sql.NullString
-		var profileId int
+		var profileId int64
 		var accName string
 		rows.Scan(&id, &date, &amount, &method, &vendor, &isRecurring, &description, &primaryCat, &secondaryCat, &profileId, &accName)
 		view = append(view, model.Transaction{

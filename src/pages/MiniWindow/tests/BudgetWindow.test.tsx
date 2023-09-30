@@ -21,11 +21,13 @@ describe("Expenses", () => {
         const mockAddExpenses = jest.fn();
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
+        const mockUpdateAllExpenses = jest.fn();
         jest.spyOn(Create,'useCreate').mockReturnValue({
             getExpenses: mockGetExpenses,
             addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
+            updateAllExpenses: mockUpdateAllExpenses,
             isLoading: true
         });
 
@@ -49,7 +51,7 @@ describe("Expenses", () => {
     test("user should see expenses at initial render after loading spinner", async () => {
         // Mock
         fetchMock.enableMocks();
-        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})
+        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
 
         // Render
         render(<MiniWindowComponent/>)
@@ -67,7 +69,7 @@ describe("Expenses", () => {
     test("user should be able to edit expenses and save changes", async () => {
         // Mock
         fetchMock.enableMocks();
-        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})
+        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
         // Render
         render(<MiniWindowComponent/>)
         // Recreate user actions
@@ -80,7 +82,12 @@ describe("Expenses", () => {
         })
         // Assert
         await waitFor(() => {
-
+            expect(fetchMock).toBeCalledWith(
+                EndPoint.GET_EXPENSES,
+                {
+                    method: 'GET',
+                }
+            );
             expect(fetchMock).toBeCalledWith(
                 EndPoint.UPDATE_EXPENSES,
                 {
@@ -95,7 +102,20 @@ describe("Expenses", () => {
     });
 
     test("user should be able to change view and update locally the view", async () => {
-        // Mock
+        // Create mocks
+        const mockGetExpenses = jest.fn();
+        const mockAddExpenses = jest.fn();
+        const mockShowExpenses = jest.fn();
+        const mockUpdateExpenses = jest.fn();
+        const mockUpdateAllExpenses = jest.fn();
+        jest.spyOn(Create,'useCreate').mockReturnValue({
+            getExpenses: mockGetExpenses,
+            addExpenses: mockAddExpenses,
+            showExpenses: mockShowExpenses,
+            updateExpense: mockUpdateExpenses,
+            updateAllExpenses: mockUpdateAllExpenses,
+            isLoading: true
+        });
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})
         // Render
@@ -109,5 +129,6 @@ describe("Expenses", () => {
             expect(mockDispatch).toBeCalledTimes(1)
         })
         expect(mockDispatch).toBeCalledWith({ type:"SET_STATE", state: { budgetView: BudgetView.WEEKLY }})
+        expect(mockUpdateAllExpenses).toBeCalledWith(BudgetView.WEEKLY)
     });
 });

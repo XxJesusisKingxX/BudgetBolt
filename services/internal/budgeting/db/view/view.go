@@ -3,8 +3,9 @@ package view
 import (
 	"database/sql"
 	"strings"
+
 	"github.com/lib/pq"
-	
+
 	"services/internal/budgeting/db/model"
 )
 
@@ -18,7 +19,7 @@ func ViewExpense(rows *sql.Rows) []model.Expense {
 		var spent float64
 		var category pq.StringArray
 		var transactionIds pq.StringArray
-		var profileId int
+		var profileId int64
 		rows.Scan(&id, &name, &limit, &spent, &category, &transactionIds, &profileId)
 		view = append(view, model.Expense{
 			ID: id,

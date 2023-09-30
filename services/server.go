@@ -1,8 +1,11 @@
 package main
 
 import (
+	// api "services/external/api/plaid"
 	api "services/external/api/plaid"
-	apiSql "services/internal/api/sql"
+	budgetApi "services/internal/budgeting/db/api"
+	transApi "services/internal/transaction_history/db/api"
+	userApi "services/internal/user_management/db/api"
 	"services/internal/utils/sql/driver"
 
 	"database/sql"
@@ -59,30 +62,28 @@ func init() {
 	configuration.AddDefaultHeader("PLAID-SECRET", PLAID_SECRET)
 	configuration.UseEnvironment(environments[PLAID_ENV])
 	client = plaid.NewAPIClient(configuration)
-
-	// create database connections
-	dbUser, err := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "user", driver.DB{}, false)
-	dbUser.SetMaxOpenConns(10)
-    dbUser.SetMaxIdleConns(5)
-	db["user"] = dbUser
-	
-	dbTransaction, _ := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "transaction", driver.DB{}, false)
-	dbTransaction.SetMaxOpenConns(10)
-    dbTransaction.SetMaxIdleConns(5)
-	db["transaction"] = dbTransaction
-	
-	dbBudget, _ := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "budget", driver.DB{}, false)
-	dbBudget.SetMaxOpenConns(10)
-    dbBudget.SetMaxIdleConns(5)
-	db["budget"] = dbBudget
-
 }
 
 func main() {
 	r := gin.Default()
 	router := r.Group("/api")
-	api.SetupPlaidRoutes(router, api.PlaidClient{}, db, apiSql.DB{}, client)
-	apiSql.SetupPostgresRoutes(router, apiSql.DB{}, db )
+	api.SetupPlaidRoutes(router, api.PlaidClient{}, client)
+
+	dbUser, _ := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "user", driver.DB{}, false)
+	dbUser.SetMaxOpenConns(10)
+    dbUser.SetMaxIdleConns(5)
+	userApi.SetupUserRoutes(router, dbUser)
+
+	dbTransaction, _ := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "transaction", driver.DB{}, false)
+	dbTransaction.SetMaxOpenConns(10)
+    dbTransaction.SetMaxIdleConns(5)
+	transApi.SetupTransactionRoutes(router, dbTransaction)
+
+	dbBudget, _ := driver.LogonDB(driver.CREDENTIALS{ User: PG_USER, Pass: PG_SECRET }, "budget", driver.DB{}, false)
+	dbBudget.SetMaxOpenConns(10)
+    dbBudget.SetMaxIdleConns(5)
+	budgetApi.SetupBudgetRoutes(router, dbBudget)
+	
 	APP_PORT := "8000"
 	err := r.Run(":" + APP_PORT)
 	if err != nil {

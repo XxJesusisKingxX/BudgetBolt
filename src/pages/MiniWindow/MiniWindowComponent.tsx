@@ -5,8 +5,8 @@ import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';
 
 const MiniWindowComponent = () => {
-    const { getExpenses, addExpenses, showExpenses, isLoading } = useCreate();
-    const { lastTransactionsUpdate, dispatch } = useContext(AppContext);
+    const { getExpenses, addExpenses, showExpenses, updateAllExpenses, isLoading } = useCreate();
+    const { dispatch } = useContext(AppContext);
 
     const [addExpense, setAddExpense] = useState(false);
 
@@ -26,13 +26,14 @@ const MiniWindowComponent = () => {
         setAmount(event.target.value);
     }
     const handleViewOnChange = (event: any) => {
+        updateAllExpenses(event.target.value)
         dispatch({ type:"SET_STATE", state: { budgetView: event.target.value }});
     }
 
     useEffect(() => {
         getExpenses();
         // eslint-disable-next-line
-    },[lastTransactionsUpdate])
+    },[])
 
     return (
         <div className='miniwindow'>

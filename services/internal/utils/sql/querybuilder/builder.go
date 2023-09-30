@@ -45,13 +45,6 @@ func BuildRetrieveQuery(tableName string, model interface{}) (string, error) {
 func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 	query := "SELECT * FROM transactions WHERE %v" // TODO have the ability to make more complex where conditons sunch as nesting and other operators: >,<,IS NULL,etc
 
-	// Order by queries
-	if m.Query.Select.OrderBy.Asc {
-		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy.Column)
-	} else if m.Query.Select.OrderBy.Desc {
-		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy.Column)
-	}
-
 	conditions := CreateWhereCondition(m)
 	if conditions == "" {
 		err := errors.New("Empty model")
@@ -67,6 +60,14 @@ func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 			query += fmt.Sprintf(" AND %v >= %v", m.Query.Select.GreaterThanEq.Column, m.Query.Select.GreaterThanEq.Value)
 		}
 	}
+
+	// Order by queries
+	if m.Query.Select.OrderBy.Asc {
+		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy.Column)
+	} else if m.Query.Select.OrderBy.Desc {
+		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy.Column)
+	}
+	
 	return query, nil
 }
 

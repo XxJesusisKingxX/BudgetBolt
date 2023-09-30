@@ -13,8 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"services/external/api/plaid"
-	apiSql "services/internal/api/sql"
-	"services/internal/user_managment/db/model"
+	"services/internal/utils/http"
 	"services/internal/utils/testing"
 )
 
@@ -26,6 +25,7 @@ func TestCreateAccessToken(t *testing.T) {
 		TokenErr       error
 		ProfileErr     error
 		ExpectedCode   int
+		Response       map[string]request.MockResponse
 		ExpectedBody   string
 	}{
 		{
@@ -33,18 +33,28 @@ func TestCreateAccessToken(t *testing.T) {
 			TokenErr: errors.New("Failed to get token"),
 			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to get token",
 		},
 		{
 			TestName:     "ProfileFails",
 			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
-			ProfileErr:   errors.New("Failed to get profile"),
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to get profile",
 		},
 		{
-			TestName:     "Received",
+			TestName:     "TokenCreated",
 			PublicToken:  "public-sandbox-12345678-1234-1234-1234-123456789012",
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/create": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedCode: http.StatusOK,
 		},
 	}
@@ -55,17 +65,15 @@ func TestCreateAccessToken(t *testing.T) {
 			// Create mock engine
 			gin.SetMode(gin.TestMode)
 			r := gin.Default()
-
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/get-access-token", func(c *gin.Context) {
 				api.CreateAccessToken(c,
 					api.MockPlaidClient{Err: tc.ProfileErr},
-					apiSql.MockDB{ 
-						Profile: model.Profile{ID: 1},
-						TokenErr: tc.TokenErr,
-					},
 					nil,
-					nil,
+					mockClient,
 					true,
 				)
 			})
@@ -94,28 +102,35 @@ func TestLinkTokenCreate(t *testing.T) {
 	// Define a slice of test cases.
 	testCases := []struct {
 		TestName     string
-		Profile      model.Profile
 		ExpectedCode int
+		Response     map[string]request.MockResponse
 		ExpectedBody string
 		Err          error
 	}{
 		{
 			TestName: "LinkTokenCreated",
-			Profile:  model.Profile{Name: "test_user"},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedCode: http.StatusOK,
 		},
 		{
 			TestName:   "ProfileFailed",
 			Err: errors.New("Failed to get profile"),
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedCode: http.StatusInternalServerError,
 			ExpectedBody: "Failed to get profile",
 		},
 		{
 			TestName:     "LinkTokenCreationFailed",
-			Profile:      model.Profile{},
 			Err:  errors.New("Failed to create token"),
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to create token",
 		},
 	}
 
@@ -125,10 +140,12 @@ func TestLinkTokenCreate(t *testing.T) {
 			// Create mock engine
 			gin.SetMode(gin.TestMode)
 			r := gin.Default()
-
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/create-link-token", func(c *gin.Context) {
-				api.CreateLinkToken(c, api.MockPlaidClient{Err: tc.Err}, apiSql.MockDB{Profile: tc.Profile}, nil, nil)
+				api.CreateLinkToken(c, api.MockPlaidClient{Err: tc.Err}, mockClient, nil)
 			})
 
 			// Create request

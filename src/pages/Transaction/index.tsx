@@ -5,7 +5,6 @@ import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
 import { getCookie } from '../../utils/cookie';
-import { getDateView } from '../../utils/formatDate';
 
 // Transaction interface for a single transaction
 interface Transactions {
@@ -20,7 +19,7 @@ const Transaction = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     // Accessing isTransactionsRefresh, dispatch, mode, and isLogin from contexts
-    const { budgetView, isTransactionsRefresh, dispatch } = useContext(AppContext);
+    const { isTransactionsRefresh, dispatch } = useContext(AppContext);
     const { mode } = useContext(ThemeContext);
     const { isLogin } = useContext(LoginContext);
 
@@ -45,9 +44,6 @@ const Transaction = () => {
                 // Get transactions for user
                 const baseURL = window.location.href;
                 const url = new URL(baseURL + EndPoint.GET_TRANSACTIONS);
-                url.search = new URLSearchParams({
-                    date: getDateView(new Date(), budgetView)
-                }).toString();
                 const retrieveResponse = await fetch(url, {
                     method: "GET",
                 });
@@ -55,6 +51,7 @@ const Transaction = () => {
                 if (retrieveResponse.ok) {
                     const data = await retrieveResponse.json();
                     setTransactions(data["transactions"]);
+                    console.log(transactions)
                 } else {
                     console.error("failed to retrieve transactions");
                     setIsLoading(false);
@@ -75,18 +72,18 @@ const Transaction = () => {
             const intervalId = setInterval(checkHourlyUpdate, everyHour);
             return () => clearInterval(intervalId);
         }
-    }, [isTransactionsRefresh, budgetView, isLogin, dispatch]);
+    }, [isTransactionsRefresh, isLogin, dispatch]);
 
     const loading = `/images/${mode}/loading.png`;
 
     return (
         <>
-            {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction) => (
+            {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction: any) => (
                 <TransactionComponent
-                    key={transaction.ID}
-                    account={transaction.AccountName}
-                    transaction={transaction.Vendor.length < maxChar ? transaction.Vendor : "Click to see more"}
-                    amount={transaction.Amount}
+                    key={transaction.transaction_id}
+                    account={transaction.from_account}
+                    transaction={transaction.vendor}
+                    amount={transaction.net_amount}
                     mode={mode}
                 />
             )) : (
