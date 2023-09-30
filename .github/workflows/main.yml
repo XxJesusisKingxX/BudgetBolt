@@ -26,7 +26,8 @@ jobs:
   test-backend:
     runs-on: ubuntu-latest
     defaults:
-      run: cd ./services
+      run:
+        working-directory: ./services
     steps:
     - name: Checkout
       uses: actions/checkout@v3
