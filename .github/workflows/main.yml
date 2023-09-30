@@ -24,6 +24,7 @@ jobs:
       run: npm test
 
   test-backend:
+    runs-on: ubuntu-latest
     steps:
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -32,7 +33,7 @@ jobs:
 
     - name: Change to services directory
       run: cd services
-
+      
     - name: Install Go dependencies
       run: go mod download
 
