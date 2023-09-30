@@ -32,10 +32,10 @@ jobs:
         go-version: 1.17
       
     - name: Install Go dependencies
-      working-directory: ./services
+      working-directory: services
       run: go mod download
 
     - name: Test Go
-      working-directory: ./services
+      working-directory: services
       run: go test ./...
 
