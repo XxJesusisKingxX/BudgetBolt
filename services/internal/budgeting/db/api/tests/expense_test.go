@@ -12,34 +12,40 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"services/internal/api/sql"
-	budget "services/internal/budgeting/db/model"
-	user "services/internal/user_managment/db/model"
+	"services/internal/budgeting/db/api"
+	"services/internal/budgeting/db/model"
+	user "services/internal/user_management/db/model"
+	"services/internal/utils/http"
 	"services/internal/utils/testing"
 )
 
 func TestGetExpenses(t *testing.T) {
 	// Create mock engine
 	gin.SetMode(gin.TestMode)
-
 	// Define a slice of test cases.
 	limit := 1.0
 	spent := 1.0
 	testCases := []struct {
 		TestName     string
-		Expense      []budget.Expense
+		Expense      []model.Expense
 		ExpectedCode int
+		Response     map[string]request.MockResponse
 		ExpectedBody string
 		ProfileErr   error
 		ExpenseErr   error
 	}{
 		{
 			TestName: "ExpensesFound",
-			Expense: []budget.Expense{
+			Expense: []model.Expense{
 				{
 					Name:  "Test",
 					Limit: &limit,
 					Spent: &spent,
+				},
+			},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
 				},
 			},
 			ExpectedCode: http.StatusOK,
@@ -47,20 +53,34 @@ func TestGetExpenses(t *testing.T) {
 		{
 			TestName: "ProfileNotFound",
 			ProfileErr:   errors.New(""),
-			ExpectedCode: http.StatusNotFound,
-			ExpectedBody: "PROFILE NOT FOUND",
+			ExpectedCode: http.StatusInternalServerError,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 		},
 		{
 			TestName: "ExpensesNotFound",
 			ExpenseErr:   errors.New(""),
 			ExpectedCode: http.StatusNotFound,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedBody: "EXPENSES NOT FOUND",
 		},
 		{
 			TestName: "ExpensesEmpty",
-			Expense: []budget.Expense{},
+			Expense: []model.Expense{},
 			ExpenseErr:   errors.New(""),
 			ExpectedCode: http.StatusNotFound,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedBody: "EXPENSES NOT FOUND",
 		},
 	}
@@ -69,6 +89,9 @@ func TestGetExpenses(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestName, func(t *testing.T) {
 			r := gin.Default()
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.GET("/get-expenses", func(c *gin.Context) {
 				api.RetrieveExpenses(c,
@@ -79,6 +102,7 @@ func TestGetExpenses(t *testing.T) {
 						ExpenseErr: tc.ExpenseErr,
 					},
 					nil,
+					mockClient,
 					true,
 				)
 			})
@@ -112,6 +136,7 @@ func TestCreateExpenses(t *testing.T) {
 		TestName     string
 		Form         url.Values
 		ExpectedCode int
+		Response     map[string]request.MockResponse
 		ExpectedBody string
 		ProfileErr   error
 		ExpenseErr   error
@@ -125,6 +150,11 @@ func TestCreateExpenses(t *testing.T) {
 			},
 			ExpenseErr:   errors.New(""),
 			ExpectedCode: http.StatusNotImplemented,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedBody: "EXPENSES NOT CREATED",
 		},
 		{
@@ -134,9 +164,13 @@ func TestCreateExpenses(t *testing.T) {
 				"limit": {"100.00"},
 				"spent": {"50.00"},
 			},
-			ProfileErr:   errors.New(""),
-			ExpectedCode: http.StatusNotFound,
-			ExpectedBody: "PROFILE NOT FOUND",
+			ProfileErr: errors.New(""),
+			ExpectedCode: http.StatusInternalServerError,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 		},
 		{
 			TestName: "ExpensesCreated",
@@ -144,6 +178,11 @@ func TestCreateExpenses(t *testing.T) {
 				"name":  {"TestExpense"},
 				"limit": {"100.00"},
 				"spent": {"50.00"},
+			},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
 			},
 			ExpectedCode: http.StatusOK,
 		},
@@ -183,6 +222,9 @@ func TestCreateExpenses(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestName, func(t *testing.T) {
 			r := gin.Default()
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/create-expenses", func(c *gin.Context) {
 				api.CreateExpenses(c,
@@ -191,6 +233,7 @@ func TestCreateExpenses(t *testing.T) {
 						ExpenseErr: tc.ExpenseErr,
 					},
 					nil,
+					mockClient,
 					true,
 				)
 			})
@@ -220,6 +263,7 @@ func TestUpdateExpenses(t *testing.T) {
 		TestName    string
 		Form         url.Values
 		ExpectedCode int
+		Response     map[string]request.MockResponse
 		ExpectedBody string
 		ProfileErr   error
 		ExpenseErr   error
@@ -229,6 +273,11 @@ func TestUpdateExpenses(t *testing.T) {
 			Form: url.Values{
 				"limit": {"100.00"},
 				"id":    {"1"},
+			},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
 			},
 			ExpectedCode: http.StatusOK,
 		},
@@ -240,6 +289,11 @@ func TestUpdateExpenses(t *testing.T) {
 			},
 			ExpenseErr:   errors.New(""),
 			ExpectedCode: http.StatusNotImplemented,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedBody: "EXPENSES NOT UPDATED",
 		},
 		{
@@ -249,8 +303,12 @@ func TestUpdateExpenses(t *testing.T) {
 				"id":    {"1"},
 			},
 			ProfileErr:   errors.New(""),
-			ExpectedCode: http.StatusNotFound,
-			ExpectedBody: "PROFILE NOT FOUND",
+			ExpectedCode: http.StatusInternalServerError,
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 		},
 		{
 			TestName: "LimitFieldInvalid",
@@ -286,6 +344,9 @@ func TestUpdateExpenses(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestName, func(t *testing.T) {
 			r := gin.Default()
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/update-expenses", func(c *gin.Context) {
 				api.UpdateExpenses(c,
@@ -294,12 +355,100 @@ func TestUpdateExpenses(t *testing.T) {
 						ExpenseErr: tc.ExpenseErr,
 					},
 					nil,
+					mockClient,
 					true,
 				)
 			})
 			// Create request
 			req, _ := http.NewRequest("POST", "/update-expenses", strings.NewReader(tc.Form.Encode()))
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, req)
+			// Receive response
+			var body map[string]string
+			responseBody, _ := io.ReadAll(w.Result().Body)
+			json.Unmarshal(responseBody, &body)
+			defer w.Result().Body.Close()
+			// Assert
+			tests.Equals(t, tc.ExpectedCode, w.Code)
+			tests.Equals(t, tc.ExpectedBody, body["error"])
+		})
+	}
+}
+
+func TestUpdateAllExpenses(t *testing.T) {
+	// Create mock engine
+	gin.SetMode(gin.TestMode)
+
+	// Define a slice of test cases.
+	testCases := []struct {
+		TestName    string
+		ExpectedCode int
+		Response     map[string]request.MockResponse
+		ExpectedBody string
+		ProfileErr   error
+		ExpenseErr   error
+	}{
+		{
+			TestName: "ExpensesUpdated",
+			Response: map[string]request.MockResponse{
+				"transactions/get?uid=test&date=123": {
+					Code: http.StatusOK,
+				},
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+			},
+			ExpectedCode: http.StatusOK,
+		},
+		{
+			TestName: "TransactionsNotFound",
+			ExpectedCode: http.StatusInternalServerError,
+			Response: map[string]request.MockResponse{
+				"transactions/get?uid=test&date=123": {
+					Code: http.StatusInternalServerError,
+				},
+			},
+		},
+		{
+			TestName: "ProfileNotFound",
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
+			ExpectedCode: http.StatusInternalServerError,
+		},
+	}
+
+	// Run all test cases
+	for _, tc := range testCases {
+		t.Run(tc.TestName, func(t *testing.T) {
+			r := gin.Default()
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
+			// Handle mock route
+			r.POST("/update-expenses/all", func(c *gin.Context) {
+				api.UpdateAllExpenses(c,
+					api.MockDB{
+					},
+					nil,
+					mockClient,
+					true,
+				)
+			})
+			// Create request
+			form := url.Values{
+				"date": {"123"},
+			}
+			req, _ := http.NewRequest("POST", "/update-expenses/all", strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			cookie := &http.Cookie{
+				Name:  "UID",
+				Value: "test",
+			}
+			req.AddCookie(cookie)
 			w := httptest.NewRecorder()
 			r.ServeHTTP(w, req)
 			// Receive response

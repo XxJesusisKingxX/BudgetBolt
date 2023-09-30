@@ -10,7 +10,7 @@ import (
 	"services/external/api/plaid"
 	"services/internal/utils/testing"
 )
-func TestGetExpenses(t *testing.T) {
+func TestError(t *testing.T) {
 	// Define a slice of test cases.
 	testCases := []struct {
 		TestName     string

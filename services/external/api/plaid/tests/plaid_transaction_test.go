@@ -9,13 +9,11 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
 
+	"services/internal/utils/http"
 	"services/external/api/plaid"
-	apiSql "services/internal/api/sql"
-	"services/internal/user_managment/db/model"
 	"services/internal/utils/testing"
 )
 func TestCreateTransactions(t *testing.T) {
@@ -26,6 +24,7 @@ func TestCreateTransactions(t *testing.T) {
 		ProfileErr     error
 		TokenErr       error
 		TransactionsErr error
+		Response        map[string]request.MockResponse
 		ExpectedCode   int
 		ExpectedBody   string
 	}{
@@ -35,26 +34,50 @@ func TestCreateTransactions(t *testing.T) {
 				{AccountId: "1", Date: "2023/01/01", Amount: 11.11},
 				{AccountId: "2", Date: "2023/02/02", Amount: 22.22},
 			},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/get?uid=": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedCode:   http.StatusOK,
-			ExpectedBody:   "",
 		},
 		{
 			TestName:       "ProfileNotReceived",
-			ProfileErr:     errors.New("Failed to get profile id"),
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 			ExpectedCode:   http.StatusInternalServerError,
-			ExpectedBody:   "Failed to get profile id",
 		},
 		{
 			TestName:       "TokenNotReceived",
-			TokenErr:       errors.New("Failed to get access token"),
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/get?uid=": {
+					Code: http.StatusInternalServerError,
+				},
+			},
 			ExpectedCode:   http.StatusInternalServerError,
-			ExpectedBody:   "Failed to get access token",
 		},
 		{
 			TestName:       "TransactionsNotCreated",
-			TransactionsErr: errors.New("Failed to get transactions"),
+			TransactionsErr: errors.New("Failed to create transactions"),
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/get?uid=": {
+					Code: http.StatusOK,
+				},
+			},
 			ExpectedCode:   http.StatusInternalServerError,
-			ExpectedBody:   "Failed to get transactions",
+			ExpectedBody:   "Failed to create transactions",
 		},
 	}
 
@@ -64,14 +87,15 @@ func TestCreateTransactions(t *testing.T) {
 			// Create mock engine
 			gin.SetMode(gin.TestMode)
 			r := gin.Default()
-
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/create-transactions", func(c *gin.Context) {
 				api.CreateTransactions(c,
 					api.MockPlaidClient{SyncResp: plaid.TransactionsSyncResponse{Added: tc.Transactions}, Err: tc.TransactionsErr},
-					apiSql.MockDB{Profile: model.Profile{ID: 1}, Token: model.Token{Token: "access-sandbox-111-222-3333-4444"}, ProfileErr: tc.ProfileErr, TokenErr: tc.TokenErr},
 					nil,
-					nil,
+					mockClient,
 					true,
 				)
 			})

@@ -3,8 +3,8 @@ package controller
 import (
 	"database/sql"
 
-	"services/internal/user_managment/db/view"
-	"services/internal/user_managment/db/model"
+	"services/internal/user_management/db/view"
+	"services/internal/user_management/db/model"
 	q "services/internal/utils/sql/querybuilder"
 )
 

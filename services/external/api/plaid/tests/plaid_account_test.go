@@ -9,13 +9,11 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
 
 	"services/external/api/plaid"
-	apiSql "services/internal/api/sql"
-	"services/internal/user_managment/db/model"
+	"services/internal/utils/http"
 	"services/internal/utils/testing"
 )
 
@@ -24,7 +22,7 @@ func TestCreateAccounts(t *testing.T) {
 	testCases := []struct {
 		TestName     string
 		PlaidClient  api.MockPlaidClient
-		MockDB       apiSql.MockDB
+		Response     map[string]request.MockResponse
 		ExpectedCode int
 		ExpectedBody string
 	}{
@@ -37,36 +35,43 @@ func TestCreateAccounts(t *testing.T) {
 					},
 				},
 			},
-			MockDB: apiSql.MockDB{
-				Profile: model.Profile{ID: 1}, 
-				Token: model.Token{Token: "access-sandbox-11-222-33"},
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/get?uid=": {
+					Code: http.StatusOK,
+				},
 			},
 			ExpectedCode: http.StatusOK,
 		},
 		{
 			TestName:   "ProfileNotReceived",
 			PlaidClient: api.MockPlaidClient{},
-			MockDB: apiSql.MockDB{
-				ProfileErr: errors.New("Failed to get profile id"), 
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusInternalServerError,
+				},
 			},
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to get profile id",
 		},
 		{
 			TestName:     "TokenNotReceived",
 			PlaidClient:  api.MockPlaidClient{},
-			MockDB: apiSql.MockDB{
-				TokenErr: errors.New("Failed to get token"), 
+			Response: map[string]request.MockResponse{
+				"profile/get": {
+					Code: http.StatusOK,
+				},
+				"token/get": {
+					Code: http.StatusInternalServerError,
+				},
 			},
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to get token",
 		},
 		{
 			TestName:     "AccountsNotCreated",
 			PlaidClient:  api.MockPlaidClient{Err:errors.New("Failed to get accounts")},
-			MockDB: apiSql.MockDB{},
 			ExpectedCode: http.StatusInternalServerError,
-			ExpectedBody: "Failed to get accounts",
 		},
 	}
 
@@ -76,10 +81,12 @@ func TestCreateAccounts(t *testing.T) {
 			// Create mock engine
 			gin.SetMode(gin.TestMode)
 			r := gin.Default()
-
+			// Mock requests
+			mockClient := request.MockHTTPClient{}
+			mockClient.Responses = tc.Response
 			// Handle mock route
 			r.POST("/create-accounts", func(c *gin.Context) {
-				api.CreateAccounts(c, tc.PlaidClient, tc.MockDB, nil, nil, true)
+				api.CreateAccounts(c, tc.PlaidClient, nil, mockClient, true)
 			})
 
 			// Create request

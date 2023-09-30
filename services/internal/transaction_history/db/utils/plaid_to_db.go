@@ -8,7 +8,7 @@ import (
 	"github.com/plaid/plaid-go/v12/plaid"
 )
 
-func TransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Transaction){
+func TransactionsToDB(db *sql.DB, profileId int64, transactions []plaid.Transaction){
 	for _, v := range transactions {
     	acc, _ := ctrl.RetrieveAccount(db, model.Account{ ID: v.AccountId })
 		trans := model.Transaction {
@@ -27,7 +27,7 @@ func TransactionsToDB(db *sql.DB, profileId int, transactions []plaid.Transactio
 	}
 }
 
-func AccountsToDB(db *sql.DB, profileId int, accounts []plaid.AccountBase){
+func AccountsToDB(db *sql.DB, profileId int64, accounts []plaid.AccountBase){
 	for _, v := range accounts {
 		acc := model.Account {
 			ID: v.AccountId,

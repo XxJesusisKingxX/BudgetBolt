@@ -2,30 +2,36 @@ package api
 
 import (
 	"context"
-	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
 
-	"services/internal/api/sql"
-	transaction "services/internal/transaction_history/db/utils"
-	user "services/internal/user_managment/db/model"
+	user "services/internal/user_management/db/model"
+	request "services/internal/utils/http"
 )
 
-func CreateLinkToken(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient) {
+func CreateLinkToken(c *gin.Context, ps Plaid, httpClient request.HTTP, plaidapi *plaid.APIClient) {
 	ctx := context.Background()
 	uid, _ := c.Cookie("UID")
-	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-	if err != nil {
-		RenderError(c, err, PlaidClient{})
+
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
+
 	countryCodes := convertCountryCodes(strings.Split("US", ","))
 	products := convertProducts(strings.Split("transactions", ","))
-	request := ps.NewLinkTokenCreateRequest(uid, strconv.Itoa(profile.ID), countryCodes, products, "")
+	request := ps.NewLinkTokenCreateRequest(uid, uid, countryCodes, products, "")
 	linkTokenCreateResp, err := ps.CreateLinkToken(plaidapi, ctx, request)
 	if err != nil {
 		RenderError(c, err, PlaidClient{})
@@ -34,71 +40,105 @@ func CreateLinkToken(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]
 	c.JSON(http.StatusOK, gin.H{"link_token": linkTokenCreateResp.GetLinkToken()})
 }
 
-func CreateAccessToken(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient, debug bool) {
+func CreateAccessToken(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, httpClient request.HTTP, debug bool) {
 	ctx := context.Background()
 	publicToken := c.PostForm("public_token")
 	uid, _ := c.Cookie("UID")
 	exchangePublicTokenResp, err := ps.ItemPublicTokenExchange(plaidapi, ctx, publicToken)
+
 	if err != nil {
 		RenderError(c, err, PlaidClient{})
 		return
 	}
-	var id int
+	var id int64
 	accessToken := exchangePublicTokenResp.GetAccessToken()
 	itemID := exchangePublicTokenResp.GetItemId()
-	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-	if err == nil {
-		id = profile.ID
-		err := dbs.CreateToken(db["user"], user.Token{ ProfileID: id, Item: itemID, Token: accessToken })
-		if err != nil {
-			RenderError(c, err, PlaidClient{})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{})
-	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-	}
-}
 
-func CreateAccounts(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient, debug bool) {
-	ctx := context.Background()
-	uid, _ := c.Cookie("UID")
-	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-	if err != nil {
-		RenderError(c, err, PlaidClient{})
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
-	id := profile.ID
-	token, err := dbs.RetrieveToken(db["user"], id)
-	if err != nil {
-		RenderError(c, err, PlaidClient{})
+
+	id = profile.ID
+	body = fmt.Sprintf("id=%v&token=%v&itemId=%v", id, accessToken, itemID)
+	status, _, _ = httpClient.POST("token/create", body)
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func CreateAccounts(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, httpClient request.HTTP, debug bool) {
+	ctx := context.Background()
+	uid, _ := c.Cookie("UID")
+
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, _ := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	var token user.Token
+	url := fmt.Sprintf("token/get?uid=%v", uid)
+	status, resp, _ = httpClient.GET(url)
+	request.ParseResponse(resp, &token)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 	accessToken := token.Token
 	accounts, err := ps.AccountsGet(plaidapi, ctx, accessToken)
+	
 	if err != nil {
 		RenderError(c, err, PlaidClient{})
 		return
 	}
 	if !debug {
-		transaction.AccountsToDB(db["transaction"], id, accounts)
+		id := profile.ID
+		accountsJson, _ := json.Marshal(accounts)
+		body = fmt.Sprintf("id=%v&accounts=%v", id, accountsJson)
+		httpClient.POST("accounts/store", body)
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func CreateTransactions(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient, debug bool) {
+func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, httpClient request.HTTP, debug bool) {
 	ctx := context.Background()
 	uid, _ := c.Cookie("UID")
-	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-	if err != nil {
+
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != 200 {
+		err = errors.New("")
 		RenderError(c, err, PlaidClient{})
 		return
 	}
-	token, err := dbs.RetrieveToken(db["user"], profile.ID)
-	if err != nil {
+
+	var token user.Token
+	url := fmt.Sprintf("token/get?uid=%v", uid)
+	status, resp, _ = httpClient.GET(url)
+	request.ParseResponse(resp, &token)
+
+	if status != 200 {
+		err := errors.New("")
 		RenderError(c, err, PlaidClient{})
 		return
 	}
+
 	accessToken := token.Token
 	var cursor *string
 	var transactions []plaid.Transaction
@@ -115,65 +155,10 @@ func CreateTransactions(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[stri
 		cursor = &nextCursor
 	}
 	if !debug {
-		transaction.TransactionsToDB(db["transaction"], profile.ID, transactions)
+		id := profile.ID
+		transactionJson, _ := json.Marshal(transactions)
+		body = fmt.Sprintf("id=%v&transactions=%v", id, string(transactionJson))
+		httpClient.POST("transactions/store", body)
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }
-
-// Investment and Holding if we ever decide to add
-
-// func CreateInvestmentTransactions(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient, debug bool) {
-// 	ctx := context.Background()
-// 	uid, _ := c.Cookie("UID")
-// 	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	token, err := dbs.RetrieveToken(db["user"], profile.ID)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	accessToken := token.Token
-// 	invTxResp, err := ps.InvestmentsTransactionsGet(plaidapi, ctx, accessToken)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	invest := invTxResp.InvestmentTransactions
-// 	// accounts := invTxResp.Accounts
-// 	if !debug {
-// 		// resp.ParseAccountsToDB(db, accessToken, accounts)
-// 		postgresparser.ParseInvestmentsToDB(db[""], invest)
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{})
-// }
-
-// func CreateHoldings(c *gin.Context, ps Plaid, dbs api.DBHandler, db map[string]*sql.DB, plaidapi *plaid.APIClient, debug bool) {
-// 	ctx := context.Background()
-// 	uid, _ := c.Cookie("UID")
-// 	profile, err := dbs.RetrieveProfile(db["user"], uid, true)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	token, err := dbs.RetrieveToken(db["user"], profile.ID)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	accessToken := token.Token
-// 	holdingsGetResp, err := ps.InvestmentsHoldingsGet(plaidapi, ctx, accessToken)
-// 	if err != nil {
-// 		RenderError(c, err, PlaidClient{})
-// 		return
-// 	}
-// 	// accounts := holdingsGetResp.Accounts
-// 	holdings := holdingsGetResp.Holdings
-// 	if !debug {
-// 		// resp.ParseAccountsToDB(db, accessToken, accounts)
-// 		postgresparser.ParseHoldingsToDB(db[""], holdings)
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{})
-// }

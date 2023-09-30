@@ -3,8 +3,8 @@ package utils
 import (
 	"database/sql"
 
-	ctrl "services/internal/user_managment/db/controller"
-	"services/internal/user_managment/db/model"
+	ctrl "services/internal/user_management/db/controller"
+	"services/internal/user_management/db/model"
 )
 
 func ProfileToDB(db *sql.DB, username string, password string){
