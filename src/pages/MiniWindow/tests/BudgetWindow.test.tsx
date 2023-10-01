@@ -22,7 +22,7 @@ describe("Expenses", () => {
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
         const mockUpdateAllExpenses = jest.fn();
-        jest.spyOn(Create,'useCreate').mockReturnValue({
+        jest.spyOn(Create,'useExpense').mockReturnValue({
             getExpenses: mockGetExpenses,
             addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,
@@ -109,7 +109,7 @@ describe("Expenses", () => {
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
         const mockUpdateAllExpenses = jest.fn();
-        jest.spyOn(Create,'useCreate').mockReturnValue({
+        jest.spyOn(Create,'useExpense').mockReturnValue({
             getExpenses: mockGetExpenses,
             addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,

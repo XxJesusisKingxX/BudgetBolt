@@ -126,3 +126,73 @@ Update all user's budgeted expenses based on transaction data.
     // "message": "All expenses updated successfully."
 }
 ```
+
+## Retrieve Income
+
+Retrieve the user's incomes
+
+- **Endpoint URL:** `/incomes/get`
+- **HTTP Method:** GET
+
+### Parameters
+
+- `uid` (string): User ID for whom to get incomes.
+
+## Request Example
+
+```json
+{
+    "uid": "fgtg435dviukgfdert645hgr5hgfghetyryhh566hyrt4htrhhb54",
+}
+```
+
+**Response Example:**
+
+```json
+{
+    "incomes": [
+        {
+            "income_id": "12345abcde",
+            "income_name": "20230929",
+            "income_amount": 100.50,
+            "profile_id":2
+        },
+        {
+            "income_id": "67890fghij",
+            "income_name": "20230930",
+            "income_amount": 75.25,
+            "profile_id":2
+        }
+    ]
+}
+```
+
+## Create/Update Income
+
+Create/Update the user's incomes
+
+- **Endpoint URL:** `/incomes/upsert`
+- **HTTP Method:** POST
+
+### Parameters
+
+- `uid` (string): User ID for whom to get incomes.
+- `date` (string): The date from to get the incomes
+
+## Request Example
+
+```json
+{
+    "uid": "fgtg435dviukgfdert645hgr5hgfghetyryhh566hyrt4htrhhb54",
+    "date": "2022-03-01"
+}
+```
+
+**Response Example:**
+
+```json
+{
+    // "message": "Incomes created/updated successfully."
+}
+```
+

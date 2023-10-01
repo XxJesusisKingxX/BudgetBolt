@@ -9,6 +9,7 @@ import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { getCookie } from "./utils/cookie";
+import PlaidLink from "./pages/Plaid/PlaidLink";
 
 const App = () => {
   const { profile, dispatch } = useContext(AppContext);
@@ -52,6 +53,9 @@ const App = () => {
             <>
               <Sideview/>
               <Dashboard/>
+              <div className="add-account">
+                <PlaidLink/>
+              </div>
             </>
             :
             null

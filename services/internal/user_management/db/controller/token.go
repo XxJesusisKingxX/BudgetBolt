@@ -26,16 +26,16 @@ func UpdateToken(db *sql.DB, setM model.Token, whereM model.Token) error {
 	return err
 }
 
-func RetrieveToken(db *sql.DB, m model.Token) (model.Token, error) {
+func RetrieveToken(db *sql.DB, m model.Token) ([]model.Token, error) {
 	query, err := q.BuildRetrieveQuery("tokens", m)
 	if err == nil {
 		rows, err := db.Query(query)
 		if err != nil {
-			return model.Token{}, err
+			return nil, err
 		}
 		return view.ViewToken(rows), nil
 	}
-	return model.Token{}, err
+	return nil, err
 }
 
 func DeleteToken(db *sql.DB, m model.Token) error {

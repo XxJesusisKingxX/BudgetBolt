@@ -8,7 +8,7 @@ import (
 )
 
 func SetupBudgetRoutes(router *gin.RouterGroup, db *sql.DB) {
-    httpClient := request.HTTPClient{} 
+    httpClient := request.HTTPClient{}
     client := httpClient.NewHTTPClient("http://localhost:8000/api/")
 
     router.POST("expenses/create", func(c *gin.Context) {
@@ -22,5 +22,11 @@ func SetupBudgetRoutes(router *gin.RouterGroup, db *sql.DB) {
     })
     router.POST("expenses/update/all", func(c *gin.Context) {
         UpdateAllExpenses(c, DB{}, db, client, false)
+    })
+    router.GET("incomes/get", func(c *gin.Context) {
+        RetrieveIncome(c, DB{}, db, client, false)
+    })
+    router.POST("incomes/upsert", func(c *gin.Context) {
+        UpsertIncome(c, DB{}, db, client, false)
     })
 }

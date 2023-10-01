@@ -102,6 +102,13 @@ Retrieve a user's plaid token.
 
 ```json
 {
-    "access_token":"access-production-e193aaa7-b4ca-4130-933b-ecbd59e0e0ab"
+    "token":[
+        {
+            "token_id": 1,
+            "access_token":"access-production-e193aaa7-b4ca-4130-933b-ecbd59e0e0ab",
+            "item_id":"wvpEqaR98pfNJbAraz6JhoP7Peb6QyTrLz7pE",
+            "profile_id":3
+        }
+    ]
 }
 ```

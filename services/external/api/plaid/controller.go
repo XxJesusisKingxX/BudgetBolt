@@ -88,7 +88,7 @@ func CreateAccounts(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, httpCli
 		return
 	}
 
-	var token user.Token
+	var token user.Tokens
 	url := fmt.Sprintf("token/get?uid=%v", uid)
 	status, resp, _ = httpClient.GET(url)
 	request.ParseResponse(resp, &token)
@@ -97,18 +97,21 @@ func CreateAccounts(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, httpCli
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
-	accessToken := token.Token
-	accounts, err := ps.AccountsGet(plaidapi, ctx, accessToken)
 	
-	if err != nil {
-		RenderError(c, err, PlaidClient{})
-		return
-	}
-	if !debug {
-		id := profile.ID
-		accountsJson, _ := json.Marshal(accounts)
-		body = fmt.Sprintf("id=%v&accounts=%v", id, accountsJson)
-		httpClient.POST("accounts/store", body)
+	for _, token := range token.Tokens {
+		accessToken := token.Token
+		accounts, err := ps.AccountsGet(plaidapi, ctx, accessToken)
+		
+		if err != nil {
+			RenderError(c, err, PlaidClient{})
+			return
+		}
+		if !debug {
+			id := profile.ID
+			accountsJson, _ := json.Marshal(accounts)
+			body = fmt.Sprintf("id=%v&accounts=%v", id, string(accountsJson))
+			httpClient.POST("accounts/store", body)
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -128,7 +131,7 @@ func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, htt
 		return
 	}
 
-	var token user.Token
+	var token user.Tokens
 	url := fmt.Sprintf("token/get?uid=%v", uid)
 	status, resp, _ = httpClient.GET(url)
 	request.ParseResponse(resp, &token)
@@ -139,26 +142,28 @@ func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, htt
 		return
 	}
 
-	accessToken := token.Token
-	var cursor *string
-	var transactions []plaid.Transaction
-	hasMore := true
-	for hasMore {
-		resp, err := ps.NewTransactionsSyncRequest(plaidapi, ctx, accessToken, cursor)
-		if err != nil {
-			RenderError(c, err, PlaidClient{})
-			return
+	for _, token := range token.Tokens{
+		accessToken := token.Token
+		var cursor *string
+		var transactions []plaid.Transaction
+		hasMore := true
+		for hasMore {
+			resp, err := ps.NewTransactionsSyncRequest(plaidapi, ctx, accessToken, cursor)
+			if err != nil {
+				RenderError(c, err, PlaidClient{})
+				return
+			}
+			transactions = append(transactions, resp.GetAdded()...)
+			hasMore = resp.GetHasMore()
+			nextCursor := resp.GetNextCursor()
+			cursor = &nextCursor
 		}
-		transactions = append(transactions, resp.GetAdded()...)
-		hasMore = resp.GetHasMore()
-		nextCursor := resp.GetNextCursor()
-		cursor = &nextCursor
-	}
-	if !debug {
-		id := profile.ID
-		transactionJson, _ := json.Marshal(transactions)
-		body = fmt.Sprintf("id=%v&transactions=%v", id, string(transactionJson))
-		httpClient.POST("transactions/store", body)
+		if !debug {
+			id := profile.ID
+			transactionJson, _ := json.Marshal(transactions)
+			body = fmt.Sprintf("id=%v&transactions=%v", id, string(transactionJson))
+			httpClient.POST("transactions/store", body)
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }

@@ -9,7 +9,7 @@ describe("Render Charts", () => {
             expenses: '3000',
             savings: '2000',
             level: '3',
-            per: '50%'
+            percentage: 0
         };
         render(<FinancialsSnapshot {...props} />);
         // Check if income, expenses, savings, and trend are rendered

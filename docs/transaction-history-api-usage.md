@@ -17,6 +17,7 @@ Store the user's plaid transactions
 
 - `date` (string): The date range to get transactions from
 - `uid` (float, required): The user's id
+- `category` (string): The primary category
 
 **Response Example:**
 

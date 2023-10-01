@@ -1,13 +1,16 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import './FinancialsSnapshotChart.css';
+import AppContext from '../../../context/AppContext';
 
 // Props interface describing the expected props for the FinancialsPeek component
 interface Props {
     level: string;
-    per: string; 
+    percentage: number;
 }
 
-const FinancialsSnapshotChart: FC<Props> = ({ level, per }) => {
+const FinancialsSnapshotChart: FC<Props> = ({ level, percentage }) => {
+    const maxPercentage = 100
+    const { totalExpenses, totalIncome } = useContext(AppContext)
     return (
         <div className='financials-snapshot-chart'>
             <div className='financials-snapshot-chart__legend'>
@@ -21,8 +24,14 @@ const FinancialsSnapshotChart: FC<Props> = ({ level, per }) => {
             </div>
             <div className='financials-snapshot-chart__outer-circle'>
                 <div style={{ height:`${level}rem`}} className='financials-snapshot-chart__inner-circle'>
-                    <div className='financials-snapshot-chart__inner-circle--toptext'>{100-Number(per)}%</div>
-                    <div className='financials-snapshot-chart__inner-circle--btmtext'>{per}%</div>
+                    {totalExpenses == 0 && totalIncome == 0 ?
+                    null
+                    :
+                    <>
+                        <div className='financials-snapshot-chart__inner-circle--toptext'>{percentage > maxPercentage ? 0 : maxPercentage - percentage}%</div>
+                        <div className='financials-snapshot-chart__inner-circle--btmtext'>{percentage}%</div>
+                    </>
+                    }
                 </div>
             </div>
         </div>

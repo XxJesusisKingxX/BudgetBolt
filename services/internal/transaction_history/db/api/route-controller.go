@@ -5,12 +5,14 @@ import (
 	"services/internal/transaction_history/db/utils"
 	user "services/internal/user_management/db/model"
 	"services/internal/utils/http"
-	
+	"strings"
+
+	"database/sql"
 	"encoding/json"
 	"fmt"
-	"strconv"
-	"database/sql"
 	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
 )
@@ -43,6 +45,7 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 	uid, _ := c.Cookie("UID")
 	uidP := c.Query("uid")
 	date := c.Query("date")
+	category := c.Query("category")
 
 	// Retrieve the user's profile based on the uid.
 	var profile user.Profile
@@ -73,6 +76,10 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 					GreaterThanEq: model.GreaterThanEq{
 						Value: date,
 						Column: "transaction_date",
+					},
+					Equal: model.Equal{
+						Value: strings.ToUpper(category),
+						Column: "primary_category",
 					},
 				},
 			},

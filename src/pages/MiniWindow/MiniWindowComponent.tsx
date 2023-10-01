@@ -1,11 +1,11 @@
-import { ChangeEvent, useContext, useEffect, useCallback, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import './MiniWindow.css'
-import { Expense, useCreate } from './useExpense';
+import { Expense, useExpense } from './useExpense';
 import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';
 
 const MiniWindowComponent = () => {
-    const { addExpenses, showExpenses, updateAllExpenses, isLoading, } = useCreate();
+    const { addExpenses, showExpenses, updateAllExpenses, isLoading, } = useExpense();
     const { budgetView, dispatch } = useContext(AppContext);
 
     const [addExpense, setAddExpense] = useState(false);
@@ -25,8 +25,9 @@ const MiniWindowComponent = () => {
     const handleAmountOnChange = (event: any) => {
         setAmount(event.target.value);
     }
-    const handleViewOnChange = async (event: any) => {
-        await updateAllExpenses(event.target.value)
+    const handleViewOnChange = (event: any) => {
+        updateAllExpenses(event.target.value)
+        dispatch({ type:'SET_STATE', state:{ budgetView: event.target.value}})
     };
 
     useEffect(() => {

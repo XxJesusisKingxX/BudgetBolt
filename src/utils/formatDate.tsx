@@ -99,7 +99,6 @@ export const getDateView = (currentDate: Date, view: BudgetView) => {
             formattedDate = `${year}-01-01`;
             return formattedDate;
     }
-
     switch (view) {
         case BudgetView.WEEKLY:
             return weeklyView();

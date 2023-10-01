@@ -20,7 +20,7 @@ describe("useCreate", () => {
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({}), { status: 200 });
         // Render
-        const { result } = renderHook(Create.useCreate);
+        const { result } = renderHook(Create.useExpense);
         act(() => {
             result.current.updateExpense(id,limit)
         })
@@ -51,7 +51,7 @@ describe("useCreate", () => {
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({}), { status: 200 });
         // Render
-        const { result } = renderHook(Create.useCreate);
+        const { result } = renderHook(Create.useExpense);
         act(() => {
             result.current.updateExpense(id,limit)
         })
@@ -86,7 +86,7 @@ describe("useCreate", () => {
             Limit: "100.00",
             Spent: "0.00"
         }
-        const { result } = renderHook(Create.useCreate);
+        const { result } = renderHook(Create.useExpense);
 
         act(() => {
             result.current.addExpenses(expense)

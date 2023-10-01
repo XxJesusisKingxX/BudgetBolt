@@ -4,14 +4,14 @@ import FinancialsSnapshotChart from './component/FinancialsSnapshotChart';
 
 // Props interface describing the expected props for the FinancialsPeek component
 interface Props {
-    income: string;   // Total income amount as a string
-    expenses: string; // Total expenses amount as a string
-    savings: string;  // Total savings amount as a string
-    level: string;    // The current level expenses are at compared to savings
-    per: string       // The current level percentage
+    income: string;    // Total income amount as a string
+    expenses: string;  // Total expenses amount as a string
+    savings: string;   // Total savings amount as a string
+    level: string;     // The current level expenses are at compared to savings
+    percentage: number // The current level percentage
 }
 
-const FinancialsSnapshotComponent: FC<Props> = ({ income, expenses, savings, level, per}) => {
+const FinancialsSnapshotComponent: FC<Props> = ({ income, expenses, savings, level, percentage}) => {
     return (
         <div className='financials-snapshot'>
             <div className='financials-snapshot__titles'>
@@ -22,7 +22,7 @@ const FinancialsSnapshotComponent: FC<Props> = ({ income, expenses, savings, lev
                 {/* Total Savings */}
                 <h3 className='financials-snapshot__titles__header'>Total Savings:<span className='financials-snapshot__titles__savings'>${savings}</span></h3>
             </div>
-            <FinancialsSnapshotChart level={level} per={per} />
+            <FinancialsSnapshotChart level={level} percentage={percentage} />
         </div>
     );
 }

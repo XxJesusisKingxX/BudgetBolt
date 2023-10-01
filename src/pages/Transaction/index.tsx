@@ -42,9 +42,7 @@ const Transaction = () => {
                 });
 
                 // Get transactions for user
-                const baseURL = window.location.href;
-                const url = new URL(baseURL + EndPoint.GET_TRANSACTIONS);
-                const retrieveResponse = await fetch(url, {
+                const retrieveResponse = await fetch(EndPoint.GET_TRANSACTIONS, {
                     method: "GET",
                 });
                 

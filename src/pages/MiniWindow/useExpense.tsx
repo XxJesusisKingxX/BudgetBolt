@@ -14,7 +14,7 @@ export interface Expense {
     Spent: string  // Amount spent in the budgeted expense
 }
 
-export const useCreate = () => {
+export const useExpense = () => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [isLoading, setLoading] = useState(false);
     const [expTotal, setExpTotal] = useState(0.00);
@@ -34,8 +34,8 @@ export const useCreate = () => {
     
             if (response.ok) {
                 setLoading(false);
-                const d = await getExpenses()
-                storeExpenseTotal(d);
+                const exp = await getExpenses()
+                storeExpenseTotal(exp);
             }
         } catch (error) {
             console.log(error);

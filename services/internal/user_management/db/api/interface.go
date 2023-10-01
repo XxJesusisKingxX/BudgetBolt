@@ -11,13 +11,13 @@ type DBHandler interface {
 	RetrieveProfile(db *sql.DB, id string, uid bool) (user.Profile, error)
 	CreateProfile(db *sql.DB, user string, password string, randomUID string) error
 	CreateToken(db *sql.DB, m user.Token) error
-	RetrieveToken(db *sql.DB, profileId int64) (user.Token, error)
+	RetrieveToken(db *sql.DB, profileId int64) ([]user.Token, error)
 }
 
 type DB struct{}
 type MockDB struct {
 	Profile user.Profile
-	Token user.Token
+	Token []user.Token
 	ProfileErr error
 	TokenErr error
 }
@@ -31,7 +31,7 @@ func (t MockDB) CreateProfile(db *sql.DB, user string, password string, randomUI
 func (t MockDB) CreateToken(db *sql.DB, m user.Token) error{
 	return t.TokenErr
 }
-func (t MockDB) RetrieveToken(db *sql.DB, profileId int64) (user.Token, error) {
+func (t MockDB) RetrieveToken(db *sql.DB, profileId int64) ([]user.Token, error) {
 	return t.Token, t.TokenErr
 }
 func (t DB) RetrieveProfile(db *sql.DB, id string, uid bool) (user.Profile, error) {
@@ -56,7 +56,7 @@ func (t DB) CreateToken(db *sql.DB, m user.Token) error {
 	err := controller.CreateToken(db, m)
 	return err
 }
-func (t DB) RetrieveToken(db *sql.DB, profileId int64) (user.Token, error) {
+func (t DB) RetrieveToken(db *sql.DB, profileId int64) ([]user.Token, error) {
 	token, err := controller.RetrieveToken(db, user.Token{ ProfileID: profileId })
 	return token, err
 }

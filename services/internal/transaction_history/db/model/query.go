@@ -3,6 +3,7 @@ package model
 type QueryParameters struct {
 	OrderBy OrderBy
 	GreaterThanEq GreaterThanEq
+	Equal Equal
 }
 
 type OrderBy struct {
@@ -13,7 +14,12 @@ type OrderBy struct {
 
 type GreaterThanEq struct {
 	Column  string
-	Value   string
+	Value   interface{}
+}
+
+type Equal struct {
+	Column  string
+	Value   interface{}
 }
 
 type Querys struct {
