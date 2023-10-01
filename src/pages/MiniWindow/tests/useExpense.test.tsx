@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import fetchMock  from 'jest-fetch-mock';
 import { renderHook } from '@testing-library/react-hooks';
 import { act, waitFor } from '@testing-library/react';
-import * as Create from '../useCreate';
+import * as Create from '../useExpense';
 import { EndPoint } from '../../../constants/endpoints';
 
 

@@ -6,6 +6,8 @@ export const mockDispatch = jest.fn();
 
 export const initAppState = {
     profile: "",
+    totalIncome: 0.00,
+    totalExpenses: 0.00,
     budgetView: BudgetView.MONTHLY,
     isTransactionsUpdated: false,
     lastTransactionsUpdate: new Date(),

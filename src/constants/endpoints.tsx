@@ -8,6 +8,6 @@ export enum EndPoint {
     GET_PROFILE = "api/profile/get",
     CREATE_PROFILE = "api/profile/create",
     CREATE_ACCOUNTS = "api/accounts/create",
-    CREATE_LINK_TOKEN = "api/create_link_token",
-    CREATE_ACCESS_TOKEN = "api/create_access_token"
+    CREATE_LINK_TOKEN = "api/link_token/create",
+    CREATE_ACCESS_TOKEN = "api/access_token/create"
 }

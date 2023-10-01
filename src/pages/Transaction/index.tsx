@@ -51,7 +51,6 @@ const Transaction = () => {
                 if (retrieveResponse.ok) {
                     const data = await retrieveResponse.json();
                     setTransactions(data["transactions"]);
-                    console.log(transactions)
                 } else {
                     console.error("failed to retrieve transactions");
                     setIsLoading(false);

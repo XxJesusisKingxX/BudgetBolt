@@ -5,6 +5,8 @@ import { BudgetView } from "../constants/view";
 // Define the shape of the state
 interface State {
   profile: string
+  totalIncome: number
+  totalExpenses: number
   budgetView: BudgetView
   isTransactionsUpdated: boolean;
   lastTransactionsUpdate: Date;
@@ -15,6 +17,8 @@ interface State {
 // Set initial state values
 const initialState: State = {
   profile: '',
+  totalIncome: 0.00,
+  totalExpenses: 0.00,
   budgetView: BudgetView.MONTHLY,
   isTransactionsUpdated: false,
   lastTransactionsUpdate: new Date(),

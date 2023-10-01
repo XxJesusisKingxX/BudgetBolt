@@ -3,7 +3,7 @@ import fetchMock  from 'jest-fetch-mock';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import MiniWindowComponent from '../MiniWindowComponent';
 import userEvent from '@testing-library/user-event';
-import * as Create from '../useCreate';
+import * as Create from '../useExpense';
 import { EndPoint } from '../../../constants/endpoints';
 import { BudgetView } from '../../../constants/view';
 import { mockDispatch, renderWithAppContext } from '../../../context/mock/AppContext.mock';
@@ -28,7 +28,8 @@ describe("Expenses", () => {
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            isLoading: true
+            expTotal: 0,
+            isLoading: true,
         });
 
         // Render
@@ -114,7 +115,8 @@ describe("Expenses", () => {
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            isLoading: true
+            expTotal: 0,
+            isLoading: true,
         });
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})

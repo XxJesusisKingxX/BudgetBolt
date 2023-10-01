@@ -8,12 +8,13 @@ describe("Render Charts", () => {
             income: '5000',
             expenses: '3000',
             savings: '2000',
-            trend: 'Positive',
+            level: '3',
+            per: '50%'
         };
         render(<FinancialsSnapshot {...props} />);
         // Check if income, expenses, savings, and trend are rendered
         expect(screen.getByRole('heading', {name: `Total Income: $${props.income}`})).toBeInTheDocument();
         expect(screen.getByRole('heading', {name: `Total Expenses: $${props.expenses}`})).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: `Total Savings: $${props.savings} ${props.trend}`})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: `Total Savings: $${props.savings}`})).toBeInTheDocument();
     });
 });
