@@ -17,7 +17,6 @@ export interface Expense {
 export const useExpense = () => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [isLoading, setLoading] = useState(false);
-    const [expTotal, setExpTotal] = useState(0.00);
 
     const { mode } = useContext(ThemeContext);
     const { dispatch } = useContext(AppContext);
@@ -132,6 +131,7 @@ export const useExpense = () => {
         let total: number = 0.00;
         expensesList.slice().map((expense: any) => {
             total += expense.expense_spent > 0 ? expense.expense_spent : 0
+            return null;
         });
         dispatch({ type:'SET_STATE', state: { totalExpenses: total }})
     }
@@ -142,7 +142,6 @@ export const useExpense = () => {
         showExpenses,
         updateExpense,
         updateAllExpenses,
-        expTotal,
         isLoading
     };
 };

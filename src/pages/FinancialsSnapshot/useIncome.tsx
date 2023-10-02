@@ -1,16 +1,13 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { EndPoint } from "../../constants/endpoints";
 import AppContext from "../../context/AppContext";
 import { getDateView } from "../../utils/formatDate";
 
 export const useIncome = () => {
-    const [incomes, setIncomes] = useState(null);
-
     const { budgetView, dispatch } = useContext(AppContext);
 
     const upsertIncome = async () => {
-        try{
-            console.log(budgetView)
+        try {
             const response = await fetch(EndPoint.UPSERT_INCOMES, {
                 method: "POST",
                 body: new URLSearchParams({
@@ -20,7 +17,7 @@ export const useIncome = () => {
     
             if (response.ok) {
                 const inc = await getIncomes();
-                storeIncomeTotal(inc)
+                storeIncomeTotal(inc);
             }
         } catch(error) {
             console.log(error);
@@ -35,8 +32,7 @@ export const useIncome = () => {
             if (response.ok) {
                 const data = await response.json();
                 if (data) {
-                    setIncomes(data["incomes"]);
-                    return data["incomes"]
+                    return data["incomes"];
                 }
             }
         } catch(error) {
@@ -48,14 +44,13 @@ export const useIncome = () => {
     const storeIncomeTotal = (incomesList: any) => {
         let total: number = 0.00;
         incomesList.slice().map((income: any) => {
-            total += income.income_amount > 0 ? income.income_amount : 0
+            total += income.income_amount > 0 ? income.income_amount : 0;
+            return null;
         });
-        dispatch({ type:'SET_STATE', state: { totalIncome: total }})
+        dispatch({ type:'SET_STATE', state: { totalIncome: total }});
     }
 
     return {
         upsertIncome,
     };
 };
-
-// test

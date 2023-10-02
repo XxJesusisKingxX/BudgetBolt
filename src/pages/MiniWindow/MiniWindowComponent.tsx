@@ -6,7 +6,7 @@ import { BudgetView } from '../../constants/view';
 
 const MiniWindowComponent = () => {
     const { addExpenses, showExpenses, updateAllExpenses, isLoading, } = useExpense();
-    const { budgetView, dispatch } = useContext(AppContext);
+    const { dispatch } = useContext(AppContext);
 
     const [addExpense, setAddExpense] = useState(false);
 

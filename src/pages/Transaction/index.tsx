@@ -73,13 +73,28 @@ const Transaction = () => {
 
     const loading = `/images/${mode}/loading.png`;
 
+    const displayName = (vendor: string, description: string) => {
+        if (vendor !== "") {
+            if (vendor.length > maxChar) {
+                return "Click to see more";
+            } else {
+                return vendor;
+            }
+        } else {
+            if (description.length > maxChar) {
+                return "Click to see more";
+            } else {
+                return description;
+            }
+        }
+    }
     return (
         <>
             {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction: any) => (
                 <TransactionComponent
                     key={transaction.transaction_id}
                     account={transaction.from_account}
-                    transaction={transaction.vendor}
+                    transaction={displayName(transaction.vendor, transaction.description)}
                     amount={transaction.net_amount}
                     mode={mode}
                 />

@@ -17,6 +17,7 @@ const FinancialsSnapshot = () => {
 
     useEffect(() => {
         upsertIncome();
+        // eslint-disable-next-line
     },[totalExpenses, totalIncome])
 
     return (

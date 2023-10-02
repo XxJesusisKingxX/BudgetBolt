@@ -45,10 +45,11 @@ const App = () => {
 
   return (
       <Header>
-        <Menu/>
+        
         <LoginProvider>
           <ThemeProvider>
             <Auth/>
+
             {getCookie("UID") != null ?
             <>
               <Sideview/>
@@ -56,6 +57,7 @@ const App = () => {
               <div className="add-account">
                 <PlaidLink/>
               </div>
+              <Menu/>
             </>
             :
             null

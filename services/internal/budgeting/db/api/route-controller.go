@@ -261,7 +261,7 @@ func UpsertIncome(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient request.
 			})
 		}
 	}
-	
+
 	if err != nil {
 		c.JSON(http.StatusNotImplemented, gin.H{"error":"INCOMES NOT CREATED/UPDATED"})
 		return
@@ -306,5 +306,3 @@ func RetrieveIncome(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient reques
 		"incomes": incomes,
 	})
 }
-
-// test incomes

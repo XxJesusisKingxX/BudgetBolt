@@ -10,7 +10,9 @@ interface Props {
 
 const FinancialsSnapshotChart: FC<Props> = ({ level, percentage }) => {
     const maxPercentage = 100
+    
     const { totalExpenses, totalIncome } = useContext(AppContext)
+
     return (
         <div className='financials-snapshot-chart'>
             <div className='financials-snapshot-chart__legend'>
@@ -24,12 +26,12 @@ const FinancialsSnapshotChart: FC<Props> = ({ level, percentage }) => {
             </div>
             <div className='financials-snapshot-chart__outer-circle'>
                 <div style={{ height:`${level}rem`}} className='financials-snapshot-chart__inner-circle'>
-                    {totalExpenses == 0 && totalIncome == 0 ?
+                    {totalExpenses === 0 && totalIncome === 0 ?
                     null
                     :
                     <>
-                        <div className='financials-snapshot-chart__inner-circle--toptext'>{percentage > maxPercentage ? 0 : maxPercentage - percentage}%</div>
-                        <div className='financials-snapshot-chart__inner-circle--btmtext'>{percentage}%</div>
+                        <div data-testid='financials-snapshot-top-percent' className='financials-snapshot-chart__inner-circle--toptext'>{percentage > maxPercentage ? 0 : maxPercentage - percentage}%</div>
+                        <div data-testid='financials-snapshot-btm-percent'  className='financials-snapshot-chart__inner-circle--btmtext'>{percentage}%</div>
                     </>
                     }
                 </div>

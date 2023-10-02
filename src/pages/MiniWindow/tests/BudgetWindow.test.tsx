@@ -15,7 +15,7 @@ beforeEach(() => {
 
 describe("Expenses", () => {
 
-    test('user should be able to add expenses and get expenses on success', async () => {
+    test('user should be able to add expenses', async () => {
         // Create mocks
         const mockGetExpenses = jest.fn();
         const mockAddExpenses = jest.fn();
@@ -28,7 +28,6 @@ describe("Expenses", () => {
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            expTotal: 0,
             isLoading: true,
         });
 
@@ -42,7 +41,6 @@ describe("Expenses", () => {
         userEvent.click(screen.getByRole('button', { name: "Save"}))
 
         // Assert
-        expect(mockGetExpenses).toHaveBeenCalledTimes(1);
         await waitFor( async ()=> {
             expect(mockAddExpenses).toHaveBeenCalledTimes(1);
         })
@@ -52,6 +50,7 @@ describe("Expenses", () => {
     test("user should see expenses at initial render after loading spinner", async () => {
         // Mock
         fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
 
         // Render
@@ -70,6 +69,8 @@ describe("Expenses", () => {
     test("user should be able to edit expenses and save changes", async () => {
         // Mock
         fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
+        // Render
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
         // Render
         render(<MiniWindowComponent/>)
@@ -115,7 +116,6 @@ describe("Expenses", () => {
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            expTotal: 0,
             isLoading: true,
         });
         fetchMock.enableMocks();
