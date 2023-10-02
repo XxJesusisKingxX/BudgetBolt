@@ -9,14 +9,28 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
 
-	"services/internal/utils/http"
 	"services/external/api/plaid"
+	user "services/internal/user_management/db/model"
+	"services/internal/utils/http"
 	"services/internal/utils/testing"
 )
 func TestCreateTransactions(t *testing.T) {
+	// Mock token return fake response
+	fakeTokens := user.Tokens{
+		Tokens: []user.Token{
+			{
+				ID:        1,
+				Item:      "item1",
+				Token:     "fake_token_1",
+				ProfileID: 101,
+			},
+		},
+	}
+	tokenResp, _ := json.Marshal(fakeTokens)
 	// Define a slice of test cases.
 	testCases := []struct {
 		TestName       string
@@ -73,6 +87,7 @@ func TestCreateTransactions(t *testing.T) {
 					Code: http.StatusOK,
 				},
 				"token/get?uid=": {
+					Response: tokenResp,
 					Code: http.StatusOK,
 				},
 			},
