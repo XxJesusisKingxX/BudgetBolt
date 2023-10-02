@@ -74,7 +74,6 @@ func TestGetExpenses(t *testing.T) {
 		{
 			TestName: "ExpensesEmpty",
 			Expense: []model.Expense{},
-			ExpenseErr:   errors.New(""),
 			ExpectedCode: http.StatusNotFound,
 			Response: map[string]request.MockResponse{
 				"profile/get": {

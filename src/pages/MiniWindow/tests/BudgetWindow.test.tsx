@@ -3,7 +3,7 @@ import fetchMock  from 'jest-fetch-mock';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import MiniWindowComponent from '../MiniWindowComponent';
 import userEvent from '@testing-library/user-event';
-import * as Create from '../useCreate';
+import * as Create from '../useExpense';
 import { EndPoint } from '../../../constants/endpoints';
 import { BudgetView } from '../../../constants/view';
 import { mockDispatch, renderWithAppContext } from '../../../context/mock/AppContext.mock';
@@ -15,20 +15,20 @@ beforeEach(() => {
 
 describe("Expenses", () => {
 
-    test('user should be able to add expenses and get expenses on success', async () => {
+    test('user should be able to add expenses', async () => {
         // Create mocks
         const mockGetExpenses = jest.fn();
         const mockAddExpenses = jest.fn();
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
         const mockUpdateAllExpenses = jest.fn();
-        jest.spyOn(Create,'useCreate').mockReturnValue({
+        jest.spyOn(Create,'useExpense').mockReturnValue({
             getExpenses: mockGetExpenses,
             addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            isLoading: true
+            isLoading: true,
         });
 
         // Render
@@ -41,7 +41,6 @@ describe("Expenses", () => {
         userEvent.click(screen.getByRole('button', { name: "Save"}))
 
         // Assert
-        expect(mockGetExpenses).toHaveBeenCalledTimes(1);
         await waitFor( async ()=> {
             expect(mockAddExpenses).toHaveBeenCalledTimes(1);
         })
@@ -51,6 +50,7 @@ describe("Expenses", () => {
     test("user should see expenses at initial render after loading spinner", async () => {
         // Mock
         fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
 
         // Render
@@ -69,6 +69,8 @@ describe("Expenses", () => {
     test("user should be able to edit expenses and save changes", async () => {
         // Mock
         fetchMock.enableMocks();
+        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
+        // Render
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
         // Render
         render(<MiniWindowComponent/>)
@@ -108,13 +110,13 @@ describe("Expenses", () => {
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
         const mockUpdateAllExpenses = jest.fn();
-        jest.spyOn(Create,'useCreate').mockReturnValue({
+        jest.spyOn(Create,'useExpense').mockReturnValue({
             getExpenses: mockGetExpenses,
             addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,
-            isLoading: true
+            isLoading: true,
         });
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})

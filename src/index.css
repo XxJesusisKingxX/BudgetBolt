@@ -10,6 +10,14 @@
     --HEALTH_MEDIUM: yellow;
     --HEALTH_LOW: green;
 }
+
+.add-account {
+    position: absolute;
+    top: 0;
+    right: 5rem;
+    margin: 0.6rem;
+}
+
 .link {
     text-decoration: underline;
     cursor: pointer;

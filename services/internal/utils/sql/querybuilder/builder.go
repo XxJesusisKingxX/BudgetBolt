@@ -61,11 +61,19 @@ func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 		}
 	}
 
+	if m.Query.Select.Equal.Value != "" {
+		if reflect.TypeOf( m.Query.Select.Equal.Value).Kind() == reflect.String {
+			query += fmt.Sprintf(" AND %v = '%v'", m.Query.Select.Equal.Column, m.Query.Select.Equal.Value)
+		} else {
+			query += fmt.Sprintf(" AND %v = %v", m.Query.Select.Equal.Column, m.Query.Select.Equal.Value)
+		}
+	}
+
 	// Order by queries
 	if m.Query.Select.OrderBy.Asc {
-		query = query + fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy.Column)
+		query += fmt.Sprintf(" ORDER BY %v ASC", m.Query.Select.OrderBy.Column)
 	} else if m.Query.Select.OrderBy.Desc {
-		query = query + fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy.Column)
+		query += fmt.Sprintf(" ORDER BY %v DESC", m.Query.Select.OrderBy.Column)
 	}
 	
 	return query, nil

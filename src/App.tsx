@@ -9,6 +9,7 @@ import AppContext from "./context/AppContext";
 import { LoginProvider } from "./context/LoginContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { getCookie } from "./utils/cookie";
+import PlaidLink from "./pages/Plaid/PlaidLink";
 
 const App = () => {
   const { profile, dispatch } = useContext(AppContext);
@@ -44,14 +45,19 @@ const App = () => {
 
   return (
       <Header>
-        <Menu/>
+        
         <LoginProvider>
           <ThemeProvider>
             <Auth/>
+
             {getCookie("UID") != null ?
             <>
               <Sideview/>
               <Dashboard/>
+              <div className="add-account">
+                <PlaidLink/>
+              </div>
+              <Menu/>
             </>
             :
             null

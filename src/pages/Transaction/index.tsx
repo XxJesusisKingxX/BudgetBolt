@@ -42,16 +42,13 @@ const Transaction = () => {
                 });
 
                 // Get transactions for user
-                const baseURL = window.location.href;
-                const url = new URL(baseURL + EndPoint.GET_TRANSACTIONS);
-                const retrieveResponse = await fetch(url, {
+                const retrieveResponse = await fetch(EndPoint.GET_TRANSACTIONS, {
                     method: "GET",
                 });
                 
                 if (retrieveResponse.ok) {
                     const data = await retrieveResponse.json();
                     setTransactions(data["transactions"]);
-                    console.log(transactions)
                 } else {
                     console.error("failed to retrieve transactions");
                     setIsLoading(false);
@@ -76,13 +73,28 @@ const Transaction = () => {
 
     const loading = `/images/${mode}/loading.png`;
 
+    const displayName = (vendor: string, description: string) => {
+        if (vendor !== "") {
+            if (vendor.length > maxChar) {
+                return "Click to see more";
+            } else {
+                return vendor;
+            }
+        } else {
+            if (description.length > maxChar) {
+                return "Click to see more";
+            } else {
+                return description;
+            }
+        }
+    }
     return (
         <>
             {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction: any) => (
                 <TransactionComponent
                     key={transaction.transaction_id}
                     account={transaction.from_account}
-                    transaction={transaction.vendor}
+                    transaction={displayName(transaction.vendor, transaction.description)}
                     amount={transaction.net_amount}
                     mode={mode}
                 />

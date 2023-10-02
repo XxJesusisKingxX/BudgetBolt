@@ -150,6 +150,6 @@ func RetrieveToken(c *gin.Context, dbs DBHandler, db *sql.DB, debug bool) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"access_token": token.Token,
+		"tokens": token,
 	})
 }

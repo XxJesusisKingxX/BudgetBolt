@@ -13,3 +13,6 @@ type Token struct {
 	Token       string   `json:"access_token" db:"access_token"`
 	ProfileID   int64    `json:"profile_id" db:"profile_id"`
 }
+type Tokens struct {
+	Tokens []Token  `json:"tokens"`
+}

@@ -4,6 +4,7 @@ import { EndPoint } from "../../constants/endpoints";
 import ThemeContext from "../../context/ThemeContext";
 import { getDateView } from "../../utils/formatDate";
 import { BudgetView } from "../../constants/view";
+import AppContext from "../../context/AppContext";
 
 // Interface for the shape of a expense
 export interface Expense {
@@ -13,13 +14,14 @@ export interface Expense {
     Spent: string  // Amount spent in the budgeted expense
 }
 
-export const useCreate = () => {
+export const useExpense = () => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [isLoading, setLoading] = useState(false);
 
-    const { mode } = useContext(ThemeContext)
+    const { mode } = useContext(ThemeContext);
+    const { dispatch } = useContext(AppContext);
 
-    const updateAllExpenses = async (currentView: BudgetView) => {
+    const updateAllExpenses = async (currentView: BudgetView = BudgetView.MONTHLY) => {
         try {
             setLoading(true)
             const response = await fetch(EndPoint.UPDATE_ALL_EXPENSES, {
@@ -31,10 +33,11 @@ export const useCreate = () => {
     
             if (response.ok) {
                 setLoading(false);
-                getExpenses();
+                const exp = await getExpenses()
+                storeExpenseTotal(exp);
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     };
 
@@ -60,7 +63,7 @@ export const useCreate = () => {
             }
         }
         else {
-            console.error("ERROR: empty limit and/or id")
+            console.error("ERROR: empty limit and/or id");
         }
     };
 
@@ -74,6 +77,8 @@ export const useCreate = () => {
                 const data = await response.json();
                 if (data) {
                     setExpenses(data["expenses"]);
+                    setLoading(false)
+                    return data["expenses"]
                 }
                 setLoading(false);
             }
@@ -84,20 +89,25 @@ export const useCreate = () => {
     };
 
     const showExpenses = (loading = isLoading, expensesList = expenses) => {
-        
         const loadingIcon = `/images/${mode}/loading.png`;
-        return !loading && expensesList ? (
-            expensesList.slice().map((expense: any) => (
-              <ExpenseComponent
-                key={expense.expense_id}
-                update={updateExpense}
-                id={expense.expense_id}
-                name={expense.expense_name}
-                limit={expense.expense_limit}
-                spent={expense.expense_spent}
-              />
-            ))
-          ) : <img className='miniwindow__budget__view__loading' src={loadingIcon} alt="Loading" />;
+
+        const rows = expensesList.slice().map((expense: any) => (
+            <ExpenseComponent
+            key={expense.expense_id}
+            update={updateExpense}
+            id={expense.expense_id}
+            name={expense.expense_name}
+            limit={expense.expense_limit}
+            spent={expense.expense_spent}
+            />
+        ));
+        return (
+        !loading && expensesList ?
+        rows 
+        : 
+        <img className='miniwindow__budget__view__loading' src={loadingIcon} alt="Loading" />
+        );
+
     }
 
     const addExpenses = async (expense: Expense) => {
@@ -115,6 +125,15 @@ export const useCreate = () => {
             console.log(error);
         }
         
+    }
+
+    const storeExpenseTotal = (expensesList: any) => {
+        let total: number = 0.00;
+        expensesList.slice().map((expense: any) => {
+            total += expense.expense_spent > 0 ? expense.expense_spent : 0
+            return null;
+        });
+        dispatch({ type:'SET_STATE', state: { totalExpenses: total }})
     }
 
     return {

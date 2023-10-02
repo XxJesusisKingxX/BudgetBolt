@@ -1,11 +1,11 @@
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import './MiniWindow.css'
-import { Expense, useCreate } from './useCreate';
+import { Expense, useExpense } from './useExpense';
 import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';
 
 const MiniWindowComponent = () => {
-    const { getExpenses, addExpenses, showExpenses, updateAllExpenses, isLoading } = useCreate();
+    const { addExpenses, showExpenses, updateAllExpenses, isLoading, } = useExpense();
     const { dispatch } = useContext(AppContext);
 
     const [addExpense, setAddExpense] = useState(false);
@@ -27,11 +27,11 @@ const MiniWindowComponent = () => {
     }
     const handleViewOnChange = (event: any) => {
         updateAllExpenses(event.target.value)
-        dispatch({ type:"SET_STATE", state: { budgetView: event.target.value }});
-    }
+        dispatch({ type:'SET_STATE', state:{ budgetView: event.target.value}})
+    };
 
     useEffect(() => {
-        getExpenses();
+        updateAllExpenses();
         // eslint-disable-next-line
     },[])
 

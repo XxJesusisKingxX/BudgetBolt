@@ -145,17 +145,19 @@ func UpdateAllExpenses(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient req
 	status, resp, _ := httpClient.GET(url)
 	request.ParseResponse(resp, &transaction)
 
-	if status != http.StatusOK {
+	if status != http.StatusOK && status != http.StatusNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 	// Get the category totals for all possible expenses
 	categoryTotals := make(map[string]float64)
 	for _, transaction := range transaction.Transactions {
-		primary := transaction.PrimaryCategory
-		detailed := transaction.DetailCategory
-		categoryTotals[primary] += transaction.Amount
-		categoryTotals[detailed] += transaction.Amount
+		if transaction.Amount > 0 {
+			primary := transaction.PrimaryCategory
+			detailed := transaction.DetailCategory
+			categoryTotals[primary] += transaction.Amount
+			categoryTotals[detailed] += transaction.Amount
+		}
 	}
 
 	// Get profile
@@ -186,4 +188,121 @@ func UpdateAllExpenses(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient req
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+// Create/Update a user's budgeted expenses.
+func UpsertIncome(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient request.HTTP, debug bool) {
+	// Extract the session cookie
+	uid, _ := c.Cookie("UID")
+	date := c.PostForm("date")
+
+	// Get transactions
+	var transaction transaction.Transactions
+	url := fmt.Sprintf("transactions/get?uid=%v&date=%v&category=income", uid, date)
+	status, resp, _ := httpClient.GET(url)
+	request.ParseResponse(resp, &transaction)
+
+	if status != http.StatusOK && status != http.StatusNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	// Retrieve the user's profile based on the username.
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+	// Check if incomes already exist
+	incomeTotals := make(map[string]float64)
+	if len(transaction.Transactions) != 0 {
+		for _, transaction := range transaction.Transactions {
+			if transaction.Vendor != "" {
+				incomeTotals[transaction.Vendor] += transaction.Amount * -1 // remove negative
+			} else {
+				incomeTotals[transaction.Description] += transaction.Amount * -1
+			}
+		}
+
+		for name, amount := range incomeTotals {
+			incomes, _ := dbs.RetrieveIncome(db, model.Income{
+				Name: name,
+			})
+			if incomes != nil {
+				// Income already exists, update it
+				err = dbs.UpdateIncome(db, model.Income{
+					Amount: &amount,
+				},model.Income{
+					Name: name,
+				})
+			} else {
+				// Income doesn't exist, create a new one
+				err = dbs.CreateIncome(db, model.Income{
+					Name: name,
+					Amount: &amount,
+					ProfileID: profile.ID,
+				})
+			}
+		}
+	} else {
+		incomes, _ := dbs.RetrieveIncome(db, model.Income{
+			ProfileID: profile.ID,
+		})
+		for _, income := range incomes {
+			amount := 0.00
+			err = dbs.UpdateIncome(db, model.Income{
+				Amount: &amount,
+			},model.Income{
+				Name: income.Name,
+			})
+		}
+	}
+
+	if err != nil {
+		c.JSON(http.StatusNotImplemented, gin.H{"error":"INCOMES NOT CREATED/UPDATED"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func RetrieveIncome(c *gin.Context, dbs DBHandler, db *sql.DB, httpClient request.HTTP, debug bool) {
+	// Extract the session cookie or form
+	uid, _ := c.Cookie("UID")
+	uidP := c.Query("uid")
+
+	// Retrieve the user's profile based on the cookie or form.
+	var profile user.Profile
+	var body string
+	if len(uidP) != 0 {
+		body = fmt.Sprintf("uid=%v", uidP)
+	} else {
+		body = fmt.Sprintf("uid=%v", uid)
+	}
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	var incomes []model.Income
+	if err == nil {
+		// Retrieve the user's expenses based on the profile ID.
+		incomes, err = dbs.RetrieveIncome(db, model.Income{
+			ProfileID: profile.ID,
+		})
+	}
+	if err != nil || len(incomes) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error":"INCOMES NOT FOUND"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"incomes": incomes,
+	})
 }

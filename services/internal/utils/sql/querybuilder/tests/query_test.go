@@ -25,13 +25,13 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	})
 
 	t.Run("Model Missing `db` Tag", func(t *testing.T) {
-		testModel := struct{ ID int }{ID: 1}
+		testModel:= struct{ ID int }{ID: 1}
 		result, _ := querybuilder.FormatColumnsAndValues(testModel)
 		tests.Equals(t, "", result)
 	})
 
 	t.Run("Invalid Parameter Type", func(t *testing.T) {
-		testModel := struct{ Test string }{Test: "Test"}
+		testModel := struct { Test string }{Test: "Test"}
 		defer func() {
 			if result := recover(); result != nil {
 				tests.Equals(t, "Invalid parameter type", result)
@@ -63,7 +63,7 @@ func TestSetColumnsAndValues(t *testing.T) {
 	})
 
 	t.Run("Invalid Parameter Type", func(t *testing.T) {
-		testModel := struct{ Test string }{Test: "Test"}
+		testModel := struct { Test string }{Test: "Test"}
 		defer func() {
 			if result := recover(); result != nil {
 				tests.Equals(t, "Invalid parameter type", result)
@@ -176,4 +176,42 @@ func TestBuildDeleteQuery(t *testing.T) {
 		result, _ := querybuilder.BuildDeleteQuery("expenses", testModel)
 		tests.Equals(t, expectedQuery, result)
 	})
+}
+
+
+
+
+func TestBuildTransactionRetrieveQuery(t *testing.T) {
+
+	t.Run("Empty Model", func(t *testing.T) {
+		emptyQuery, _ := querybuilder.BuildTransactionRetrieveQuery(transaction.Transaction{})
+		tests.Equals(t, "", emptyQuery )
+	})
+
+	t.Run("Non-Empty Model", func(t *testing.T) {
+		nonEmptyModel := transaction.Transaction{
+			ProfileID: 1,
+			Query: transaction.Querys{
+				Select: transaction.QueryParameters{
+					GreaterThanEq: transaction.GreaterThanEq{
+						Column: "age",
+						Value:  2,
+					},
+					Equal: transaction.Equal{
+						Column: "city",
+						Value:  "New York",
+					},
+					OrderBy: transaction.OrderBy{
+						Column: "name",
+						Asc:    true,
+						Desc:   false,
+					},
+				},
+			},
+		}
+		actualQuery, _ := querybuilder.BuildTransactionRetrieveQuery(nonEmptyModel)
+		expectedQuery := "SELECT * FROM transactions WHERE profile_id = '1' AND age >= 2 AND city = 'New York' ORDER BY name ASC"
+		tests.Equals(t, expectedQuery, actualQuery )
+	})
+
 }

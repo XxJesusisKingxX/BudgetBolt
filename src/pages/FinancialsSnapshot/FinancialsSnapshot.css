@@ -1,28 +1,30 @@
-.financialspeek {
+
+.financials-snapshot {
     background-color: var(--BACKGROUND_MODE);
     box-shadow: -0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
     border-radius: 0.5rem;
     width: 39rem;
     height: 7rem;
     margin: 1.5rem;
+    display: flex;
 }
-    .financialspeek__titles {
+    .financials-snapshot__titles {
         display: flex;
         flex-direction: column;
         padding: 1rem;
     }
-        .financialspeek__titles__header {
+        .financials-snapshot__titles__header {
             margin: 0rem;
         }
-        .financialspeek__titles__income {
+        .financials-snapshot__titles__income {
             padding-left: 0.5rem;
         }
-        .financialspeek__titles__expenses {
+        .financials-snapshot__titles__expenses {
             padding-left: 0.5rem;
         }
-        .financialspeek__titles__savings {
+        .financials-snapshot__titles__savings {
             padding-left: 0.5rem;
         }
-        .financialspeek__titles__trend {
+        .financials-snapshot__titles__trend {
             padding-left: 0.5rem;
         }

@@ -7,7 +7,9 @@ export enum EndPoint {
     UPDATE_ALL_EXPENSES = "api/expenses/update/all",
     GET_PROFILE = "api/profile/get",
     CREATE_PROFILE = "api/profile/create",
+    GET_INCOMES = "api/incomes/get",
+    UPSERT_INCOMES = "api/incomes/upsert",
     CREATE_ACCOUNTS = "api/accounts/create",
-    CREATE_LINK_TOKEN = "api/create_link_token",
-    CREATE_ACCESS_TOKEN = "api/create_access_token"
+    CREATE_LINK_TOKEN = "api/link_token/create",
+    CREATE_ACCESS_TOKEN = "api/access_token/create"
 }
