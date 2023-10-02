@@ -20,7 +20,7 @@
         width: 1rem;
         position: relative;
         right: 1rem;
-        transition: 0.2s;
+        transition: background-color 1s;
         border: 0.1rem solid var(--FONT_MODE);
     }
     .healthind__dot--default {

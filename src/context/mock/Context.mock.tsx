@@ -18,7 +18,6 @@ export const initLoginState = {
 // Create mock Theme Context
 export const mockThemeDispatch = jest.fn();
 export const initThemeState = {
-    health: Health.NONE,
     mode: ModeType.LIGHT,
     themeDispatch: mockThemeDispatch
 };
@@ -27,6 +26,7 @@ export const initThemeState = {
 export const mockDispatch = jest.fn();
 export const initAppState = {
     profile: "",
+    health: Health.NONE,
     totalIncome: 0.00,
     totalExpenses: 0.00,
     budgetView: BudgetView.MONTHLY,

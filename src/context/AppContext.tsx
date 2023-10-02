@@ -1,10 +1,12 @@
 // Import necessary components from React
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
 import { BudgetView } from "../constants/view";
+import { Health } from "../constants/style";
 
 // Define the shape of the state
 interface State {
   profile: string
+  health: Health;
   totalIncome: number
   totalExpenses: number
   budgetView: BudgetView
@@ -17,6 +19,7 @@ interface State {
 // Set initial state values
 const initialState: State = {
   profile: '',
+  health: Health.NONE,
   totalIncome: 0.00,
   totalExpenses: 0.00,
   budgetView: BudgetView.MONTHLY,

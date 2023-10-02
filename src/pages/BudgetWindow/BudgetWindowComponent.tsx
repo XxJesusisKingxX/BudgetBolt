@@ -1,10 +1,10 @@
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import './MiniWindow.css'
+import './BudgetWindow.css'
 import { Expense, useExpense } from './useExpense';
 import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';
 
-const MiniWindowComponent = () => {
+const BudgetWindowComponent = () => {
     const { addExpenses, showExpenses, updateAllExpenses, isLoading, } = useExpense();
     const { dispatch } = useContext(AppContext);
 
@@ -67,4 +67,4 @@ const MiniWindowComponent = () => {
         </div>
     );
 }
-export default MiniWindowComponent
+export default BudgetWindowComponent

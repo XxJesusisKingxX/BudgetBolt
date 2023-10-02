@@ -2,7 +2,7 @@ import React from 'react';
 import BudgetTrender from '../Charts/Chart';
 import FinancialsSnapshot from '../FinancialsSnapshot';
 import HealthIndicator from '../HealthIndicator';
-import MiniWindow from '../MiniWindow';
+import BudgetWindow from '../BudgetWindow';
 import BillTracker from '../BillTracker';
 import './Dashboard.css';
 
@@ -35,8 +35,8 @@ const DashboardComponent: React.FC<Props> = ({ user, date }) => {
                     <div className='dashboard__widgets__top__right'>
                         {/* FinancialsSnapshot component */}
                         <FinancialsSnapshot />
-                        {/* MiniWindow component */}
-                        <MiniWindow />
+                        {/* BudgetWindow component */}
+                        <BudgetWindow />
                     </div>
                 </div>
                 {/* Bottom widget */}
