@@ -4,7 +4,6 @@ import AppContext from '../../context/AppContext';
 import { useIncome } from './useIncome';
 
 const FinancialsSnapshot = () => {
-    // TODO: Add logic to determine income
     const { totalExpenses, totalIncome } = useContext(AppContext)
 
     const { upsertIncome } = useIncome();

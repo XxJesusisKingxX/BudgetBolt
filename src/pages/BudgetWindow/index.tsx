@@ -1,4 +1,4 @@
-import MiniWindowComponent from './MiniWindowComponent';
+import MiniWindowComponent from './BudgetWindowComponent';
 
 const MiniWindow = () => {
     return (

@@ -49,7 +49,7 @@ const Menu: FC<Props> = ({ showDropdown, onMouseOut, onMouseOver }) => {
                     <ul className='menu__list__item'><img alt='goals and savings icon' className='menu__list__item__icon' src={goalIcon}/><a href='/'>Goals and Savings</a></ul>
                     <ul className='menu__list__item'><img alt='remninders and alerts icon' className='menu__list__item__icon' src={reminderIcon}/><a href='/'>Reminders and Alerts</a></ul>
                     <ul className='menu__list__item'><img alt='settings icon' className='menu__list__item__icon' src={settingsIcon}/><a href='/'>Settings</a></ul>
-                    <ul className='menu__list__item'><img alt='help icon' className='menu__list__item__icon' src={helpIcon}/><a href='/'>Help and Support</a></ul>
+                    <ul className='menu__list__item menu__list__item--last'><img alt='help icon' className='menu__list__item__icon' src={helpIcon}/><a href='/'>Help and Support</a></ul>
                 </div>
             </div>
         </>

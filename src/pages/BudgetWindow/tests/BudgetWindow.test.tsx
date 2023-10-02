@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import fetchMock  from 'jest-fetch-mock';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import MiniWindowComponent from '../MiniWindowComponent';
+import BudgetWindowComponent from '../BudgetWindowComponent';
 import userEvent from '@testing-library/user-event';
 import * as Create from '../useExpense';
 import { EndPoint } from '../../../constants/endpoints';
@@ -32,7 +32,7 @@ describe("Expenses", () => {
         });
 
         // Render
-        render(<MiniWindowComponent/>)
+        render(<BudgetWindowComponent/>)
 
         // Reflect user actions
         userEvent.click(screen.getByRole('button', { name: "+ Create Expense"}))
@@ -54,7 +54,7 @@ describe("Expenses", () => {
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
 
         // Render
-        render(<MiniWindowComponent/>)
+        render(<BudgetWindowComponent/>)
 
         // Assert for loading spinner
         expect(screen.getByRole('img', { name: "Loading" })).toBeTruthy();
@@ -73,7 +73,7 @@ describe("Expenses", () => {
         // Render
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
         // Render
-        render(<MiniWindowComponent/>)
+        render(<BudgetWindowComponent/>)
         // Recreate user actions
         await waitFor(() => {
             userEvent.click(screen.getByRole('button', { name: "Edit" }));
@@ -121,7 +121,7 @@ describe("Expenses", () => {
         fetchMock.enableMocks();
         fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"ID":"1","Name":"Test","Limit":"100.00","Spent":"150.00"}]}), {status: 200})
         // Render
-        renderWithAppContext(<MiniWindowComponent/>)
+        renderWithAppContext(<BudgetWindowComponent/>)
         // Recreate user actions
         act(() => {
             userEvent.selectOptions(screen.getByRole('combobox', { name: "" }), BudgetView.WEEKLY);

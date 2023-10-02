@@ -1,36 +1,39 @@
 import '@testing-library/jest-dom'
-import { initThemeState, renderWithThemeContext } from '../../../context/mock/ThemeContext.mock';
 import HealthIndicator from '..';
+import { initAppState, mockDispatch, renderWithAppContext } from '../../../context/mock/AppContext.mock';
+
+
 
 // Global States Intialization
-const health = initThemeState.health;
+const health = initAppState.health;
+
 
 afterEach(() => {
-    initThemeState.health = health;
+    initAppState.health = health;
 })
 
 describe("Render HealthIndicator:", () => {
     test("show red", () => {
-        initThemeState.health = 1
-        const { container } = renderWithThemeContext(<HealthIndicator/>);
+        initAppState.health = 1
+        const { container } = renderWithAppContext(<HealthIndicator/>);
         const healthDot = container.querySelector('.healthind__dot--red');
         expect(healthDot).toBeInTheDocument();
     });
     test("show yellow", () => {
-        initThemeState.health = 2
-        const { container } = renderWithThemeContext(<HealthIndicator/>);
+        initAppState.health = 2
+        const { container } = renderWithAppContext(<HealthIndicator/>);
         const healthDot = container.querySelector('.healthind__dot--yellow');
         expect(healthDot).toBeInTheDocument();
     });
     test("show green", () => {
-        initThemeState.health = 3
-        const { container } = renderWithThemeContext(<HealthIndicator/>);
+        initAppState.health = 3
+        const { container } = renderWithAppContext(<HealthIndicator/>);
         const healthDot = container.querySelector('.healthind__dot--green');
         expect(healthDot).toBeInTheDocument();
     });
-    test("show none", () => {
-        initThemeState.health = 0
-        const { container } = renderWithThemeContext(<HealthIndicator/>);
+    test("show none", async () => {
+        initAppState.health = 0
+        const { container } = renderWithAppContext(<HealthIndicator/>);
         const healthDot = container.querySelector('.healthind__dot--default');
         expect(healthDot).toBeInTheDocument();
     });

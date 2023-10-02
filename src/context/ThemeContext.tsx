@@ -1,16 +1,14 @@
 // Import necessary components and types from React and other files
 import { createContext, useReducer, Dispatch, ReactNode } from "react";
-import { Health, ModeType } from "../constants/style";
+import { ModeType } from "../constants/style";
 
 // Define the shape of the state
 interface State {
-  health: Health;
   mode: ModeType;
 }
 
 // Set initial state values
 const initialState: State = {
-  health: Health.NONE,
   mode: ModeType.LIGHT,
 };
 

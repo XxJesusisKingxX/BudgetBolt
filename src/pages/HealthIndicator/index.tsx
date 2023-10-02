@@ -1,10 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import HealthIndicatorComponent from './HealthIndicatorComponent'; // Importing the HealthIndicator component
-import ThemeContext from '../../context/ThemeContext'; // Importing the ThemeContext
+import AppContext from '../../context/AppContext';
+import { useHealth } from './useHealth';
 
 const HealthIndicator = () => {
-    // Accessing the health value from ThemeContext
-    const { health } = useContext(ThemeContext);
+    const { totalExpenses, totalIncome, health } = useContext(AppContext)
+
+    const { calculateHealth } = useHealth();
 
     let healthClassName = "";
 
@@ -18,6 +20,11 @@ const HealthIndicator = () => {
     } else if (health === 0) {
         healthClassName = "healthind__dot healthind__dot--default";
     }
+
+    useEffect(() => {
+        calculateHealth();
+        // eslint-disable-next-line
+    },[totalExpenses, totalIncome])
 
     return (
         // Render the HealthIndicator component with the calculated class

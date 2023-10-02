@@ -1,3 +1,4 @@
+import { Health } from '../../constants/style';
 import { BudgetView } from '../../constants/view';
 import AppContext from '../AppContext';
 import { render, RenderResult } from '@testing-library/react';
@@ -6,6 +7,7 @@ export const mockDispatch = jest.fn();
 
 export const initAppState = {
     profile: "",
+    health: Health.NONE,
     totalIncome: 0.00,
     totalExpenses: 0.00,
     budgetView: BudgetView.MONTHLY,
