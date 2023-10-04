@@ -51,17 +51,17 @@ func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 		return "", err
 	}
 	query = fmt.Sprintf(query, conditions)
-
+	
 	// Additional conditionals
-	if m.Query.Select.GreaterThanEq.Value != "" {
+	if m.Query.Select.GreaterThanEq.Value != nil && m.Query.Select.GreaterThanEq.Value != "" {
 		if reflect.TypeOf(m.Query.Select.GreaterThanEq.Value).Kind() == reflect.String {
 			query += fmt.Sprintf(" AND %v >= '%v'", m.Query.Select.GreaterThanEq.Column, m.Query.Select.GreaterThanEq.Value)
 		} else {
 			query += fmt.Sprintf(" AND %v >= %v", m.Query.Select.GreaterThanEq.Column, m.Query.Select.GreaterThanEq.Value)
 		}
 	}
-
-	if m.Query.Select.Equal.Value != "" {
+	
+	if m.Query.Select.Equal.Value != nil && m.Query.Select.Equal.Value != "" {
 		if reflect.TypeOf( m.Query.Select.Equal.Value).Kind() == reflect.String {
 			query += fmt.Sprintf(" AND %v = '%v'", m.Query.Select.Equal.Column, m.Query.Select.Equal.Value)
 		} else {

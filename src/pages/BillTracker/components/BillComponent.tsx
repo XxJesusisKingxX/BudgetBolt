@@ -4,18 +4,18 @@ import '../../../assets/view/styles/billtracker/Bill.css';
 interface Props {
     name: string;                 // The name associated with the bill.
     price: string;                // The price or amount of the bill.
-    daysLeft: number;             // The number of days left until the bill's due date.
+    daysLeft: string;             // The number of days left until the bill's due date.
     dueDate: string;              // The due date of the bill.
     category: string;             // The category or type of the bill (e.g., utility, rent, subscription).
     spacing: number;              // The spacing value for positioning the component.
-    icon: string                  // An icon for the bill category.
+    icon?: string                  // An icon for the bill category.
 }
 
 const BillComponent: FC<Props> = ({ icon, name, price, daysLeft, dueDate, category, spacing }) => {
     return (
         <div data-testid='bill' className='bill'>
             {/* Display the icon if provided */}
-            <img data-testid='bill-icon' className='bill__icon' src={icon} alt='category icon'/>
+            <img data-testid='bill-icon' className='bill__icon' src={icon} alt='ico'/>
             {/* Display the bill name, price, and days left */}
             <span className='bill__name'>{name}:</span>
             <span className='bill__amount'>${price}</span>

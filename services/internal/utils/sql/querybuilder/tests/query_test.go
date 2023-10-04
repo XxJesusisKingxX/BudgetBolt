@@ -18,8 +18,8 @@ func TestFormatColumnsAndValues(t *testing.T) {
 	})
 
 	t.Run("Non-Empty Model with Tags", func(t *testing.T) {
-		testModel := transaction.Transaction{ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
-		expectedColumns := "transaction_id, net_amount, vendor, is_recurring"
+		testModel := transaction.Transaction{ID: "1", Vendor: "Test", Amount: 123.45}
+		expectedColumns := "transaction_id, net_amount, vendor"
 		result, _ := querybuilder.FormatColumnsAndValues(testModel)
 		tests.Equals(t, expectedColumns, result)
 	})
@@ -50,8 +50,8 @@ func TestSetColumnsAndValues(t *testing.T) {
 	})
 
 	t.Run("Non-Empty Model with Tags", func(t *testing.T) {
-		testModel := transaction.Transaction{ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
-		expectedQuery := "net_amount = 123.45, vendor = 'Test', is_recurring = true"
+		testModel := transaction.Transaction{ID: "1", Vendor: "Test", Amount: 123.45}
+		expectedQuery := "net_amount = 123.45, vendor = 'Test'"
 		result := querybuilder.SetColumnsAndValues(testModel)
 		tests.Equals(t, expectedQuery, result)
 	})
@@ -81,8 +81,8 @@ func TestCreateWhereCondition(t *testing.T) {
 	})
 
 	t.Run("Non-Empty Model with Tags", func(t *testing.T) {
-		testModel := transaction.Transaction{ID: "1", Vendor: "Test", IsRecurring: true, Amount: 123.45}
-		expectedQuery := "transaction_id = '1' AND net_amount = 123.45 AND vendor = 'Test' AND is_recurring = true"
+		testModel := transaction.Transaction{ID: "1", Vendor: "Test", Amount: 123.45}
+		expectedQuery := "transaction_id = '1' AND net_amount = 123.45 AND vendor = 'Test'"
 		result := querybuilder.CreateWhereCondition(testModel)
 		tests.Equals(t, expectedQuery, result)
 	})

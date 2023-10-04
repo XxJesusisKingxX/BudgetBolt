@@ -1,55 +1,50 @@
 import '@testing-library/jest-dom'
-import { render, screen, waitFor } from '@testing-library/react';
-import { useCreate } from '../../useCreate';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import { Bills } from '../../useBill';
+import * as Create from '../../useBill';
 import Bill from '../../components/Bill';
+import { renderHook } from '@testing-library/react-hooks';
 
 describe("Render Bill", () => {
     // need to test for loading screen after bill implementation
-    test("show bill", () => {
+    test("show bill", async () => {
         // Create bill array of Bills type
-        const billList = [
-            {
-               ID: 1,
-               Amount: 111.11,
-               Vendor: "Discover",
-               Category: "CreditCard",
-               DueDate: "Jan 12, 2023"
+        const billList: Bills = {
+            "AMF": {
+                average_amount: 24.8,
+                category: "ENTERTAINMENT",
+                degraded: 0,
+                due_date: "2023-10-18",
+                earliest_date_cycle: "2023-09-18",
+                frequency: 1,
+                last_date_cycle: "2023-09-18",
+                max_amount: 24.8,
+                name: "AMF",
+                previous_date_cycle: "2023-09-18",
+                status: "UNKNOWN",
+                total_amount: 24.8
             }
-        ]
+        }
         // Render bills with custom hook
-        const { createBill } = useCreate();
-        const bills = createBill(billList)
-        render(bills[0]);
+        let endResult;
+        const { result } = renderHook(() => Create.useBill());
+        act(() => {
+            endResult = result.current.showBills(false, billList);
+        });
+        render(<div>{endResult}</div>);
         // Assertions
-        expect(screen.getByTestId('bill')).toBeTruthy();
+        await waitFor(() => {
+            expect(screen.getByText("AMF")).toBeTruthy();
+        })
+        expect(screen.getByText("$24.80")).toBeTruthy();
+        expect(screen.queryByTestId('bill-daysleft')).toBeTruthy();
+        expect(screen.getByText("Category:ENTERTAINMENT")).toBeTruthy();
+        expect(screen.getByText("Due Date:2023-10-18")).toBeTruthy();
+        expect(screen.queryByTestId("bill-icon")).toBeTruthy();
+        expect(screen.queryByText("NaN")).toBeFalsy(); // Make sure no field is empty
     });
     test("show no bill", () => {
         render(<Bill/>);
         expect(screen.queryByTestId('bill')).toBeFalsy();
     });
-    test("show all bill props", async () => {
-        // Create bill array of Bills type
-        const billList = [
-            {
-               ID: 1,
-               Amount: 120,
-               Vendor: "Walmart",
-               Category: "Credit Card",
-               DueDate: "Aug 26, 2023"
-            }
-        ]
-        // Render bills with custom hook
-        const { createBill } = useCreate();
-        const bills = createBill(billList)
-        render(bills[0]);
-        // Assertions
-        expect(screen.getByText("$120.00")).toBeTruthy();
-        expect(screen.queryByTestId('bill-daysleft')).toBeTruthy();
-        expect(screen.getByText("Walmart")).toBeTruthy();
-        expect(screen.getByText("Category:Credit Card")).toBeTruthy();
-        expect(screen.getByText("Due Date:Aug 26, 2023")).toBeTruthy();
-        expect(screen.queryByTestId("bill-icon")).toBeTruthy();
-        expect(screen.queryByText("NaN")).toBeFalsy(); // Make sure no field is empty
-    });
-    // no need to test useCreate hook since already tested here
 });

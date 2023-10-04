@@ -8,12 +8,12 @@ import (
 	q "services/internal/utils/sql/querybuilder"
 )
 
-var (
-	tableName string = "transactions"
+const (
+	TRANSACTIONS string = "transactions"
 )
 
 func CreateTransaction(db *sql.DB, m model.Transaction) error {
-	query, err := q.BuildCreateQuery("transactions", m)
+	query, err := q.BuildCreateQuery(TRANSACTIONS, m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -22,7 +22,7 @@ func CreateTransaction(db *sql.DB, m model.Transaction) error {
 }
 
 func UpdateTransaction(db *sql.DB, setM model.Transaction, whereM model.Transaction) error {
-	query, err := q.BuildUpdateQuery("transactions", setM, whereM)
+	query, err := q.BuildUpdateQuery(TRANSACTIONS, setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -43,7 +43,7 @@ func RetrieveTransaction(db *sql.DB, m model.Transaction) ([]model.Transaction, 
 }
 
 func DeleteTransaction(db *sql.DB, m model.Transaction) error {
-	query, err := q.BuildDeleteQuery("transactions", m)
+	query, err := q.BuildDeleteQuery(TRANSACTIONS, m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err

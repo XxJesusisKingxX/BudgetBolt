@@ -35,20 +35,53 @@ func ViewTransaction(rows *sql.Rows) []model.Transaction {
 		var amount float64
 		var method sql.NullString
 		var vendor sql.NullString
-		var isRecurring bool
 		var description string
 		var primaryCat sql.NullString
 		var secondaryCat sql.NullString
 		var profileId int64
 		var accName string
-		rows.Scan(&id, &date, &amount, &method, &vendor, &isRecurring, &description, &primaryCat, &secondaryCat, &profileId, &accName)
+		var pending bool
+		rows.Scan(&id, &date, &amount, &method, &vendor, &description, &primaryCat, &secondaryCat, &profileId, &accName, &pending)
 		view = append(view, model.Transaction{
 			ID: id,
 			Date: strings.Split(date,"T")[0],
 			Amount: amount,
 			Method: strings.TrimSpace(method.String),
 			Vendor: strings.TrimSpace(vendor.String),
-			IsRecurring: isRecurring,
+			Description: strings.TrimSpace(description),
+			ProfileID: profileId,
+			PrimaryCategory: strings.TrimSpace(primaryCat.String),
+			DetailCategory: strings.TrimSpace(secondaryCat.String),
+			AccountName: accName,
+			Pending: pending,
+		})
+	}
+	return view
+}
+
+func ViewRecurringTransaction(rows *sql.Rows) []model.RecurringTransaction {
+	var view []model.RecurringTransaction
+	defer rows.Close()
+	for rows.Next() {
+		var id string
+		var lastDate string
+		var avgAmt float64
+		var merchant sql.NullString
+		var description string
+		var frequency string
+		var status string
+		var primaryCat sql.NullString
+		var secondaryCat sql.NullString
+		var profileId int64
+		var accName string
+		rows.Scan(&id, &lastDate, &avgAmt, &merchant, &description, &frequency, &status, &primaryCat, &secondaryCat, &profileId, &accName)
+		view = append(view, model.RecurringTransaction{
+			ID: id,
+			LastDate: strings.Split(lastDate,"T")[0],
+			AvgAmount: avgAmt,
+			Merchant: strings.TrimSpace(merchant.String),
+			Status: status,
+			Frequency: frequency,
 			Description: strings.TrimSpace(description),
 			ProfileID: profileId,
 			PrimaryCategory: strings.TrimSpace(primaryCat.String),

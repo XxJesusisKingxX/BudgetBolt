@@ -1,21 +1,20 @@
-import { useContext, useState } from 'react';
-import ThemeContext from '../../../context/ThemeContext';
-import { useCreate, Bills } from '../useCreate';
+import { useContext, useEffect } from 'react';
+import { useBill } from '../useBill';
+import AppContext from '../../../context/AppContext';
 
 const Bill = () => {
-    const { mode } = useContext(ThemeContext);
-    const { createBill } = useCreate();
-    // eslint-disable-next-line
-    const [loading, setLoading] = useState(false)
-    // *TODO* actually fetch real data and test
-    // eslint-disable-next-line
-    const [bills, setBills] = useState<Bills[]>([]);
+    const { getBills, showBills } = useBill();
+
+    const { budgetView } = useContext(AppContext)
     
-    const loadingIcon = `/images/${mode}/loading.png`;
+    useEffect(() => {
+        getBills();
+        // eslint-disable-next-line
+    },[budgetView])
+
     return (
         <>
-            {!loading ? createBill(bills) : <img className='loading loading--bills' src={loadingIcon} alt='Loading'/>
-            }
+            {showBills()}
         </>
     );
 };
