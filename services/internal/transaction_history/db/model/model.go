@@ -31,7 +31,21 @@ type Transaction struct {
 
 }
 type Transactions struct {
-	Transactions []Transaction `json:"transactions"`
+    Transactions []Transaction `json:"transactions"`
+}
+type Bill struct {
+    Name              string   `json:"name"`
+    Total             float64  `json:"total_amount"`
+    MaxAmount         float64  `json:"max_amount"`
+    AverageAmount     float64  `json:"average_amount"`
+    DueDate           string   `json:"due_date"`
+    EarliestDate      string   `json:"earliest_date_cycle"`
+    PreviousDateCycle string   `json:"previous_date_cycle"`
+    LastDateCycle     string   `json:"last_date_cycle"`
+    Frequency         int      `json:"frequency"`
+    Status            string   `json:"status"`
+    Degraded          int      `json:"degraded"`
+    Category          string   `json:"category"`
 }
 type Account struct {
 	ID             string  `db:"account_id"`

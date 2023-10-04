@@ -61,7 +61,7 @@ func BuildTransactionRetrieveQuery(m model.Transaction) (string, error) {
 		}
 	}
 	
-	if m.Query.Select.Equal.Value != nil && m.Query.Select.GreaterThanEq.Value != "" {
+	if m.Query.Select.Equal.Value != nil && m.Query.Select.Equal.Value != "" {
 		if reflect.TypeOf( m.Query.Select.Equal.Value).Kind() == reflect.String {
 			query += fmt.Sprintf(" AND %v = '%v'", m.Query.Select.Equal.Column, m.Query.Select.Equal.Value)
 		} else {

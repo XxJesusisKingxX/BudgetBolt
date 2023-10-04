@@ -65,7 +65,8 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 	}
 
 	var transactions []model.Transaction
-	var streams = make(map[string]map[string]interface{})
+	var bills = make(map[string]*model.Bill)
+
 	// var recurringTransactions []model.RecurringTransaction
 
 	// if recurring == "enable" {
@@ -119,90 +120,62 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 			if transaction.PrimaryCategory == "INCOME" || transaction.PrimaryCategory == "TRANSFER_IN" || transaction.PrimaryCategory == "TRANSFER_OUT" || transaction.PrimaryCategory == "BANK_FEES" {
 				continue
 			}
-			var prop map[string]interface{}
-			// set props defaults
-			props := map[string]interface{}{
-				"name":"",
-				"total": 0.0,
-				"maxAmt": 0.0,
-				"avgAmt": 0.0,
-				"freq": 1,
-				"status": "",
-				"degraded": 0,
-				"earliestDate": "",
-				"prevDateCycle": "",
-				"lastDateCycle": "",
-			}
+
+			var key string
 			if transaction.Vendor != "" {
-				if _, ok := streams[transaction.Vendor]; !ok {
-					// intialize first time seeing
-					streams[transaction.Vendor] = props
-					props["name"] = transaction.Vendor
-					props["total"] = transaction.Amount
-					props["maxAmt"] = transaction.Amount
-					props["avgAmt"] = transaction.Amount
-					props["status"] = "UNKNOWN"
-					props["earliestDate"] = transaction.Date
-					props["prevDateCycle"] = transaction.Date
-					props["lastDateCycle"] = transaction.Date
-					continue
-				}
-				// set props to be updated
-				prop = streams[transaction.Vendor]
+				key = transaction.Vendor
 			} else {
-				if _, ok := streams[transaction.Description]; !ok {
-					// intialize first time seeing
-					streams[transaction.Description] = props
-					props["name"] = transaction.Description
-					props["total"] = transaction.Amount
-					props["maxAmt"] = transaction.Amount
-					props["avgAmt"] = transaction.Amount
-					props["status"] = "UNKNOWN"
-					props["earliestDate"] = transaction.Date
-					props["prevDateCycle"] = transaction.Date
-					props["lastDateCycle"] = transaction.Date
+				key = transaction.Description
+			}
+
+			if bill, ok := bills[key]; !ok {
+				// Initialize first time seeing
+				bills[key] = &model.Bill{
+					Name:              key,
+					Total:             transaction.Amount,
+					MaxAmount:         transaction.Amount,
+					AverageAmount:     transaction.Amount,
+					Status:            "UNKNOWN",
+					Frequency:         1,
+					EarliestDate:      transaction.Date,
+					PreviousDateCycle: transaction.Date,
+					LastDateCycle:     transaction.Date,
+					Category:          transaction.PrimaryCategory,
+				}
+				continue
+			} else {
+				// Add total
+				bill.Total += transaction.Amount
+				// Add amount of times seen (reset if trend breaks)
+				bill.Frequency += 1
+				// Calculate average amount over all recurring transactions
+				bill.AverageAmount = bill.Total / float64(bill.Frequency)
+				// Calculate max amount spent over all recurring transactions
+				bill.MaxAmount = math.Max(bill.MaxAmount, transaction.Amount)
+				// Check if the trend is healthy; if not, set "true" to "DEGRADED"
+				if !utils.IsTrendHealthy(bill.PreviousDateCycle, bill.LastDateCycle, recurring) {
+					bill.Degraded += 1
+					// Reset frequency
+					bill.Frequency = 1
+					// Reset prev and current dater pointer to same
+					bill.PreviousDateCycle = transaction.Date
+					bill.LastDateCycle = transaction.Date
 					continue
 				}
-				// set props to be updated
-				prop = streams[transaction.Description]
-			}
-
-			// Add total
-			prop["total"] = prop["total"].(float64) + transaction.Amount
-			// Add amount of times seen (reset if trend breaks)
-			prop["freq"] = prop["freq"].(int) + 1
-			// Calculate average amount over all recurring transactions
-			prop["avgAmt"] = prop["total"].(float64) / float64(prop["freq"].(int))
-			// Calculate max amount spent over all recurring transactions
-			prop["maxAmt"] = math.Max(prop["maxAmt"].(float64), transaction.Amount)
-
-			// Set pointer for previous date cycle and current cycle
-			var cur string
-			var prev string
-			cur = prop["lastDateCycle"].(string)
-			prev = prop["prevDateCycle"].(string)
-
-			// Check if the trend is healthy; if not, set "true" to "DEGRADED"
-			if !utils.IsTrendHealthy(prev, cur, recurring) {
-				prop["degraded"] = prop["degraded"].(int) + 1
-				// Reset frequency
-				prop["freq"] = 1
-				// Reset prev and current dater pointer to same
-				props["prevDateCycle"] = transaction.Date
-				props["lastDateCycle"] = transaction.Date
-				continue
-			}
-			// Swap current pointer to prev before updating to continue streak
-			prop["prevDateCycle"] = prop["lastDateCycle"]
-			prop["lastDateCycle"] = transaction.Date
-
-			// Set "status" to "MATURE" or "EARLY" based on "freq" if not already set to "DEGRADED"
-			if prop["freq"].(int) >= 3 {
-				prop["status"] = "MATURE"
-			} else if prop["freq"].(int) == 2 {
-				prop["status"] = "EARLY"
+				// Swap current pointer to prev before updating to continue streak
+				bill.PreviousDateCycle = bill.LastDateCycle
+				bill.LastDateCycle = transaction.Date
+				// Get due date next
+				bill.DueDate = utils.PredictNextDueDate(bill.PreviousDateCycle, bill.LastDateCycle)
+				// Set "status" to "MATURE" or "EARLY" based on "freq" if not already set to "DEGRADED"
+				if bill.Frequency >= 3 {
+					bill.Status = "MATURE"
+				} else if bill.Frequency == 2 {
+					bill.Status = "EARLY"
+				}
 			}
 		}
+
 
 	} else {
 		transactions, err = dbs.RetrieveTransaction(db, model.Transaction{
@@ -230,9 +203,10 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 		c.JSON(http.StatusNotFound, gin.H{"error":"TRANSACTIONS NOT FOUND"})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": transactions,
-		"recurring": streams,
+		"bills": bills,
 	})
 }
 

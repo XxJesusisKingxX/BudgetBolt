@@ -76,4 +76,13 @@ func IsTrendHealthy(date1 string, date2 string, view string) bool {
 	}
 }
 
+func PredictNextDueDate(previousDateCycle, lastDateCycle string) string {
+	last, _ := time.Parse("2006-01-02", lastDateCycle)
+	prev, _ := time.Parse("2006-01-02", previousDateCycle)
+	// Calculate the time interval between the two previous due dates
+	interval := last.Sub(prev)
+	// Add the interval to the most recent due date to predict the next due date
+	nextDueDate := last.Add(interval)
+	return nextDueDate.Format("2006-01-02")
+}
 // Test funcitons

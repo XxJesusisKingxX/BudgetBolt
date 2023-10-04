@@ -7,16 +7,23 @@ import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 
 // Interface for the shape of a bill
-export interface Bills {
-    ID: number;       // Unique identifier for the bill
-    Amount: number;   // Amount of the bill
-    Vendor: string;   // Vendor associated with the bill
-    Category: string; // Category of the bill
-    DueDate: string;     // Date of the bill
+interface Bill {
+    name: string
+    total_amount: number
+    max_amount: number
+    average_amount: number
+    due_date: string
+    earliest_date_cycle: string
+    previous_date_cycle: string
+    last_date_cycle: string
+    frequency: number
+    status: string
+    degraded: number
+    category: string
 }
 
 export const useBill = () => {
-    const [bills, setBills] = useState<Bills[]>([]);
+    const [bills, setBills] = useState<Bill[]>([]);
     const [isLoading, setLoading] = useState(false);
 
     const { budgetView } = useContext(AppContext)
@@ -33,8 +40,8 @@ export const useBill = () => {
             if (response.ok) {
                 const data = await response.json();
                 if (data) {
-                    setBills(data["recurring"]);
-                    setLoading(false)
+                    setBills(data["bills"]);
+                    console.log(data["bills"])
                 }
                 setLoading(false);
             }
@@ -45,9 +52,8 @@ export const useBill = () => {
     };
 
     const showBills = (loading = isLoading, billList = bills) => {
-        console.log(billList)
-        const loadingIcon = `/images/${mode}/loading.png`;
         const maxPeek = 6; // max amount of bills to show
+        const maxChar = 4; // max amount characters to show for name
         const spacing = 2; // spacing between bills every render
 
         const handleDaysLeft= (date: string) => {
@@ -60,7 +66,7 @@ export const useBill = () => {
             // Convert milliseconds to days
             const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            return String(daysLeft);
+            return daysLeft;
         };
 
         const getCategoryIcon = (category: string) => {
@@ -72,33 +78,35 @@ export const useBill = () => {
                     return ''; // Default icon or handle missing icons
             }
         };
-        
-        // update to get the correct due date
-        // update to inlcude category
-        billList = Array.from(billList)
-        const rows = billList.slice(0, maxPeek).map((bill: any, idx) => (
-            <BillComponent
-                key={idx}
-                name={bill.name}                         // Vendor associated with the bill
-                price={bill.avgAmt.toFixed(2)}             // Amount of the bill
-                daysLeft={handleDaysLeft(bill.lastDateCycle)}    // Number of days left (TODO: Update)
-                dueDate={bill.lastDateCycle}                     // Date of the bill
-                category={bill.Category}                   // Category of the bill
-                spacing={idx * spacing}                    // Spacing based on index
-                icon={getCategoryIcon(bill.Category.toLowerCase())}  // Show icon based on category
-            />
-        ));
-        return (
-        !loading && billList ?
-        rows
-        :
-        <img className='loading loading--bills' src={loadingIcon} alt='Loading'/>
-        );
+
+        const rows = Object.keys(bills)
+        .slice(0, maxPeek)
+        .map((name: any, idx) => {
+            const bill: Bill = bills[name];
+            const billName = bill.name.length > maxChar ? bill.name.slice(0, 4) + "*" : bill.name;
+            if (handleDaysLeft(bill.due_date) > 0) {
+            return (
+                <BillComponent
+                    key={idx}
+                    name={billName}
+                    price={bill.average_amount.toFixed(2)}
+                    daysLeft={handleDaysLeft(bill.due_date).toString()}
+                    dueDate={bill.due_date}
+                    category={bill.category}
+                    spacing={idx * spacing}
+                    icon={getCategoryIcon(bill.category.toLowerCase())}
+                />
+            );
+            }
+        });
+
+        return rows;
 
     }
 
     return {
         showBills,
-        getBills
+        getBills,
+        bills
     };
 };

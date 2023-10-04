@@ -8,9 +8,9 @@ const Bill = () => {
     const { budgetView } = useContext(AppContext)
     
     useEffect(() => {
-        getBills()
+        getBills();
     },[budgetView])
-    
+
     return (
         <>
             {showBills()}
