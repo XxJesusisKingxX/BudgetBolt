@@ -7,7 +7,8 @@ import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 
 // Interface for the shape of a bill
-interface Bill {
+export interface Bills {
+  [key: string]: {
     name: string
     total_amount: number
     max_amount: number
@@ -20,10 +21,11 @@ interface Bill {
     status: string
     degraded: number
     category: string
+  };
 }
 
 export const useBill = () => {
-    const [bills, setBills] = useState<Bill[]>([]);
+    const [bills, setBills] = useState<Bills>({});
     const [isLoading, setLoading] = useState(false);
 
     const { budgetView } = useContext(AppContext)
@@ -41,7 +43,6 @@ export const useBill = () => {
                 const data = await response.json();
                 if (data) {
                     setBills(data["bills"]);
-                    console.log(data["bills"])
                 }
                 setLoading(false);
             }
@@ -51,10 +52,11 @@ export const useBill = () => {
 
     };
 
-    const showBills = (loading = isLoading, billList = bills) => {
+    const showBills = (loading = isLoading, billList: Bills = bills) => {
         const maxPeek = 6; // max amount of bills to show
         const maxChar = 4; // max amount characters to show for name
         const spacing = 2; // spacing between bills every render
+        const loadingIcon = `/images/${mode}/loading.png`;
 
         const handleDaysLeft= (date: string) => {
             const currentDate = new Date();
@@ -79,10 +81,10 @@ export const useBill = () => {
             }
         };
 
-        const rows = Object.keys(bills)
+        const rows = Object.keys(billList)
         .slice(0, maxPeek)
         .map((name: any, idx) => {
-            const bill: Bill = bills[name];
+            const bill = billList[name]
             const billName = bill.name.length > maxChar ? bill.name.slice(0, 4) + "*" : bill.name;
             if (handleDaysLeft(bill.due_date) > 0) {
             return (
@@ -99,14 +101,16 @@ export const useBill = () => {
             );
             }
         });
-
-        return rows;
-
+        return (
+            !loading && billList ?
+            rows
+            :
+            <img className='loading loading--bills' src={loadingIcon} alt="Loading" />
+        );
     }
 
     return {
         showBills,
         getBills,
-        bills
     };
 };
