@@ -11,6 +11,9 @@ func SetupTransactionRoutes(router *gin.RouterGroup, db *sql.DB ) {
     httpClient := request.HTTPClient{} 
     client := httpClient.NewHTTPClient("http://localhost:8000/api/")
     
+    router.DELETE("transactions/pending/remove", func(c *gin.Context) {
+        DeletePendingTransactions(c, DB{}, db, client, false)
+    })
     router.GET("transactions/get", func(c *gin.Context) {
         RetrieveTransactions(c, DB{}, db, client, false)
     })

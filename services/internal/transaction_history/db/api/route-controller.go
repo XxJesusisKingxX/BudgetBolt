@@ -6,12 +6,13 @@ import (
 	user "services/internal/user_management/db/model"
 	"services/internal/utils/http"
 	"strings"
-
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
+	"math"
 
 	"github.com/gin-gonic/gin"
 	"github.com/plaid/plaid-go/v12/plaid"
@@ -46,6 +47,7 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 	uidP := c.Query("uid")
 	date := c.Query("date")
 	category := c.Query("category")
+	recurring := c.Query("recurring")
 
 	// Retrieve the user's profile based on the uid.
 	var profile user.Profile
@@ -63,8 +65,146 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 	}
 
 	var transactions []model.Transaction
-	if err == nil {
-		// Retrieve the user's transactions based on the profile ID.
+	var streams = make(map[string]map[string]interface{})
+	// var recurringTransactions []model.RecurringTransaction
+
+	// if recurring == "enable" {
+	// 	recurringTransactions, err = dbs.RetrieveRecurringTransaction(db, model.RecurringTransaction{
+	// 		ProfileID: int64(profile.ID),
+	// 		Query: model.Querys{
+	// 			Select: model.QueryParameters{
+	// 				OrderBy: model.OrderBy {
+	// 					Desc: true,
+	// 					Column: "last_date",
+	// 				},
+	// 				GreaterThanEq: model.GreaterThanEq{
+	// 					Value: date,
+	// 					Column: "last_date",
+	// 				},
+	// 			},
+	// 		},
+	// 	})
+
+	// 	if err != nil || len(recurringTransactions) == 0 {
+	// 		c.JSON(http.StatusNotFound, gin.H{"error":"TRANSACTIONS NOT FOUND"})
+	// 		return
+	// 	}
+
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"transactions": recurringTransactions,
+	// 	})
+
+	// } 
+
+	// Calculate recurring
+	if recurring != "" {
+		transactions, err = dbs.RetrieveTransaction(db, model.Transaction{
+			ProfileID: int64(profile.ID),
+			Query: model.Querys{
+				Select: model.QueryParameters{
+					OrderBy: model.OrderBy {
+						Asc: true,
+						Column: "transaction_date",
+					},
+					GreaterThanEq: model.GreaterThanEq{
+						Value: utils.LookBackView(date, recurring),
+						Column: "transaction_date",
+					},
+				},
+			},
+		})
+
+		for _,transaction := range transactions {
+			// TODO ADD QUERY ABILTITY TO SPEED UP
+			if transaction.PrimaryCategory == "INCOME" || transaction.PrimaryCategory == "TRANSFER_IN" || transaction.PrimaryCategory == "TRANSFER_OUT" || transaction.PrimaryCategory == "BANK_FEES" {
+				continue
+			}
+			var prop map[string]interface{}
+			// set props defaults
+			props := map[string]interface{}{
+				"name":"",
+				"total": 0.0,
+				"maxAmt": 0.0,
+				"avgAmt": 0.0,
+				"freq": 1,
+				"status": "",
+				"degraded": 0,
+				"earliestDate": "",
+				"prevDateCycle": "",
+				"lastDateCycle": "",
+			}
+			if transaction.Vendor != "" {
+				if _, ok := streams[transaction.Vendor]; !ok {
+					// intialize first time seeing
+					streams[transaction.Vendor] = props
+					props["name"] = transaction.Vendor
+					props["total"] = transaction.Amount
+					props["maxAmt"] = transaction.Amount
+					props["avgAmt"] = transaction.Amount
+					props["status"] = "UNKNOWN"
+					props["earliestDate"] = transaction.Date
+					props["prevDateCycle"] = transaction.Date
+					props["lastDateCycle"] = transaction.Date
+					continue
+				}
+				// set props to be updated
+				prop = streams[transaction.Vendor]
+			} else {
+				if _, ok := streams[transaction.Description]; !ok {
+					// intialize first time seeing
+					streams[transaction.Description] = props
+					props["name"] = transaction.Description
+					props["total"] = transaction.Amount
+					props["maxAmt"] = transaction.Amount
+					props["avgAmt"] = transaction.Amount
+					props["status"] = "UNKNOWN"
+					props["earliestDate"] = transaction.Date
+					props["prevDateCycle"] = transaction.Date
+					props["lastDateCycle"] = transaction.Date
+					continue
+				}
+				// set props to be updated
+				prop = streams[transaction.Description]
+			}
+
+			// Add total
+			prop["total"] = prop["total"].(float64) + transaction.Amount
+			// Add amount of times seen (reset if trend breaks)
+			prop["freq"] = prop["freq"].(int) + 1
+			// Calculate average amount over all recurring transactions
+			prop["avgAmt"] = prop["total"].(float64) / float64(prop["freq"].(int))
+			// Calculate max amount spent over all recurring transactions
+			prop["maxAmt"] = math.Max(prop["maxAmt"].(float64), transaction.Amount)
+
+			// Set pointer for previous date cycle and current cycle
+			var cur string
+			var prev string
+			cur = prop["lastDateCycle"].(string)
+			prev = prop["prevDateCycle"].(string)
+
+			// Check if the trend is healthy; if not, set "true" to "DEGRADED"
+			if !utils.IsTrendHealthy(prev, cur, recurring) {
+				prop["degraded"] = prop["degraded"].(int) + 1
+				// Reset frequency
+				prop["freq"] = 1
+				// Reset prev and current dater pointer to same
+				props["prevDateCycle"] = transaction.Date
+				props["lastDateCycle"] = transaction.Date
+				continue
+			}
+			// Swap current pointer to prev before updating to continue streak
+			prop["prevDateCycle"] = prop["lastDateCycle"]
+			prop["lastDateCycle"] = transaction.Date
+
+			// Set "status" to "MATURE" or "EARLY" based on "freq" if not already set to "DEGRADED"
+			if prop["freq"].(int) >= 3 {
+				prop["status"] = "MATURE"
+			} else if prop["freq"].(int) == 2 {
+				prop["status"] = "EARLY"
+			}
+		}
+
+	} else {
 		transactions, err = dbs.RetrieveTransaction(db, model.Transaction{
 			ProfileID: int64(profile.ID),
 			Query: model.Querys{
@@ -84,17 +224,19 @@ func RetrieveTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient r
 				},
 			},
 		})
-
-		if err != nil || len(transactions) == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error":"TRANSACTIONS NOT FOUND"})
-			return
-		}
 	}
 
+	if err != nil || len(transactions) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error":"TRANSACTIONS NOT FOUND"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"transactions": transactions,
+		"recurring": streams,
 	})
 }
+
+
 
 func StoreTransactions(c *gin.Context, dbs DBHandler, db *sql.DB, debug bool) {
 	id, idErr := strconv.ParseInt(c.PostForm("id"), 10, 64)
@@ -106,13 +248,64 @@ func StoreTransactions(c *gin.Context, dbs DBHandler, db *sql.DB, debug bool) {
 	var data []plaid.Transaction
 	transactions := c.PostForm("transactions")
 	err := json.Unmarshal([]byte(transactions), &data)
+	// var dataStream []plaid.TransactionStream
+	// recurringTransactions := c.PostForm("recurrings")
+	// err = json.Unmarshal([]byte(recurringTransactions), &dataStream)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 	if debug != true {
 		utils.TransactionsToDB(db, id, data)
+		// utils.RecurringTransactionsToDB(db, id, dataStream)
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
 }
+
+func DeletePendingTransactions(c *gin.Context, dbs DBHandler, db *sql.DB,httpClient request.HTTP, debug bool) {
+	uid, _ := c.Cookie("UID")
+
+	var profile user.Profile
+	body := fmt.Sprintf("uid=%v", uid)
+	status, resp, err := httpClient.POST("profile/get", body)
+	request.ParseResponse(resp, &profile)
+
+	if status != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	transactions, err := dbs.RetrieveTransaction(db, model.Transaction{
+		ProfileID: int64(profile.ID),
+		Query: model.Querys{
+			Select: model.QueryParameters{
+				Equal: model.Equal{
+					Value: true,
+					Column: "pending",
+				},
+			},
+		},
+	})
+
+	for _, transaction := range transactions {
+		const FIVEDAYS = 5 * 24 * time.Hour // 5 days in duration
+		postedDate, _ := time.Parse("2006-01-02", transaction.Date)
+		timePassed := time.Since(postedDate)
+		if timePassed >= FIVEDAYS {
+			err = dbs.DeleteTransaction(db, model.Transaction{
+				ID: transaction.ID,
+			})
+		}
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+// test delete pending

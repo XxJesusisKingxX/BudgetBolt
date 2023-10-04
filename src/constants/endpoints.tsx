@@ -1,6 +1,7 @@
 export enum EndPoint {
     GET_TRANSACTIONS = "api/transactions/get",
     CREATE_TRANSACTIONS = "api/transactions/create",
+    REMOVE_PENDING = "api/transactions/pending/remove",
     GET_EXPENSES = "api/expenses/get",
     CREATE_EXPENSES = "api/expenses/create",
     UPDATE_EXPENSES = "api/expenses/update",

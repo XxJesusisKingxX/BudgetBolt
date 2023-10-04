@@ -41,6 +41,11 @@ const Transaction = () => {
                     method: "POST",
                 });
 
+                // Clear pending if any greatern than 5 days
+                await fetch(EndPoint.REMOVE_PENDING, {
+                    method: "DELETE",
+                });
+
                 // Get transactions for user
                 const retrieveResponse = await fetch(EndPoint.GET_TRANSACTIONS, {
                     method: "GET",

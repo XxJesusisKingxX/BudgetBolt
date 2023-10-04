@@ -16,6 +16,7 @@ type Plaid interface {
 	CreateLinkToken(client *plaid.APIClient, ctx context.Context, request *plaid.LinkTokenCreateRequest) (plaid.LinkTokenCreateResponse, error)
 	NewLinkTokenCreateRequest(name string, user string, countryCodes []plaid.CountryCode, products []plaid.Products, redirectURI string) (*plaid.LinkTokenCreateRequest)
 	NewTransactionsSyncRequest(client *plaid.APIClient, ctx context.Context, accessToken string, cursor *string) (plaid.TransactionsSyncResponse, error)
+	NewTransactionsRecurringGetRequest(client *plaid.APIClient, ctx context.Context, accessToken string, accounts []string) (plaid.TransactionsRecurringGetResponse, error)
 }
 
 type PlaidClient struct{}
@@ -34,6 +35,7 @@ type MockPlaidClient struct {
 	InvestHoldResp plaid.InvestmentsHoldingsGetResponse
 	TokenResp plaid.LinkTokenCreateResponse
 	SyncResp plaid.TransactionsSyncResponse
+	RecurringResp plaid.TransactionsRecurringGetResponse
 }
 
 func (t MockPlaidClient) GetAccessToken(o *plaid.ItemPublicTokenExchangeResponse) string {
@@ -75,6 +77,10 @@ func (t MockPlaidClient) NewLinkTokenCreateRequest(name string, user string, cou
 }
 func (t MockPlaidClient) NewTransactionsSyncRequest(client *plaid.APIClient, ctx context.Context, accessToken string, cursor *string) (plaid.TransactionsSyncResponse, error) {
 	return t.SyncResp, t.Err
+}
+func (t MockPlaidClient) NewTransactionsRecurringGetRequest(client *plaid.APIClient, ctx context.Context, accessToken string, accounts []string) (plaid.TransactionsRecurringGetResponse, error) {
+
+	return t.RecurringResp, t.Err
 }
 func (t PlaidClient) GetAccessToken(o *plaid.ItemPublicTokenExchangeResponse) string {
 	return o.GetAccessToken()
@@ -139,5 +145,15 @@ func (t PlaidClient) NewTransactionsSyncRequest(client *plaid.APIClient, ctx con
 		request.SetCursor(*cursor)
 	}
 	resp, _, err := client.PlaidApi.TransactionsSync(ctx).TransactionsSyncRequest(*request).Execute()
+	return resp, err
+}
+func (t PlaidClient) NewTransactionsRecurringGetRequest(client *plaid.APIClient, ctx context.Context, accessToken string, accounts []string) (plaid.TransactionsRecurringGetResponse, error) {
+	include := true
+	options := plaid.TransactionsRecurringGetRequestOptions{
+    	IncludePersonalFinanceCategory: &include,
+	}
+	request := plaid.NewTransactionsRecurringGetRequest(accessToken, accounts)
+	request.SetOptions(options)
+	resp, _, err := client.PlaidApi.TransactionsRecurringGet(ctx).TransactionsRecurringGetRequest(*request).Execute()
 	return resp, err
 }

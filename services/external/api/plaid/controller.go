@@ -12,6 +12,7 @@ import (
 	"github.com/plaid/plaid-go/v12/plaid"
 
 	user "services/internal/user_management/db/model"
+	// transaction "services/internal/transaction_history/db/model"
 	request "services/internal/utils/http"
 )
 
@@ -125,7 +126,7 @@ func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, htt
 	status, resp, err := httpClient.POST("profile/get", body)
 	request.ParseResponse(resp, &profile)
 
-	if status != 200 {
+	if status != http.StatusOK {
 		err = errors.New("")
 		RenderError(c, err, PlaidClient{})
 		return
@@ -136,7 +137,7 @@ func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, htt
 	status, resp, _ = httpClient.GET(url)
 	request.ParseResponse(resp, &token)
 
-	if status != 200 {
+	if status != http.StatusOK {
 		err := errors.New("")
 		RenderError(c, err, PlaidClient{})
 		return
@@ -158,6 +159,31 @@ func CreateTransactions(c *gin.Context, ps Plaid, plaidapi *plaid.APIClient, htt
 			nextCursor := resp.GetNextCursor()
 			cursor = &nextCursor
 		}
+
+		// var accounts transaction.Accounts
+		// url := fmt.Sprintf("accounts/get?uid=%v", uid)
+		// status, resp, _ = httpClient.GET(url)
+		// request.ParseResponse(resp, &accounts)
+	
+		// if status != http.StatusOK {
+		// 	err := errors.New("")
+		// 	RenderError(c, err, PlaidClient{})
+		// 	return
+		// }
+
+		// var recurringTransactions []plaid.TransactionStream
+		// var ids []string
+		// for _, acc := range accounts.Accounts {
+		// 	ids = append(ids, acc.ID)
+		// } 
+		// resp, err := ps.NewTransactionsRecurringGetRequest(plaidapi, ctx, accessToken, ids)
+		// recurringTransactions = resp.GetOutflowStreams()
+
+		if err != nil {
+			RenderError(c, err, PlaidClient{})
+			return
+		}
+
 		if !debug {
 			id := profile.ID
 			transactionJson, _ := json.Marshal(transactions)

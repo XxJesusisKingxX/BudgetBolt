@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
-import { render, screen, waitFor } from '@testing-library/react';
-import { useCreate } from '../../useCreate';
+import { render, screen } from '@testing-library/react';
+import { useBill } from '../../useBill';
 import Bill from '../../components/Bill';
 
 describe("Render Bill", () => {
@@ -17,9 +17,8 @@ describe("Render Bill", () => {
             }
         ]
         // Render bills with custom hook
-        const { createBill } = useCreate();
-        const bills = createBill(billList)
-        render(bills[0]);
+        const { showBills } = useBill();
+
         // Assertions
         expect(screen.getByTestId('bill')).toBeTruthy();
     });
@@ -39,9 +38,8 @@ describe("Render Bill", () => {
             }
         ]
         // Render bills with custom hook
-        const { createBill } = useCreate();
-        const bills = createBill(billList)
-        render(bills[0]);
+        const { showBills } = useBill();
+        
         // Assertions
         expect(screen.getByText("$120.00")).toBeTruthy();
         expect(screen.queryByTestId('bill-daysleft')).toBeTruthy();

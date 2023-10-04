@@ -91,3 +91,14 @@ Store the user's plaid accounts
     "id": 1,
 }
 ```
+
+## Delete Pending Transaction
+
+Delete the user's pending transactions
+
+- **Endpoint URL:** `/transactions/pending/remove`
+- **HTTP Method:** DELETE
+
+### Parameters
+
+None

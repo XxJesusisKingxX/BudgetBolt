@@ -8,8 +8,12 @@ import (
 	q "services/internal/utils/sql/querybuilder"
 )
 
+const (
+	ACCOUNTS string = "accounts"
+)
+
 func CreateAccount(db *sql.DB, m model.Account) error {
-	query, err := q.BuildCreateQuery("accounts", m)
+	query, err := q.BuildCreateQuery(ACCOUNTS, m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -18,7 +22,7 @@ func CreateAccount(db *sql.DB, m model.Account) error {
 }
 
 func UpdateAccount(db *sql.DB, setM model.Account, whereM model.Account) error {
-	query, err := q.BuildUpdateQuery("accounts", setM, whereM)
+	query, err := q.BuildUpdateQuery(ACCOUNTS, setM, whereM)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
@@ -27,7 +31,7 @@ func UpdateAccount(db *sql.DB, setM model.Account, whereM model.Account) error {
 }
 
 func RetrieveAccount(db *sql.DB, m model.Account) ([]model.Account , error) {
-	query, err := q.BuildRetrieveQuery("accounts", m)
+	query, err := q.BuildRetrieveQuery(ACCOUNTS, m)
 	if err == nil {
 		rows, err := db.Query(query)
 		if err != nil {
@@ -39,7 +43,7 @@ func RetrieveAccount(db *sql.DB, m model.Account) ([]model.Account , error) {
 }
 
 func DeleteAccount(db *sql.DB, m model.Account) error {
-	query, err := q.BuildDeleteQuery("accounts", m)
+	query, err := q.BuildDeleteQuery(ACCOUNTS, m)
 	if err == nil {
 		_, err := db.Exec(query)
 		return err
