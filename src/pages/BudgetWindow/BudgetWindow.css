@@ -2,7 +2,7 @@
     display: flex;
     background-color: var(--BACKGROUND_MODE);
     box-shadow: -0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
-    height: 14rem;
+    height: 20rem;
     width: 39rem;
     margin: 1.5rem;
     border-radius: 0.5rem;
@@ -36,11 +36,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 12rem;
+            top: 1rem;
+            box-shadow: inset 0rem 0rem 0.5rem 0.2rem var(--FONT_MODE);
+            height: 15rem;
             width: 27rem;
             position: relative;
             overflow: auto;
             scrollbar-width: thin;
+            padding-left: 0.5rem;
             scrollbar-color: var(--FONT_MODE) var(--WINDOW_MODE_L);
         }
             .miniwindow__budget__view__item {

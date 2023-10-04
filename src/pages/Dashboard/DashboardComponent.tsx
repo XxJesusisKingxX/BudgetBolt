@@ -42,7 +42,7 @@ const DashboardComponent: React.FC<Props> = ({ user, date }) => {
                 {/* Bottom widget */}
                 <div className='dashboard__widgets__bottom'>
                     {/* BudgetTrender component */}
-                    <BudgetTrender />
+                    {/* <BudgetTrender /> */}
                 </div>
             </div>
         </div>
