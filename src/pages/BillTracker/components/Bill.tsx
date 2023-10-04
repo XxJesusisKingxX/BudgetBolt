@@ -9,6 +9,7 @@ const Bill = () => {
     
     useEffect(() => {
         getBills();
+        // eslint-disable-next-line
     },[budgetView])
 
     return (

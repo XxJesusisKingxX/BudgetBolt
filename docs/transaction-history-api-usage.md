@@ -18,6 +18,7 @@ Store the user's plaid transactions
 - `date` (string): The date range to get transactions from
 - `uid` (float, required): The user's id
 - `category` (string): The primary category
+- `recurring` (string): The view to find bills within transaction
 
 **Response Example:**
 
@@ -50,7 +51,37 @@ Store the user's plaid transactions
             "profile_id": 5432,
             "from_account": "Checking Account"
         }
-    ]
+    ],
+    "recurring": {
+        "AT&T": {
+            "name": "AT&T",
+            "total_amount": 1000.0,
+            "max_amount": 1500.0,
+            "average_amount": 125.0,
+            "due_date": "2023-12-15",
+            "earliest_date_cycle": "2023-11-01",
+            "previous_date_cycle": "2023-11-30",
+            "last_date_cycle": "2023-12-30",
+            "frequency": 12,
+            "status": "ACTIVE",
+            "degraded": 0,
+            "category": "Telecommunications"
+        },
+        "McDonald's": {
+            "name": "McDonald's",
+            "total_amount": 500.0,
+            "max_amount": 800.0,
+            "average_amount": 75.0,
+            "due_date": "2023-12-20",
+            "earliest_date_cycle": "2023-11-05",
+            "previous_date_cycle": "2023-11-25",
+            "last_date_cycle": "2023-12-25",
+            "frequency": 12,
+            "status": "ACTIVE",
+            "degraded": 0,
+            "category": "Fast Food"
+        }
+    }
 }
 ```
 
