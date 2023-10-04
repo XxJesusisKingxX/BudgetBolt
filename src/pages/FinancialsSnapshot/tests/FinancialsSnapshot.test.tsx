@@ -50,7 +50,7 @@ describe("FinancialsSnapshot", () => {
         expect(screen.queryByTestId('financials-snapshot-top-percent')).toBeFalsy();
         expect(screen.queryByTestId('financials-snapshot-btm-percent')).toBeFalsy();
     });
-    test('render chart percentage over', () => {
+    test('render chart percentage expenses over', () => {
         // Set context
         initAppState.totalIncome = 1000;
         initAppState.totalExpenses = 1100;
@@ -60,5 +60,27 @@ describe("FinancialsSnapshot", () => {
         // Assert
         expect(screen.getByText("0%")).toBeInTheDocument();
         expect(screen.getByText("110%")).toBeInTheDocument();
+    });
+    test('render chart percentage expense 0', () => {
+        // Set context
+        initAppState.totalIncome = 1000;
+        initAppState.totalExpenses = 0;
+
+        renderWithAppContext(<FinancialsSnapshot/>);
+
+        // Assert
+        expect(screen.getByText("100%")).toBeInTheDocument();
+        expect(screen.getByText("0%")).toBeInTheDocument();
+    });
+    test('render chart percentage income 0', () => {
+        // Set context
+        initAppState.totalIncome = 0;
+        initAppState.totalExpenses = 1000;
+
+        renderWithAppContext(<FinancialsSnapshot/>);
+
+        // Assert
+        expect(screen.getByText("0%")).toBeInTheDocument();
+        expect(screen.getByText("100%")).toBeInTheDocument();
     });
 });
