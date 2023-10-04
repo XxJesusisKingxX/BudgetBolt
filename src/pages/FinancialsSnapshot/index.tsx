@@ -10,7 +10,11 @@ const FinancialsSnapshot = () => {
 
     // Calculate income and expenses metrics
     const maxLevel = 4;
-    const percentage = Number(((totalExpenses / totalIncome) * 100).toFixed())
+    let percentage: number = totalExpenses == 0 ? 0 : 100
+    if (totalExpenses > 0 && totalIncome > 0) {
+        percentage = Number(((totalExpenses / totalIncome) * 100).toFixed())
+    }
+    // if totalExpenses > 0 
     const level = (totalExpenses / totalIncome) * maxLevel // level current
     const currentLevel = level > maxLevel ? maxLevel : level // determine if level has surpassed max
 
