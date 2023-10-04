@@ -1,3 +1,12 @@
+---
+name: Testing request
+about: Create unit/integration tests
+title: ''
+labels: test
+assignees: ''
+
+---
+
 **Testing Specification:**
 
 [Specify the testing requirements for this feature/issue. You can mark them as "required" or "optional."]
