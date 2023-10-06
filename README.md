@@ -1,6 +1,8 @@
 # BudgetBolt
 
-![Logo](/public/images/logo.png)
+<p align="center">
+  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/public/images/logo.png?raw=true" alt="BudgetBolt logo"/>
+</p>
 
 ## Description
 
