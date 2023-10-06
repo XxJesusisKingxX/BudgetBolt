@@ -1,5 +1,5 @@
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import './BudgetWindow.css'
+import '../../assets/BudgetWindow.css'
 import { Expense, useExpense } from './useExpense';
 import AppContext from '../../context/AppContext';
 import { BudgetView } from '../../constants/view';

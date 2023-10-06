@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import './FinancialsSnapshot.css';
+import '../../assets/FinancialsSnapshot.css';
 import FinancialsSnapshotChart from './component/FinancialsSnapshotChart';
 
 // Props interface describing the expected props for the FinancialsPeek component

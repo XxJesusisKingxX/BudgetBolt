@@ -1,5 +1,5 @@
 import React from 'react';
-import './Sideview.css';
+import '../../assets/Sideview.css';
 import Transaction from '../Transaction';
 import Refresh from '../Refresh';
 

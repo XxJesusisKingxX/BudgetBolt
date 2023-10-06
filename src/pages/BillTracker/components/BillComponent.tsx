@@ -1,43 +1,47 @@
-import { FC } from 'react';
-import '../../../assets/view/styles/billtracker/Bill.css';
+import { FC, useContext } from 'react';
+import '../../../assets/Bill.css';
+import ThemeContext from '../../../context/ThemeContext';
 
 interface Props {
     name: string;                 // The name associated with the bill.
-    price: string;                // The price or amount of the bill.
-    daysLeft: string;             // The number of days left until the bill's due date.
+    shortName: string;                 // The shorten name associated with the bill.
+    price: string;                // The price or amount of the bill..
     dueDate: string;              // The due date of the bill.
-    category: string;             // The category or type of the bill (e.g., utility, rent, subscription).
-    spacing: number;              // The spacing value for positioning the component.
-    icon?: string                  // An icon for the bill category.
+    categoryName: string;             // The category or type of the bill (e.g., utility, rent, subscription).
+    category: string;             // The category to determine icon to display.
 }
 
-const BillComponent: FC<Props> = ({ icon, name, price, daysLeft, dueDate, category, spacing }) => {
+const BillComponent: FC<Props> = ({ shortName, name, price, dueDate, category, categoryName }) => {
+    const { mode } = useContext(ThemeContext);
     return (
         <div data-testid='bill' className='bill'>
-            {/* Display the icon if provided */}
-            <img data-testid='bill-icon' className='bill__icon' src={icon} alt='ico'/>
-            {/* Display the bill name, price, and days left */}
-            <span className='bill__name'>{name}:</span>
-            <span className='bill__amount'>${price}</span>
-            <span data-testid='bill-daysleft' className="bill__daysleft">{daysLeft}</span>days
+
+            <div className='bill__title'>
+                <img data-testid='bill-icon' className='bill__title__icon' src={`/images/${mode}/transactions/${category}.png`} alt='ico'/>
+                <span className='bill__title__name'>{shortName}:</span>
+            </div>
+            <div className='bill__amount'>
+                <div className='bill__amount__text'>${price}</div>
+            </div>
             {/* Expanded view */}
-            <div style={{ top: `${7 + spacing}rem` }} className='bill__fullview'>
+            <div className='bill__fullview'>
                 {/* Placeholder for expanded view content */}
-                <div className='bill__fullview__cont'/>
-                <div className='bill__fullview__txt'>
-                    <div className='bill__fullview__txt__title'>
-                        {name}
-                    </div>
-                    <div className='bill__fullview__txt__cols'>
-                        <div className='bill__fullview__txt__cols__lcol'>
-                            Due Date:
-                            <br/>
-                            {dueDate}
+                <div className='bill__fullview__cont'>
+                    <div className='bill__fullview__cont__txt'>
+                        <div className='bill__fullview__cont__txt__title'>
+                            {name}
                         </div>
-                        <div className='bill__fullview__txt__cols__rcol'>
-                            Category:
-                            <br/>
-                            {category}
+                        <div className='bill__fullview__cont__txt__cols'>
+                            <div className='bill__fullview__cont__txt__cols__lcol'>
+                                Due Date:
+                                <br/>
+                                {dueDate}
+                            </div>
+                            <div className='bill__fullview__cont__txt__cols__rcol'>
+                                Category:
+                                <br/>
+                                {categoryName}
+                            </div>
                         </div>
                     </div>
                 </div>

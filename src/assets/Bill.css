@@ -1,0 +1,96 @@
+.billtracker {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--BACKGROUND_MODE);
+    border-radius: 0.5rem;
+    box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    width: 15rem;
+    height: 24rem;
+    margin: 1.5rem;
+}
+    .billtracker__txt {
+        padding-top: 0.5rem;
+        padding-right: 0.5rem;
+        font-size: 1.3rem;
+    }
+
+
+.bill {
+    background-color: var(--WINDOW_MODE_L);
+    box-shadow: inset 0.4rem 0.25rem 0.5rem 0rem var(--FONT_MODE);
+    display: flex;
+    align-items: center;
+    width: 12rem;
+    height: 2rem;
+    margin-top: 0.8rem;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding-left: 0.5rem;
+    animation: reveal 0.2s forwards;
+    cursor: default;
+    justify-content: space-around;
+}
+.bill:hover {
+    background-color: var(--WINDOW_MODE);
+    transition: 0.3s;
+}
+.bill:hover .bill__fullview {
+    transition: 0.3s;
+    opacity: 100%;
+}
+
+    .bill__title {
+        display: flex;
+        align-items: center;
+        width: 5rem;
+        font-weight: 700;
+    }
+        .bill__title__icon {
+            width: 25px;
+            height: 25px;
+        }
+        .bill__title__name {
+            padding-left: 1rem;
+        }
+
+    .bill__amount {
+        display: flex;
+        justify-content: center;
+        background-color: var(--WINDOW_MODE);
+        border-radius: 2rem;
+        border: 0.15rem solid var(--FONT_MODE);
+        width: 5rem;
+    }
+        .bill__amount__text {
+            text-align: center;
+        }
+
+    .bill__fullview {
+        pointer-events: none;
+        opacity: 0%;
+        position: absolute;
+        left: -16rem;
+        text-align: center;
+    }
+        .bill__fullview__cont {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--BACKGROUND_MODE);
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0rem 0.2rem 0.5rem var(--FONT_MODE);
+            border: 0.5rem solid var(--FONT_MODE);
+            border-radius: 2rem;
+            width: 16rem;
+            height: 5rem;
+        }
+            .bill__fullview__cont__txt__title {
+                padding-bottom: 0.5rem;
+            }
+            .bill__fullview__cont__txt__cols {
+                display: flex;
+            }
+                .bill__fullview__cont__txt__cols__rcol {
+                    padding-left: 1rem;
+                }

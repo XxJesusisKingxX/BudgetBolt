@@ -4,7 +4,7 @@ import FinancialsSnapshot from '../FinancialsSnapshot';
 import HealthIndicator from '../HealthIndicator';
 import BudgetWindow from '../BudgetWindow';
 import BillTracker from '../BillTracker';
-import './Dashboard.css';
+import '../../assets/Dashboard.css';
 
 interface Props {
     user: string; // User's name

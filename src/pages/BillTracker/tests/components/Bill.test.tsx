@@ -19,7 +19,7 @@ describe("Render Bill", () => {
                 frequency: 1,
                 last_date_cycle: "2023-09-18",
                 max_amount: 24.8,
-                name: "AMF",
+                name: "AMFTEE",
                 previous_date_cycle: "2023-09-18",
                 status: "UNKNOWN",
                 total_amount: 24.8
@@ -34,11 +34,10 @@ describe("Render Bill", () => {
         render(<div>{endResult}</div>);
         // Assertions
         await waitFor(() => {
-            expect(screen.getByText("AMF")).toBeTruthy();
+            expect(screen.getByText("AMFT*")).toBeTruthy();
         })
         expect(screen.getByText("$24.80")).toBeTruthy();
-        expect(screen.queryByTestId('bill-daysleft')).toBeTruthy();
-        expect(screen.getByText("Category:ENTERTAINMENT")).toBeTruthy();
+        expect(screen.getByText("Category:Entertainment")).toBeTruthy();
         expect(screen.getByText("Due Date:2023-10-18")).toBeTruthy();
         expect(screen.queryByTestId("bill-icon")).toBeTruthy();
         expect(screen.queryByText("NaN")).toBeFalsy(); // Make sure no field is empty

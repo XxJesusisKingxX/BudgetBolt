@@ -1,5 +1,5 @@
 import React from 'react';
-import './HealthIndicator.css'; // Importing the CSS file for styling
+import '../../assets/HealthIndicator.css'; // Importing the CSS file for styling
 
 // Props interface for the HealthIndicator component
 interface Props {

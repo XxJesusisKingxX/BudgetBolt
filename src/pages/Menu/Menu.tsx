@@ -1,4 +1,4 @@
-import './Menu.css';
+import '../../assets/Menu.css';
 import { useContext, FC } from 'react';
 import ThemeContext from '../../context/ThemeContext';
 

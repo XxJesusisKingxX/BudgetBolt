@@ -6,7 +6,7 @@ import SignupWindow from './components/SignupWindow';
 import AccountWindow from './components/AccountWindow';
 import { useLogin } from './useLogin';
 import LoginContext from '../../context/LoginContext';
-import "../../assets/auth/styles/Auth.css";
+import "../../assets/Auth.css";
 import ThemeContext from '../../context/ThemeContext';
 import AppContext from '../../context/AppContext';
 import { deleteCookie, getCookie } from '../../utils/cookie';

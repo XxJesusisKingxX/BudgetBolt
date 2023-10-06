@@ -1,5 +1,5 @@
 import React from 'react';
-import './Transaction.css';
+import '../../assets/Transaction.css';
 
 // Props interface for the Transaction component
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 const TransactionComponent: React.FC<Props> = ({ mode, account, transaction, amount }) => {
     // Dynamic image path for the reel icon based on the provided mode
-    const reel = `/images/${mode}/transactions/reel.png`;
+    const reel = `/images/${mode}/transactions/entertainment.png`;
 
     return (
         <div className='trans'> {/* Container div for the transaction */}

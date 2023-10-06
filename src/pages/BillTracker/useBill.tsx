@@ -1,5 +1,4 @@
 import BillComponent from './components/BillComponent';
-import entertainment from '../../assets/view/images/billtracker/categories/entertainment.svg'
 import { useContext, useState } from 'react';
 import { EndPoint } from '../../constants/endpoints';
 import { getDateView } from '../../utils/formatDate';
@@ -53,13 +52,32 @@ export const useBill = () => {
     };
 
     const showBills = (loading = isLoading, billList: Bills = bills) => {
-        const maxPeek = 6; // max amount of bills to show
-        const maxChar = 4; // max amount characters to show for name
-        const spacing = 2; // spacing between bills every render
-        const loadingIcon = `/images/${mode}/loading.png`;
+        const getCategoryIcon = (category: string) => {
+            switch (category) {
+                case "Loan Payments":
+                    return 'loanpayment'
+                case "Rent And Utilities":
+                    return 'housing'
+                case "Home Improvement":
+                    return 'housing'
+                case "Government And Non Profit":
+                    return 'gov'
+                case "Entertainment":
+                    return 'entertainment'
+                case "Food And Drink":
+                    return 'entertainment'
+                case "Medical":
+                    return 'healthcare'
+                case "Personal Care":
+                    return 'selfcare'
+                case "Transportation":
+                    return 'transportation'
+                default:
+                    return 'misc'
+            }
+        };
 
-        const handleDaysLeft= (date: string) => {
-            const currentDate = new Date();
+        const handleDaysLeft= (currentDate: Date, date: string) => {
             const targetDate = new Date(date);
 
             // Calculate the time difference in milliseconds
@@ -71,34 +89,53 @@ export const useBill = () => {
             return daysLeft;
         };
 
-        const getCategoryIcon = (category: string) => {
-            // Dynamically select the image based on the category
-            switch (category) {
-                case 'entertainment':
-                    return entertainment;
-                default:
-                    return ''; // Default icon or handle missing icons
-            }
-        };
+        const capitalizeFirstLetterEachWord = (inputString: string) => {
+            // Split the input string into words
+            const words = inputString.replaceAll("_"," ").split(' ');
+          
+            // Capitalize the first letter of each word
+            const capitalizedWords = words.map((word) => {
+              if (word.length === 0) {
+                // Skip empty words (e.g., multiple spaces)
+                return word;
+              }
+              // Capitalize the first letter and keep the rest in lowercase
+              return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            });
+          
+            // Join the words back together with spaces
+            const resultString = capitalizedWords.join(' ');
+          
+            return resultString;
+        }
 
+        let billCount = 0; // Track amount of bills added
+        const maxBillsShown = 7; // max amount of bills to show
+        const maxChar = 4; // max amount characters to show for bill name
+        const loadingIcon = `/images/${mode}/loading.png`;
         const rows = Object.keys(billList)
-        .slice(0, maxPeek)
         .map((name: any, idx) => {
+            // Formatting
             const bill = billList[name]
-            const billName = bill.name.length > maxChar ? bill.name.slice(0, 4) + "*" : bill.name;
-            if (handleDaysLeft(bill.due_date) > 0) {
-            return (
-                <BillComponent
-                    key={idx}
-                    name={billName}
-                    price={bill.average_amount.toFixed(2)}
-                    daysLeft={handleDaysLeft(bill.due_date).toString()}
-                    dueDate={bill.due_date}
-                    category={bill.category}
-                    spacing={idx * spacing}
-                    icon={getCategoryIcon(bill.category.toLowerCase())}
-                />
-            );
+            const billName = bill.name.length > maxChar ? bill.name.slice(0, maxChar) + "*" : bill.name
+            const billShortName = capitalizeFirstLetterEachWord(billName);
+            const billAvgAmount = bill.average_amount.toFixed(2);
+            const billCategoryName = capitalizeFirstLetterEachWord(bill.category);
+            const billCategory = getCategoryIcon(billCategoryName);
+            const daysLeft = handleDaysLeft(new Date(), bill.due_date);
+            if (daysLeft > 0 && bill.status == "MATURE" && billCount < maxBillsShown) {
+                billCount += 1
+                return (
+                    <BillComponent
+                        key={idx}
+                        shortName={billShortName}
+                        name={bill.name}
+                        price={billAvgAmount}
+                        dueDate={bill.due_date}
+                        categoryName={billCategoryName}
+                        category={billCategory}
+                    />
+                );
             }
         });
         return (
