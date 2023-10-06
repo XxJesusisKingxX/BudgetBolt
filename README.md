@@ -1,5 +1,7 @@
 # BudgetBolt
 
+![Logo](https://raw.githubusercontent.com/XxJesusisKingxX/BudgetBolt/main/public/images/logo.png)
+
 ## Description
 
 **BudgetBolt** is a cutting-edge tool designed to streamline and automate the process of monitoring personal finances. This innovative application offers a comprehensive solution to effortlessly track spending, upcoming bills, and provide users with a quick overview of their financial transactions, income, and expenses.
