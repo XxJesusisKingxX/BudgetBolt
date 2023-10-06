@@ -1,6 +1,6 @@
 # BudgetBolt
 
-![Logo](https://raw.githubusercontent.com/XxJesusisKingxX/BudgetBolt/main/public/images/logo.png)
+![Logo](/public/images/logo.png)
 
 ## Description
 
