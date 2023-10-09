@@ -4,6 +4,7 @@ import { EndPoint } from '../../constants/endpoints';
 import { getDateView } from '../../utils/formatDate';
 import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
+import '../../assets/Loading.css'
 
 // Interface for the shape of a bill
 export interface Bills {
@@ -52,6 +53,7 @@ export const useBill = () => {
     };
 
     const showBills = (loading = isLoading, billList: Bills = bills) => {
+        //TODO TEST
         const getCategoryIcon = (category: string) => {
             switch (category) {
                 case "Loan Payments":
@@ -110,7 +112,7 @@ export const useBill = () => {
         }
 
         let billCount = 0; // Track amount of bills added
-        const maxBillsShown = 7; // max amount of bills to show
+        const maxBillsShown = 9; // max amount of bills to show
         const maxChar = 4; // max amount characters to show for bill name
         const loadingIcon = `/images/${mode}/loading.png`;
         const rows = Object.keys(billList)
@@ -139,10 +141,17 @@ export const useBill = () => {
             }
         });
         return (
-            !loading && billList ?
-            rows
-            :
-            <img className='loading loading--bills' src={loadingIcon} alt="Loading" />
+            <>
+                {!loading && billList ? (
+                  billCount === 0 ? (
+                    <span className='nobill'>No bills to show</span>
+                  ) : (
+                    rows
+                  )
+                ) : (
+                <img className='loading' src={loadingIcon} alt="Loading" />
+                )}
+            </>
         );
     }
 

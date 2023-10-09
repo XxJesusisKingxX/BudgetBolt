@@ -1,0 +1,8 @@
+.err {
+    color: var(--ERROR);
+    font-size: var(--FONT_SZ_ERR);
+}
+.err--login-signup {
+    left: 0.5rem;
+    position: relative;
+}

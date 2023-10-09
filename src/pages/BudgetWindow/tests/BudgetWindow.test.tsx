@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import fetchMock  from 'jest-fetch-mock';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import BudgetWindowComponent from '../BudgetWindowComponent';
+import BudgetWindowComponent from '../components/BudgetWindowComponent';
 import userEvent from '@testing-library/user-event';
 import * as Create from '../useExpense';
 import { EndPoint } from '../../../constants/endpoints';
@@ -14,39 +14,6 @@ beforeEach(() => {
 });
 
 describe("Expenses", () => {
-
-    test('user should be able to add expenses', async () => {
-        // Create mocks
-        const mockGetExpenses = jest.fn();
-        const mockAddExpenses = jest.fn();
-        const mockShowExpenses = jest.fn();
-        const mockUpdateExpenses = jest.fn();
-        const mockUpdateAllExpenses = jest.fn();
-        jest.spyOn(Create,'useExpense').mockReturnValue({
-            getExpenses: mockGetExpenses,
-            addExpenses: mockAddExpenses,
-            showExpenses: mockShowExpenses,
-            updateExpense: mockUpdateExpenses,
-            updateAllExpenses: mockUpdateAllExpenses,
-            isLoading: true,
-        });
-
-        // Render
-        render(<BudgetWindowComponent/>)
-
-        // Reflect user actions
-        userEvent.click(screen.getByRole('button', { name: "+ Create Expense"}))
-        userEvent.type(screen.getByLabelText('expense-name'), "TestExpense")
-        userEvent.type(screen.getByLabelText('expense-limit'), "100.00")
-        userEvent.click(screen.getByRole('button', { name: "Save"}))
-
-        // Assert
-        await waitFor( async ()=> {
-            expect(mockAddExpenses).toHaveBeenCalledTimes(1);
-        })
-        expect(mockAddExpenses).toHaveBeenCalledWith({"ID": "0", "Limit": "100.00", "Name": "TestExpense", "Spent": "0.00"});
-    });
-
     test("user should see expenses at initial render after loading spinner", async () => {
         // Mock
         fetchMock.enableMocks();
@@ -106,13 +73,11 @@ describe("Expenses", () => {
     test("user should be able to change view and update locally the view", async () => {
         // Create mocks
         const mockGetExpenses = jest.fn();
-        const mockAddExpenses = jest.fn();
         const mockShowExpenses = jest.fn();
         const mockUpdateExpenses = jest.fn();
         const mockUpdateAllExpenses = jest.fn();
         jest.spyOn(Create,'useExpense').mockReturnValue({
             getExpenses: mockGetExpenses,
-            addExpenses: mockAddExpenses,
             showExpenses: mockShowExpenses,
             updateExpense: mockUpdateExpenses,
             updateAllExpenses: mockUpdateAllExpenses,

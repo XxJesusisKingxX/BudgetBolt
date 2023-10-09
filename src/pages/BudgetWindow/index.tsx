@@ -1,9 +1,9 @@
-import MiniWindowComponent from './BudgetWindowComponent';
+import BudgetWindowComponent from './components/BudgetWindowComponent';
 
-const MiniWindow = () => {
+const BudgetWindow = () => {
     return (
-        <MiniWindowComponent
+        <BudgetWindowComponent
         />
     );
 }
-export default MiniWindow
+export default BudgetWindow

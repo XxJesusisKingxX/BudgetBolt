@@ -1,0 +1,28 @@
+.btn {
+    font-family: var(--CONTENT_ACCENT);
+    border-radius: 0.5rem;
+    background-color: var(--WINDOW_MODE_L);
+    border: 0.15rem solid var(--FONT_MODE);
+    color: var(--FONT_MODE);
+    text-align: center;
+    padding: 8px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    font-size: var(--FONT_SZ);
+    cursor: pointer;
+}
+.btn:hover {
+    transition: 0.2s;
+    background-color: var(--WINDOW_MODE);
+}
+.btn--auth {
+    position: absolute;
+    margin: 0.6rem;
+}
+.btn--edit {
+    font-size: var(--FONT_SZ_TXT);
+}
+.btn--done {
+    font-size: var(--FONT_SZ_TXT);
+    background-color: var(--WINDOW_MODE);
+}

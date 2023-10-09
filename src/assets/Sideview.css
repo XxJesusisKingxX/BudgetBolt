@@ -1,22 +1,22 @@
 .sidebar {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--CONTENT_HEADER);
+    color: var(--FONT_MODE);
     background-color: var(--WINDOW_MODE);
     text-align: center;
-    width: 20rem;
-    height: 35rem;
-    margin-left: 1rem;
+    flex-grow: 0.2;
     position: relative;
-    top: 5rem;
     border-radius: 1rem;
     outline: auto;
     outline: var(--FONT_MODE) solid 0.2rem;
     animation: reveal 1s forwards;
 }
     .sidebar__refresh {
-        top: 0.5rem;
+        top: 0.2rem;
         right: 1rem;
-        width: 1.4rem;
+        width: 20px;
         position: absolute;
-        margin-left: 1rem;
         cursor: pointer;
     }
         .sidebar__refresh--load {
@@ -41,19 +41,16 @@
                     rotate: -180deg;
                 }
             }
-    .sidebar__border {
-        position: relative;
+    .sidebar__header {
+        display: flex;
+        justify-content: center;
         top: 0.5rem;
         border-bottom: 0.2rem solid var(--FONT_MODE);
     }
-        .sidebar__border__title {
-            color: var(--FONT_MODE);
-            font-size: 1.3rem;
-            font-weight: 900;
+        .sidebar__header__title {
+            font-size: var(--FONT_SZ);
         }
     .sidebar__footer {
-        position: absolute;
-        top: 95%;
-        left: 10%;
-        color: var(--FONT_MODE);
+        padding-top: 1rem;
+        font-size: var(--FONT_SZ_SUB);
     }

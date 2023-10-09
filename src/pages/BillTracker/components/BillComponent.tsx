@@ -15,7 +15,6 @@ const BillComponent: FC<Props> = ({ shortName, name, price, dueDate, category, c
     const { mode } = useContext(ThemeContext);
     return (
         <div data-testid='bill' className='bill'>
-
             <div className='bill__title'>
                 <img data-testid='bill-icon' className='bill__title__icon' src={`/images/${mode}/transactions/${category}.png`} alt='ico'/>
                 <span className='bill__title__name'>{shortName}:</span>

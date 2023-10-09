@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import '../../assets/FinancialsSnapshot.css';
-import FinancialsSnapshotChart from './component/FinancialsSnapshotChart';
+import '../../../assets/FinancialsSnapshot.css';
+import FinancialsSnapshotChart from './FinancialsSnapshotChart';
 
 // Props interface describing the expected props for the FinancialsPeek component
 interface Props {
@@ -16,11 +16,11 @@ const FinancialsSnapshotComponent: FC<Props> = ({ income, expenses, savings, lev
         <div className='financials-snapshot'>
             <div className='financials-snapshot__titles'>
                 {/* Total Income */}
-                <h3 className='financials-snapshot__titles__header'>Total Income:<span className='financials-snapshot__titles__income'>${income}</span></h3>
+                <span className='financials-snapshot__titles__header'>Total Income:<span className='financials-snapshot__titles__income'>${income}</span></span>
                 {/* Total Expenses */}
-                <h3 className='financials-snapshot__titles__header'>Total Expenses:<span className='financials-snapshot__titles__expenses'>${expenses}</span></h3>
+                <span className='financials-snapshot__titles__header'>Total Expenses:<span className='financials-snapshot__titles__expenses'>${expenses}</span></span>
                 {/* Total Savings */}
-                <h3 className='financials-snapshot__titles__header'>Total Savings:<span className='financials-snapshot__titles__savings'>${savings}</span></h3>
+                <span className='financials-snapshot__titles__header'>Total Savings:<span className={`financials-snapshot__titles__savings ${expenses > income ? 'financials-snapshot__titles__savings--overbought' : ''}`}>${savings}</span></span>
             </div>
             <FinancialsSnapshotChart level={level} percentage={percentage} />
         </div>

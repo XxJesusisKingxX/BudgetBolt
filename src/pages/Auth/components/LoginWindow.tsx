@@ -1,7 +1,11 @@
-import { ChangeEventHandler, KeyboardEventHandler } from "react";
+import { ChangeEventHandler, KeyboardEventHandler } from 'react';
+import '../../../assets/Button.css'
+import '../../../assets/Auth.css'
+import '../../../assets/Error.css'
+import '../../../assets/Loading.css'
 
 interface Props {
-    mode: string;                                         // The current mode of the login window (e.g., "light" or "dark")
+    mode: string;                                         // The current mode of the login window (e.g., 'light' or 'dark')
     close: Function;                                      // Function to close the login window
     openSignUp: Function;                                 // Function to open the sign-up window
     login: Function;                                      // Function to handle the login process
@@ -25,54 +29,59 @@ const LoginWindow: React.FC<Props> = ({ mode, close, openSignUp, serverError, is
     const loading = `/images/${mode}/loading.png`;
 
     return (
-        <div data-testid='login-window' className="windowcont windowcont--auth">
-            <h1 className="windowcont__title">Sign In<img className="closeicon" src={cancel} onClick={() => close()} alt="Close" /></h1>
-            <div className="auth auth--username">
-                {/* Username input */}
-                <input aria-label="username" className="auth__input auth__input--roundedinsde" value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder="Username" required />
-                {/* Display error if the username is invalid */}
-                {isInvalidName ?
-                    <div data-testid='invalid-name' className="err err--usernameinvalid">
-                        Enter a valid username:
-                        <br />
-                        - Must start with a letter or an underscore (_)
-                        <br />
-                        - Valid characters: 0-9, A-z, (_)
-                    </div>
-                    :
-                    null
-                }
-            </div>
-            <div className="auth auth--password">
-                {/* Password input */}
-                <input aria-label="password" className="auth__input auth__input--roundedinsde" type="password" value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder="Password" required />
-                {/* Display error if the password is invalid */}
-                {isInvalidPass ?
-                    <p data-testid='invalid-pass' className="err err--passwordinvalid">
-                        Password is invalid.
-                        {/* Password requirements */}
-                    </p>
-                    :
-                    null
-                }
-            </div>
+        <div data-testid='login-window' className='window'>
+            <span className='window__title'>Sign In<img className='closeicon' src={cancel} onClick={() => close()} alt='Close' /></span>
+            {/* Username input */}
+            <input aria-label='username' className='window__form' value={username} onKeyUp={userKeyUp} onChange={userChange} placeholder='Username' disabled={showLoading} required />
+            {/* Display error if the username is invalid */}
+            {isInvalidName ?
+                <div data-testid='invalid-name' className='err err--login-signup'>
+                    Enter a valid username:
+                    <br />
+                    - Must start with a letter or an underscore (_)
+                    <br />
+                    - Valid characters: 0-9, A-z, (_)
+                </div>
+                :
+                null
+            }
+            {/* Password input */}
+            <input aria-label='password' className='window__form' type='password' value={password} onKeyDown={loginOnEnter} onKeyUp={passKeyUp} onChange={passChange} placeholder='Password' disabled={showLoading} required />
+            {/* Display error if the password is invalid */}
+            {isInvalidPass ?
+                <div data-testid='invalid-pass' className='err err--login-signup'>
+                    Password is invalid.
+                    <br />
+                    - At least one lowercase letter
+                    <br />
+                    - At least one uppercase letter
+                    <br />
+                    - At least one digit
+                    <br />
+                    - At least one special character (!@#$%^&*)
+                    <br />
+                    - Minimum 8 characters
+                </div>
+                :
+                null
+            }
             {/* Link to open the sign-up window */}
-            Create an Account:<span data-testid='signup-link' className="link link--signup" onClick={() => openSignUp()}>Sign Up</span>
+            <span className='window__subtitle'>Create an Account</span><span data-testid='signup-link' className={`window__link ${showLoading ? 'window__link--disable' : ''}`} onClick={() => openSignUp()}>Sign Up</span>
             {/* Display authentication error */}
             {isAuthError ?
-                <div data-testid='auth-err' className="err err--passwordinvalid">Oops! The username or password is incorrect.</div>
+                <div data-testid='auth-err' className='err err--login-signup'>Oops! The username or password is incorrect.</div>
                 :
                 null
             }
             {/* Display username error */}
             {isNameError ?
-                <div data-testid='name-err' className="err err--passwordinvalid">Oops! The username does not exist</div>
+                <div data-testid='name-err' className='err err--login-signup'>Oops! The username does not exist</div>
                 :
                 null
             }
             {/* Display server error */}
             {serverError ?
-                <div data-testid='server-err' className="err err--servererr">
+                <div data-testid='server-err' className='err err--login-signup'>
                     We apologize, but there seems to be an issue.
                     <br />
                     Please try again later.
@@ -81,11 +90,13 @@ const LoginWindow: React.FC<Props> = ({ mode, close, openSignUp, serverError, is
                 null
             }
             {/* Display loading or login button */}
-            {showLoading ?
-                <img data-testid='login-loading' src={loading} className="loading loading--login" alt="Loading" />
-                :
-                <button data-testid='login-button' onClick={() => login()} className="btn btn--login">Login</button>
-            }
+            <div className='window__button'>
+                {showLoading ?
+                    <img data-testid='login-loading' src={loading} className='loading loading--small' alt='Loading' />
+                    :
+                    <button data-testid='login-button' onClick={() => login()} className='btn btn--login'>Login</button>
+                }
+            </div>
         </div>
     );
 };

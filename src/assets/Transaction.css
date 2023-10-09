@@ -1,9 +1,8 @@
 .trans {
+    color: var(--FONT_MODE);
+    box-shadow: 0rem 0rem 0.5rem 0rem var(--FONT_MODE);
     background:linear-gradient(var(--BACKGROUND_MODE), rgba(255, 255, 255, 0));
     top: 0.5rem;
-    margin: 1rem;
-    margin-bottom: -2.2rem;
-    width: 90%;
     height: 6rem;
     position: relative;
     text-align: left;
@@ -32,4 +31,10 @@
         font-weight: 500;
         white-space: nowrap;
         animation: reveal 2s backwards;
+        font-family: var(--CONTENT);
     }
+.transaction {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}

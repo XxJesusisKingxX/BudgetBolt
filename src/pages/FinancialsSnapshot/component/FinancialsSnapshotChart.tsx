@@ -1,5 +1,5 @@
 import { FC, useContext } from 'react';
-import './FinancialsSnapshotChart.css';
+import '../../../assets/FinancialsSnapshotChart.css';
 import AppContext from '../../../context/AppContext';
 
 // Props interface describing the expected props for the FinancialsPeek component

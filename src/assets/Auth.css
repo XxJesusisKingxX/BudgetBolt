@@ -1,63 +1,62 @@
-.auth {
+.window {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-    .auth__input {
-        padding: 0.3rem;
-    }
-    .auth__input:hover {
-        background-color: var(--WINDOW_MODE);
-        transition: 0.2s;
-    }
-    .auth__input--roundedinsde {
-        color: var(--FONT_MODE);
-        border-color: var(--FONT_MODE);
-        border-radius: 0.5rem;
-    }
-.auth--username {
-    text-align: left;
-}
-.auth--password {
-    text-align: left;
-    position: relative;
-    top: 0.5rem;
-    padding-bottom: 0.5rem;
+    background-color: var(--BACKGROUND_MODE);
+    width: 15rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.2rem solid var(--FONT_MODE);
+    border-radius: 1rem;
+    gap: 0.2rem;
+    font-family: var(--CONTENT);
+    position: absolute;
+    z-index: 1;
+    color: var(--FONT_MODE)
 }
 
-.windowcont {
-    position: absolute;
-    text-align: center;
-    z-index: 1;
-}
-    .windowcont__title {
-        color: var(--FONT_MODE);
-        font-size: x-large;
+    .window__button {
+        padding: 0.5rem;
+    }
+    .window__title {
+        font-family: var(--CONTENT_HEADER);
+        font-size: var(--FONT_SZ);
         margin: 0;
         padding-top: 1rem;
         padding-bottom: 0.5rem;
     }
-.windowcont--auth {
-    background-color: var(--BACKGROUND_MODE);
-    height: 20rem;
-    width: 15rem;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border: 0.2rem solid var(--FONT_MODE);
-    border-radius: 1rem;
-}
-.windowcont--plaid {
-    background-color: var(--BACKGROUND_MODE);
-    height: 10rem;
-    width: 15rem;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    border: 0.2rem solid var(--FONT_MODE);
-    border-radius: 1rem;
-}
+    .window__form {
+        font-family: var(--CONTENT);
+        font-size: var(--FONT_SZ_TXT);
+        outline: none;
+        border-color: var(--FONT_MODE);
+        border-radius: 0.5rem;
+        padding: 0.3rem;
+    }
+    .window__form:hover {
+        background-color: var(--WINDOW_MODE);
+        transition: 0.2s;
+    }
 
+    .window__subtitle {
+        font-size: var(--FONT_SZ_SUB);
+        padding-top: 0.5rem;
+    }
+    .window__link {
+        font-size: var(--FONT_SZ_TXT);
+        margin: 0;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .window__link:hover {
+        color: var(--WINDOW_MODE);
+        transition: 0.2s;
+    }
+    .window__link--disable {
+        pointer-events: none;
+    }
+    
 .closeicon {
     width: 1rem;
     position: absolute;

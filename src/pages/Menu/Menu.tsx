@@ -1,6 +1,8 @@
 import '../../assets/Menu.css';
 import { useContext, FC } from 'react';
 import ThemeContext from '../../context/ThemeContext';
+import PlaidLink from '../Plaid/PlaidLink';
+import Auth from '../Auth';
 
 
 // Props interface for Menu component
@@ -24,6 +26,9 @@ const Menu: FC<Props> = ({ showDropdown, onMouseOut, onMouseOver }) => {
     const expenseIcon = `/images/${mode}/menu/expense.png`;
     const transactionIcon = `/images/${mode}/menu/transaction.png`;
     const budgetIcon = `/images/${mode}/menu/budget.png`;
+
+    // Get window width
+    var windowWidth = window.innerWidth <= 700;
 
     return (
         <>
@@ -49,7 +54,12 @@ const Menu: FC<Props> = ({ showDropdown, onMouseOut, onMouseOver }) => {
                     <ul className='menu__list__item'><img alt='goals and savings icon' className='menu__list__item__icon' src={goalIcon}/><a href='/'>Goals and Savings</a></ul>
                     <ul className='menu__list__item'><img alt='remninders and alerts icon' className='menu__list__item__icon' src={reminderIcon}/><a href='/'>Reminders and Alerts</a></ul>
                     <ul className='menu__list__item'><img alt='settings icon' className='menu__list__item__icon' src={settingsIcon}/><a href='/'>Settings</a></ul>
-                    <ul className='menu__list__item menu__list__item--last'><img alt='help icon' className='menu__list__item__icon' src={helpIcon}/><a href='/'>Help and Support</a></ul>
+                    <ul className={`menu__list__item ${windowWidth ? null : 'menu__list__item--last'}`}><img alt='help icon' className='menu__list__item__icon' src={helpIcon}/><a href='/'>Help and Support</a></ul>
+                    {windowWidth ? (
+                    <ul className='menu__list__item menu__list__item--last menu__list__item--center'>
+                        <PlaidLink />
+                    </ul>
+                    ) : null}
                 </div>
             </div>
         </>

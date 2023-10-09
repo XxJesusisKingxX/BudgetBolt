@@ -3,6 +3,7 @@ import { usePlaidLink } from 'react-plaid-link';
 import AppContext from '../../context/AppContext';
 import LoginContext from '../../context/LoginContext';
 import { EndPoint } from '../../constants/endpoints';
+import '../../assets/Button.css'
 
 // PlaidLinkContainer component
 const PlaidLink = () => {
@@ -67,15 +68,13 @@ const PlaidLink = () => {
   }, [ready, open, isOauth]);
 
   return (
-    <>
-        <button
-            className="btn btn--plaid"
-            onClick={() => open()}     // Click event handler to call the provided function
-            disabled={!ready}          // Disabling the button if not ready
-        >
-            Add Account
-        </button>
-    </>
+      <button
+          className='btn btn--plaid'
+          onClick={() => open()}     // Click event handler to call the provided function
+          disabled={!ready}          // Disabling the button if not ready
+      >
+          Add Account
+      </button>
   );
 };
 

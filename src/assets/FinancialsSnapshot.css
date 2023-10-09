@@ -1,30 +1,44 @@
 
 .financials-snapshot {
+    color: var(--FONT_MODE);
     background-color: var(--BACKGROUND_MODE);
     box-shadow: -0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
     border-radius: 0.5rem;
-    width: 39rem;
-    height: 7rem;
     margin: 1.5rem;
     display: flex;
+    justify-content: space-between;
 }
     .financials-snapshot__titles {
+        font-size: var(--FONT_SZ);
         display: flex;
         flex-direction: column;
         padding: 1rem;
     }
         .financials-snapshot__titles__header {
+            font-family: var(--CONTENT_HEADER);
             margin: 0rem;
         }
         .financials-snapshot__titles__income {
+            font-family: var(--CONTENT);
             padding-left: 0.5rem;
         }
         .financials-snapshot__titles__expenses {
+            font-family: var(--CONTENT);
             padding-left: 0.5rem;
         }
         .financials-snapshot__titles__savings {
+            font-family: var(--CONTENT);
             padding-left: 0.5rem;
         }
-        .financials-snapshot__titles__trend {
-            padding-left: 0.5rem;
+        .financials-snapshot__titles__savings--overbought {
+            color: var(--HEALTH_HIGH);
         }
+
+@media (max-width: 450px) {
+    .financials-snapshot__titles {
+        font-size: var(--FONT_SZ_SUB);
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+}

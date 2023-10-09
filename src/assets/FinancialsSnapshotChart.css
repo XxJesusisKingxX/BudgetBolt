@@ -1,9 +1,11 @@
 
 .financials-snapshot-chart {
+    color: var(--FONT_MODE);
+    font-size: var(--FONT_SZ_SUB);
+    font-family: var(--CONTENT_HEADER);
     display: flex;
     gap: 1rem;
-    position: absolute;
-    right: 4rem;
+    padding-right: 3rem;
 }
     .financials-snapshot-chart__legend {
         display: flex;
@@ -81,3 +83,9 @@
           color: red;
         }
     }
+
+@media (max-width: 450px) {
+    .financials-snapshot-chart {
+        display: none;
+    }
+}

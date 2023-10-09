@@ -2,16 +2,17 @@
     background-color: var(--BACKGROUND_MODE);
     box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
     display: flex;
-    justify-content: right;
+    justify-content: center;
     align-items: center;
     height: 3rem;
-    width: 15rem;
     margin: 1.5rem;
     border-radius: 0.5rem;
+    padding-left: 0.5rem;
 }
     .healthind__txt {
+        font-family: var(--CONTENT_HEADER);
         padding-right: 3.5rem;
-        font-size: 1.3rem;
+        font-size: var(--FONT_SZ);
         white-space: nowrap;
     }
     .healthind__dot {

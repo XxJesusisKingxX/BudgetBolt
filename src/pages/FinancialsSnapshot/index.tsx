@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import FinancialsSnapshotComponent from './FinancialsSnapshotComponent';
+import FinancialsSnapshotComponent from './component/FinancialsSnapshotComponent';
 import AppContext from '../../context/AppContext';
 import { useIncome } from './useIncome';
 

@@ -2,8 +2,8 @@ import PlaidLink from '../../Plaid/PlaidLink';
 
 const AccountWindow = () => {
     return (
-        <div data-testid='account-window' className='windowcont windowcont--plaid'>
-            <h1 className='windowcont__title'>Setup Account</h1>
+        <div data-testid='account-window' className='window window__button'>
+            <span className='window__title'>Setup Account</span>
             <PlaidLink/>
         </div>
     );
