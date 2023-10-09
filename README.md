@@ -1,7 +1,13 @@
 # BudgetBolt
 
 <p align="center">
-  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/public/images/logo.png?raw=true" alt="BudgetBolt logo"/>
+  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/public/images/logo.png?raw=true" alt="App logo"/>
+</p>
+
+## Preview
+
+<p align="center">
+  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/ui/design/app.png?raw=true" alt="App Home Page"/>
 </p>
 
 ## Description
