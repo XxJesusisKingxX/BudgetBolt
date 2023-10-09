@@ -89,7 +89,7 @@ export const useExpense = () => {
 
     const showExpenses = (loading = isLoading, expensesList = expenses) => {
         const loadingIcon = `/images/${mode}/loading.png`;
-
+        console.log(expensesList)
         const rows = expensesList.slice().map((expense: Expense) => (
             <ExpenseComponent
             key={expense.expense_id}

@@ -110,7 +110,7 @@ export const useBill = () => {
           
             return resultString;
         }
-
+        console.log(billList)
         let billCount = 0; // Track amount of bills added
         const maxBillsShown = 9; // max amount of bills to show
         const maxChar = 4; // max amount characters to show for bill name

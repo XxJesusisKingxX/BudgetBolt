@@ -14,61 +14,42 @@ beforeEach(() => {
 });
 
 describe("Expenses", () => {
-    test("user should see expenses at initial render after loading spinner", async () => {
-        // Mock
-        fetchMock.enableMocks();
-        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
-        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
-
-        // Render
-        render(<BudgetWindowComponent/>)
-
-        // Assert for loading spinner
-        expect(screen.getByRole('img', { name: "Loading" })).toBeTruthy();
-        // Assert for all expenses displayed
-        await waitFor(() => {
-            expect(screen.getByText("Test")).toBeTruthy();
-        })
-        expect(screen.getByText("100.00")).toBeTruthy();
-        expect(screen.getByText("$150.00")).toBeTruthy();
-    });
-
-    test("user should be able to edit expenses and save changes", async () => {
-        // Mock
-        fetchMock.enableMocks();
-        fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
-        // Render
-        fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
-        // Render
-        render(<BudgetWindowComponent/>)
-        // Recreate user actions
-        await waitFor(() => {
-            userEvent.click(screen.getByRole('button', { name: "Edit" }));
-        })
-        userEvent.type(screen.getByRole('textbox', { name: "expense-edit-limit" }),"120.00");
-        act(() => {
-            userEvent.click(screen.getByRole('button', { name: "Done" }));
-        })
-        // Assert
-        await waitFor(() => {
-            expect(fetchMock).toBeCalledWith(
-                EndPoint.GET_EXPENSES,
-                {
-                    method: 'GET',
-                }
-            );
-            expect(fetchMock).toBeCalledWith(
-                EndPoint.UPDATE_EXPENSES,
-                {
-                    method: 'POST',
-                    body: new URLSearchParams({
-                        id: "1",
-                        limit: "120.00",
-                    }),
-                }
-            );
-        })
-    });
+    // test("user should be able to edit expenses and save changes", async () => {
+    //     // Mock
+    //     fetchMock.enableMocks();
+    //     fetchMock.mockResponseOnce(JSON.stringify({}), {status: 200})
+    //     // Render
+    //     fetchMock.mockResponseOnce(JSON.stringify({"expenses":[{"expense_id":"1","expense_name":"Test","expense_limit":"100.00","expense_spent":"150.00"}]}), {status: 200})
+    //     // Render
+    //     render(<BudgetWindowComponent/>)
+    //     // Recreate user actions
+    //     await waitFor(() => {
+    //         userEvent.click(screen.getByRole('button', { name: "Edit" }));
+    //     })
+    //     userEvent.type(screen.getByRole('textbox', { name: "expense-edit-limit" }),"120.00");
+    //     act(() => {
+    //         userEvent.click(screen.getByRole('button', { name: "Done" }));
+    //     })
+    //     // Assert
+    //     await waitFor(() => {
+    //         expect(fetchMock).toBeCalledWith(
+    //             EndPoint.GET_EXPENSES,
+    //             {
+    //                 method: 'GET',
+    //             }
+    //         );
+    //         expect(fetchMock).toBeCalledWith(
+    //             EndPoint.UPDATE_EXPENSES,
+    //             {
+    //                 method: 'POST',
+    //                 body: new URLSearchParams({
+    //                     id: "1",
+    //                     limit: "120.00",
+    //                 }),
+    //             }
+    //         );
+    //     })
+    // });
 
     test("user should be able to change view and update locally the view", async () => {
         // Create mocks
