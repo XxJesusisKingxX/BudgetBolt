@@ -10,18 +10,18 @@ afterEach(() => {
     initState.showSignUpWindow = showSignUpWindow;
 })
 
-describe("Render AccountWindow:", () => {
+describe("Render SignUpWindow:", () => {
     test("hide form", () => {
         renderWithLoginContext(<Auth/>);
-        expect(screen.queryByRole('heading', {name: "Create an Account Close"})).toBeFalsy();
+        expect(screen.queryByText("Create an Account")).toBeFalsy();
     });
 
     test("show form", () => {
         initState.showSignUpWindow = true
         renderWithLoginContext(<Auth/>)
-        expect(screen.getByRole('heading', {name: "Create an Account Close"})).toBeTruthy();
-        expect(screen.queryByRole('heading', {name: "Sign In Close"})).toBeFalsy();
-        expect(screen.queryByRole('heading', {name: "Setup Account"})).toBeFalsy();
+        expect(screen.getByText("Create an Account")).toBeTruthy();
+        expect(screen.queryByText("Sign In")).toBeFalsy();
+        expect(screen.queryByText("Setup Account")).toBeFalsy();
     });
 
 });

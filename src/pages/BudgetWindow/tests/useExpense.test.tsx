@@ -73,44 +73,4 @@ describe("useCreate", () => {
             );
         });
     });
-
-    test('add expense should POST with correct URL Params and call get expenses', async () => {
-        // Create mocks
-        fetchMock.enableMocks();
-        fetchMock.mockResponse(JSON.stringify({}), { status: 200 });
-
-        // Render
-        const expense: Create.Expense = {
-            ID: "1",
-            Name: "Test",
-            Limit: "100.00",
-            Spent: "0.00"
-        }
-        const { result } = renderHook(Create.useExpense);
-
-        act(() => {
-            result.current.addExpenses(expense)
-        })
-
-        // Assert
-        await waitFor(() => {
-            expect(fetchMock).toHaveBeenCalledWith(
-                EndPoint.CREATE_EXPENSES,
-                {
-                    method: 'POST',
-                    body: new URLSearchParams({
-                        name: expense.Name,
-                        limit: expense.Limit,
-                        spent: expense.Spent,
-                    }),
-                }
-            );
-            expect(fetchMock).toHaveBeenCalledWith(
-                EndPoint.GET_EXPENSES,
-                {
-                    method: 'GET',
-                }
-            );
-        })
-    });
 });

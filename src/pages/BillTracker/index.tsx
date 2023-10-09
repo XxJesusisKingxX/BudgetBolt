@@ -1,5 +1,5 @@
 import Bill from './components/Bill';
-import '../../assets/view/styles/billtracker/View.css'
+import '../../assets/Bill.css'
 
 const BillTracker = () => {
     return (

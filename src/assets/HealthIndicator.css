@@ -1,0 +1,38 @@
+.healthind {
+    background-color: var(--BACKGROUND_MODE);
+    box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    margin: 1.5rem;
+    border-radius: 0.5rem;
+    padding-left: 0.5rem;
+}
+    .healthind__txt {
+        font-family: var(--CONTENT_HEADER);
+        padding-right: 3.5rem;
+        font-size: var(--FONT_SZ);
+        white-space: nowrap;
+    }
+    .healthind__dot {
+        border-radius: 50%;
+        height: 1rem;
+        width: 1rem;
+        position: relative;
+        right: 1rem;
+        transition: background-color 1s;
+        border: 0.1rem solid var(--FONT_MODE);
+    }
+    .healthind__dot--default {
+        background-color: var(--HEALTH_NONE);
+    }
+    .healthind__dot--red {
+        background-color: var(--HEALTH_HIGH);
+    }
+    .healthind__dot--yellow {
+        background-color: var(--HEALTH_MEDIUM);
+    }
+    .healthind__dot--green {
+        background-color: var(--HEALTH_LOW);
+    }

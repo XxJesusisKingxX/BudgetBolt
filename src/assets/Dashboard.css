@@ -1,0 +1,28 @@
+.dashboard {
+    font-family: var(--CONTENT_HEADER);
+    font-size: var(--FONT_SZ);
+    background-color: var(--WINDOW_MODE);
+    top: 5rem;
+    right: 0;
+    border-radius: 1rem;
+    outline: var(--FONT_MODE) solid 0.2rem;
+    animation: reveal 1s forwards;
+}
+    .dashboard__header {
+        display: flex;
+        border-bottom: 0.2rem solid var(--FONT_MODE);
+        justify-content: space-around;
+    }
+    .dashboard__widgets {
+        display: flex;
+        flex-direction: column;
+    }
+        .dashboard__widgets__top {
+            display: flex;
+            justify-content: center;
+        }
+        @media (max-width: 1208px) {
+            .dashboard__widgets__top {
+                display: block;
+            }
+        }

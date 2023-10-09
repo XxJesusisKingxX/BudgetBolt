@@ -5,6 +5,7 @@ import AppContext from '../../context/AppContext';
 import ThemeContext from '../../context/ThemeContext';
 import LoginContext from '../../context/LoginContext';
 import { getCookie } from '../../utils/cookie';
+import '../../assets/Loading.css'
 
 // Transaction interface for a single transaction
 interface Transactions {
@@ -23,7 +24,7 @@ const Transaction = () => {
     const { mode } = useContext(ThemeContext);
     const { isLogin } = useContext(LoginContext);
 
-    const maxPeek = 6; // Maximum number of transactions to display
+    const maxPeek = 7; // Maximum number of transactions to display
     const maxChar = 18; // Maximum number of characters for transaction name
     const everyHour = 3600000; // Interval for hourly update check
 
@@ -94,7 +95,7 @@ const Transaction = () => {
         }
     }
     return (
-        <>
+        <div className='transaction'>
             {!isLoading && transactions ? transactions.slice(0, maxPeek).map((transaction: any) => (
                 <TransactionComponent
                     key={transaction.transaction_id}
@@ -104,9 +105,9 @@ const Transaction = () => {
                     mode={mode}
                 />
             )) : (
-                <img className="loading loading--trans" src={loading} alt="Loading" />
+                <img className='loading loading--largecenter' src={loading} alt='Loading' />
             )}
-        </>
+        </div>
     );
 };
 

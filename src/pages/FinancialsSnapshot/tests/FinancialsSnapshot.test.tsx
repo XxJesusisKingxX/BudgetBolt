@@ -30,9 +30,12 @@ describe("FinancialsSnapshot", () => {
         renderWithAppContext(<FinancialsSnapshot/>);
 
         // Assert
-        expect(screen.getByRole('heading', {name: "Total Income: $1000.00"})).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: "Total Expenses: $550.00"})).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: "Total Savings: $450.00"})).toBeInTheDocument();
+        expect(screen.getByText("Total Income:")).toBeInTheDocument();
+        expect(screen.getByText("$1000.00")).toBeInTheDocument();
+        expect(screen.getByText("Total Expenses:")).toBeInTheDocument();
+        expect(screen.getByText("$550.00")).toBeInTheDocument();
+        expect(screen.getByText("Total Savings:")).toBeInTheDocument();
+        expect(screen.getByText("$450.00")).toBeInTheDocument();
         expect(screen.getByText("45%")).toBeInTheDocument();
         expect(screen.getByText("55%")).toBeInTheDocument();
         await waitFor(() => {

@@ -1,0 +1,20 @@
+.budget-overview {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 7rem;
+    gap: 8rem;
+    padding-bottom: 1rem;
+}
+
+@media (max-width: 1208px) {
+    .budget-overview {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+        top: 5rem;
+        gap: 4rem;
+        padding-bottom: 1rem;
+    }
+}

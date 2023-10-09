@@ -1,4 +1,4 @@
-import './Header.css';
+import '../../assets/Header.css';
 import { FC, ReactNode } from 'react';
 
 interface Props {

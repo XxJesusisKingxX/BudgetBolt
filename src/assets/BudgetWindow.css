@@ -1,0 +1,145 @@
+.miniwindow {
+    color: var(--FONT_MODE);
+    font-family: var(--CONTENT);
+    display: flex;
+    justify-content: center;
+    background-color: var(--BACKGROUND_MODE);
+    box-shadow: -0.2rem 0.2rem 0.2rem 0.2rem var(--FONT_MODE);
+    margin: 1.5rem;
+    padding-right: 1rem;
+    padding-bottom: 1.4rem;
+    border-radius: 0.5rem;
+}
+
+    .miniwindow__view {
+        display: flex;
+        flex-direction: column;
+        margin: 1rem;
+    }
+        .miniwindow__view__header {
+            padding-top: 0.5rem;
+            font-family: var(--CONTENT_HEADER);
+            font-size: var(--FONT_SZ_SUB);
+            margin: 0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .miniwindow__view__list {
+            font-family: var(--CONTENT_ACCENT);
+            height: 1.5rem;
+            width: 5rem;
+            border-radius: 0.3rem;
+            border: 0.15rem solid var(--FONT_MODE);
+            background-color: var(--WINDOW_MODE_L);
+        }
+        .miniwindow__view__list:hover {
+            transition: 0.2s;
+            background-color: var(--WINDOW_MODE);
+        }
+        
+    .miniwindow__budget {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+        .miniwindow__budget__header {
+            font-family: var(--CONTENT_HEADER);
+            font-size: var(--FONT_SZ);
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+            right: 2rem;
+            width: 100%;
+            padding-top: 0.5rem;
+        }
+            .miniwindow__budget__header__item--spent {
+                position: relative;
+                right: 1rem;
+            }
+            .miniwindow__budget__header__item--limit {
+                position: relative;
+                left: 0.5rem;
+            }
+
+        .miniwindow__budget__view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            top: 1rem;
+            box-shadow: inset 0rem 0rem 0.5rem 0.2rem var(--FONT_MODE);
+            position: relative;
+            overflow: auto;
+            overflow-x: hidden;
+            padding-left: 0.5rem;
+            /* scrollbar-width: thin;
+            scrollbar-color: var(--FONT_MODE) var(--WINDOW_MODE_L); */
+        }
+        
+.expense-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 0.4fr;
+    text-align: center;
+    align-items: center;
+    border-bottom: 0.1rem solid var(--FONT_MODE);
+    width: 100%;
+    opacity: 0%;
+    animation: reveal 0.5s forwards;
+    font-size: var(--FONT_SZ_TXT);
+    padding-right: 0.5rem;
+}
+
+    .expense-grid__item {
+      font-family: var(--CONTENT);
+      padding: 0.5rem;
+    }
+    .expense-grid__item--name {
+        text-align: left;
+    }
+    .expense-grid__item--overbudget {
+        font-family: var(--CONTENT_HEADER);
+        color: var(--HEALTH_HIGH);
+    }
+    .expense-grid__item--input {
+        padding: 0.2rem;
+        width: 3rem;
+        height: 0.25rem;
+        outline: none;
+    }
+            .miniwindow__budget__view__loading {
+                position: relative;
+                top: 3rem;
+                width: 80px;
+                animation: loading 1.2s infinite;
+            }
+
+@media (max-width: 375px) {
+    .miniwindow__view {
+        display: flex;
+        flex-direction: column;
+        margin: 1rem;
+        left: 0.5rem; /* changed */
+        position: relative; /* changed */
+    }
+    .miniwindow__budget__header {
+        font-family: var(--CONTENT_HEADER);
+        font-size: var(--FONT_SZ_TXT); /* changed */
+        display: flex;
+        justify-content: space-around;
+        position: relative;
+        right: 1rem;
+        width: 100%;
+        padding-top: 0.5rem;
+    }
+    .expense-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 0.4fr;
+        text-align: center;
+        align-items: center;
+        border-bottom: 0.1rem solid var(--FONT_MODE);
+        width: 100%;
+        opacity: 0%;
+        animation: reveal 0.5s forwards;
+        font-size: var(--FONT_SZ_MOBILE); /* changed */
+        padding-right: 0.5rem;
+    }
+}

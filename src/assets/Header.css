@@ -1,0 +1,26 @@
+.nav {
+    position: absolute;
+}
+    .nav__logo {
+        display: flex;
+        position: relative;
+        justify-content: center;
+    }
+    .nav__logo--default {
+        color: var(--FONT_MODE);
+        font-size: 2.5rem;
+        font-family: var(--CONTENT_HEADER);
+    }
+.nav--border {
+    width: 100%;
+    border-bottom: 2px solid var(--FONT_MODE);
+}
+
+@media (max-width: 390px) {
+    .nav__logo {
+        display: flex;
+        position: relative;
+        justify-content: center;
+        padding-left: 2rem;
+    }
+}

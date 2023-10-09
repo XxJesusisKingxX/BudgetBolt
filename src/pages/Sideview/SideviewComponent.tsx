@@ -1,5 +1,5 @@
 import React from 'react';
-import './Sideview.css';
+import '../../assets/Sideview.css';
 import Transaction from '../Transaction';
 import Refresh from '../Refresh';
 
@@ -10,13 +10,13 @@ interface Props {
 
 const SideviewComponent: React.FC<Props> = ({ lastUpdate }) => {
     return (
-        <div id='sidebar' className='sidebar'> {/* Container div for the sidebar */}
-            <div className='sidebar__border'> {/* Top border section */}
-                <span className='sidebar__border__title'>Recent Transaction</span> {/* Title for the recent transaction section */}
+        <div id='sidebar' className='sidebar'>
+            <div className='sidebar__header'>
+                <span className='sidebar__header__title'>Recent Transaction</span>
+                <Refresh />
             </div>
-            <span className='sidebar__footer'>Last updated: {lastUpdate}</span> {/* Last update information */}
-            <Refresh /> {/* Refresh button */}
-            <Transaction /> {/* Recent transaction content */}
+            <Transaction />
+            <span className='sidebar__footer'>Last updated: {lastUpdate}</span>
         </div>
     );
 };
