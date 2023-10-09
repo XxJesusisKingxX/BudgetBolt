@@ -7,7 +7,7 @@
 ## Preview
 
 <p align="center">
-  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/design/ui/app.png?raw=true" alt="App Home Page"/>
+  <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/design/ui/v1/app.png?raw=true" alt="App Home Page"/>
 </p>
 
 ## Description
