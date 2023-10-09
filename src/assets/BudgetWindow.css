@@ -112,7 +112,7 @@
                 animation: loading 1.2s infinite;
             }
 
-@media (max-width: 360px) {
+@media (max-width: 375px) {
     .miniwindow__view {
         display: flex;
         flex-direction: column;
