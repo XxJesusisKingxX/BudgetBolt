@@ -1,4 +1,4 @@
-# BudgetBolt
+# FinTrackHub
 
 <p align="center">
   <img src="https://github.com/XxJesusisKingxX/BudgetBolt/blob/main/public/images/logo.png?raw=true" alt="App logo"/>
@@ -12,7 +12,7 @@
 
 ## Description
 
-**BudgetBolt** is a cutting-edge tool designed to streamline and automate the process of monitoring personal finances. This innovative application offers a comprehensive solution to effortlessly track spending, upcoming bills, and provide users with a quick overview of their financial transactions, income, and expenses.
+**FinTrackHub** is a cutting-edge tool designed to streamline and automate the process of monitoring personal finances. This innovative application offers a comprehensive solution to effortlessly track spending, upcoming bills, and provide users with a quick overview of their financial transactions, income, and expenses.
 
 ## Key Features
 
@@ -32,4 +32,4 @@
 
 ## Conclusion
 
-"BudgetBolt" empowers users to take control of their finances effortlessly, providing a convenient way to manage and optimize their financial well-being. Whether you're saving for a big purchase, managing everyday expenses, or simply seeking financial clarity, our application is your ultimate financial companion. Start your journey to financial success today!
+"FinTrackHub" empowers users to take control of their finances effortlessly, providing a convenient way to manage and optimize their financial well-being. Whether you're saving for a big purchase, managing everyday expenses, or simply seeking financial clarity, our application is your ultimate financial companion. Start your journey to financial success today!
